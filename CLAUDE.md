@@ -37,8 +37,8 @@ https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9.
 
 ### Core palette
 ```
-Olive 900 (dark bg):     #1B1F15
-Olive 800 (elevated):    #2A2F22
+Olive 900 (dark bg):     #1C1D1A  ← gris neutre désaturé
+Olive 800 (elevated):    #2A2B27
 Paper 200 (light bg):    #F0E6D8
 Paper 100 (light surface):#F7F1E8
 Lite 300 (accent dark):  #C8FF3C  ← signature color, SIGNAL not background

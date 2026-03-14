@@ -4,10 +4,10 @@
 
 /* ── TOKENS ──────────────────────────────────────── */
 :root {
-  --lc-color-olive-950: #0E1009;
-  --lc-color-olive-900: #1B1F15;
-  --lc-color-olive-800: #2A2F22;
-  --lc-color-olive-700: #3A3F32;
+  --lc-color-olive-950: #101110;
+  --lc-color-olive-900: #1C1D1A;
+  --lc-color-olive-800: #2A2B27;
+  --lc-color-olive-700: #3A3B37;
   --lc-color-olive-600: #4E5444;
   --lc-color-olive-500: #6B7260;
   --lc-color-olive-400: #8A9080;

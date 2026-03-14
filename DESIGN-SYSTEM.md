@@ -96,10 +96,10 @@ font-family: 'IBM Plex Mono', Menlo, monospace;
 **Olive (Dark backgrounds)**
 | Token     | Hex       | Usage                                  |
 |-----------|-----------|----------------------------------------|
-| olive-950 | #0E1009   | Background le plus sombre              |
-| olive-900 | #1B1F15   | Background principal dark              |
-| olive-800 | #2A2F22   | Surfaces élevées dark (cards, sidebar) |
-| olive-700 | #3A3F32   | Borders actives dark                   |
+| olive-950 | #101110   | Background le plus sombre              |
+| olive-900 | #1C1D1A   | Background principal dark (gris neutre désaturé) |
+| olive-800 | #2A2B27   | Surfaces élevées dark (cards, sidebar) |
+| olive-700 | #3A3B37   | Borders actives dark                   |
 | olive-600 | #4E5444   | Texte tertiaire dark                   |
 | olive-500 | #6B7260   | Texte disabled dark                    |
 

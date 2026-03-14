@@ -17,11 +17,11 @@
    ──────────────────────────────────────────────────────────────── */
 
 :root {
-  /* Olive Dark Family */
-  --lc-color-olive-950: #0E1009;
-  --lc-color-olive-900: #1B1F15;
-  --lc-color-olive-800: #2A2F22;
-  --lc-color-olive-700: #3A3F32;
+  /* Dark Neutral Family (desaturated olive) */
+  --lc-color-olive-950: #101110;
+  --lc-color-olive-900: #1C1D1A;
+  --lc-color-olive-800: #2A2B27;
+  --lc-color-olive-700: #3A3B37;
   --lc-color-olive-600: #4E5444;
   --lc-color-olive-500: #6B7260;
   --lc-color-olive-400: #8A9080;
@@ -99,7 +99,7 @@
   --lc-surface-tertiary:    var(--lc-color-paper-200);
   --lc-surface-elevated:    var(--lc-color-white);
   --lc-surface-sunken:      var(--lc-color-paper-300);
-  --lc-surface-overlay:     rgba(27, 31, 21, 0.5);
+  --lc-surface-overlay:     rgba(28, 29, 26, 0.5);
 
   /* Text */
   --lc-text-primary:        var(--lc-color-olive-900);
@@ -142,10 +142,10 @@
   --lc-interactive-ghost-hover:   var(--lc-color-paper-200);
 
   /* Shadows */
-  --lc-shadow-sm:  0 1px 2px rgba(27, 31, 21, 0.05);
-  --lc-shadow-md:  0 4px 12px rgba(27, 31, 21, 0.08);
-  --lc-shadow-lg:  0 12px 40px rgba(27, 31, 21, 0.1);
-  --lc-shadow-xl:  0 24px 80px rgba(27, 31, 21, 0.14);
+  --lc-shadow-sm:  0 1px 2px rgba(28, 29, 26, 0.05);
+  --lc-shadow-md:  0 4px 12px rgba(28, 29, 26, 0.08);
+  --lc-shadow-lg:  0 12px 40px rgba(28, 29, 26, 0.1);
+  --lc-shadow-xl:  0 24px 80px rgba(28, 29, 26, 0.14);
 
   /* Chart-specific */
   --lc-chart-primary:    var(--lc-color-lite-300);
@@ -168,7 +168,7 @@
   --lc-surface-tertiary:    var(--lc-color-olive-950);
   --lc-surface-elevated:    var(--lc-color-olive-800);
   --lc-surface-sunken:      var(--lc-color-olive-950);
-  --lc-surface-overlay:     rgba(14, 16, 9, 0.7);
+  --lc-surface-overlay:     rgba(16, 17, 16, 0.7);
 
   /* Text */
   --lc-text-primary:        var(--lc-color-paper-200);
