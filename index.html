@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LiteChange — L'observabilité du changement pour les institutions qui comptent</title>
+<meta name="description" content="LiteChange rend le change management observable. Diagnostic, pilotage, mesure du ROI — fondé sur la recherche académique, forgé par 200+ transformations terrain.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   LITECHANGE.ORG — LANDING PAGE v2.0
+   Mission-driven. Research-backed. Built to last.
+   ═══════════════════════════════════════════ */
+
+:root {
+  --ink: #1B1F15;
+  --ink-mid: #2A2F22;
+  --ink-light: #3A3F32;
+  --paper: #F0E6D8;
+  --paper-light: #F7F1E8;
+  --paper-mid: #E4D9C8;
+  --paper-deep: #D4C8B6;
+  --lite: #C8FF3C;
+  --lite-dim: #9ABF30;
+  --lite-deep: #6B8A1A;
+  --lite-darker: #527A10;
+  --signal: #4A90B8;
+  --warm: #C45A32;
+  --success: #3A8A4A;
+  --warning: #D4A03A;
+  --text-on-dark: #D4CCBE;
+  --text-muted-dark: #8A9080;
+  --text-muted-light: #998B78;
+  --border-dark: rgba(240,230,216,0.08);
+  --border-light: rgba(27,31,21,0.1);
+  --font-display: 'Source Serif 4', Georgia, serif;
+  --font-body: 'DM Sans', 'Helvetica Neue', sans-serif;
+  --font-mono: 'IBM Plex Mono', Menlo, monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  color: var(--ink);
+}
+
+a { text-decoration: none; color: inherit; }
+
+.skip-link {
+  position: absolute; top: -100px; left: 16px; z-index: 200;
+  padding: 8px 16px; background: var(--lite); color: var(--ink);
+  font-weight: 600; border-radius: 0 0 6px 6px; transition: top 0.2s;
+}
+.skip-link:focus { top: 0; }
+
+.container { max-width: 1140px; margin: 0 auto; padding: 0 40px; }
+
+@media (max-width: 768px) { .container { padding: 0 20px; } }
+
+
+/* ── FADE-UP ANIMATION ── */
+
+.fade-up {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.fade-up[data-delay="1"] { transition-delay: 0.1s; }
+.fade-up[data-delay="2"] { transition-delay: 0.2s; }
+.fade-up[data-delay="3"] { transition-delay: 0.3s; }
+
+
+/* ── NAV ── */
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 16px 40px;
+  background: rgba(27,31,21,0.85);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-dark);
+  display: flex; align-items: center; justify-content: space-between;
+  transition: padding 0.3s, background 0.3s;
+}
+nav.scrolled {
+  padding: 12px 40px;
+  background: rgba(27,31,21,0.95);
+}
+
+.nav-logo {
+  font-family: var(--font-display); font-size: 20px; font-weight: 400;
+  color: var(--paper);
+}
+.nav-logo .lite { color: var(--lite); font-style: italic; font-weight: 300; }
+.nav-logo .dot {
+  display: inline-block; width: 5px; height: 5px; background: var(--lite);
+  border-radius: 50%; margin-left: 1px; vertical-align: baseline;
+  position: relative; top: -3px;
+  box-shadow: 0 0 8px rgba(200,255,60,0.4);
+  animation: glow-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 6px rgba(200,255,60,0.3); }
+  50% { box-shadow: 0 0 14px rgba(200,255,60,0.6); }
+}
+
+.nav-links { display: flex; align-items: center; gap: 32px; }
+.nav-links a { font-size: 14px; color: var(--text-on-dark); transition: color 0.2s; }
+.nav-links a:hover { color: var(--paper); }
+
+.nav-cta {
+  padding: 8px 20px; border-radius: 10px;
+  background: var(--lite); color: var(--ink);
+  font-size: 14px; font-weight: 600; transition: all 0.2s;
+}
+.nav-cta:hover { background: #D8FF72; }
+
+.nav-burger {
+  display: none; background: none; border: none; cursor: pointer;
+  width: 28px; height: 20px; position: relative; flex-shrink: 0;
+}
+.nav-burger span {
+  display: block; position: absolute; left: 0; right: 0;
+  height: 2px; background: var(--paper); border-radius: 2px;
+  transition: all 0.3s;
+}
+.nav-burger span:nth-child(1) { top: 0; }
+.nav-burger span:nth-child(2) { top: 9px; }
+.nav-burger span:nth-child(3) { top: 18px; }
+.nav-burger.open span:nth-child(1) { top: 9px; transform: rotate(45deg); }
+.nav-burger.open span:nth-child(2) { opacity: 0; }
+.nav-burger.open span:nth-child(3) { top: 9px; transform: rotate(-45deg); }
+
+.nav-mobile {
+  display: none; position: fixed; top: 56px; left: 0; right: 0;
+  background: rgba(27,31,21,0.98); backdrop-filter: blur(20px);
+  padding: 24px 40px 32px; flex-direction: column; gap: 20px;
+  border-bottom: 1px solid var(--border-dark);
+  transform: translateY(-10px); opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  pointer-events: none;
+}
+.nav-mobile.open {
+  display: flex; transform: translateY(0); opacity: 1; pointer-events: auto;
+}
+.nav-mobile a {
+  font-size: 16px; color: var(--text-on-dark); padding: 8px 0;
+  border-bottom: 1px solid var(--border-dark);
+}
+.nav-mobile .nav-cta {
+  text-align: center; margin-top: 8px; border-bottom: none;
+  color: var(--ink);
+}
+
+@media (max-width: 900px) {
+  .nav-links { display: none; }
+  .nav-burger { display: block; }
+  nav { padding: 14px 20px; }
+}
+
+
+/* ═══════════ 1. HERO ═══════════ */
+
+.hero {
+  background: var(--ink); color: var(--paper);
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  text-align: center; position: relative; overflow: hidden;
+  padding: 120px 40px 100px;
+}
+
+.hero::before {
+  content: ''; position: absolute;
+  top: 50%; left: 50%; transform: translate(-50%, -55%);
+  width: 800px; height: 800px;
+  background: radial-gradient(circle, rgba(200,255,60,0.04) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.hero-inner { position: relative; z-index: 1; max-width: 780px; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 20px; border: 1px solid var(--border-dark); border-radius: 9999px;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text-muted-dark); margin-bottom: 48px;
+  animation: hero-fade-up 0.7s ease-out 0.1s both;
+}
+.hero-badge .hb-dot { width: 5px; height: 5px; background: var(--lite); border-radius: 50%; }
+
+.hero h1 {
+  font-family: var(--font-display); font-weight: 400; font-size: clamp(36px, 5.5vw, 64px);
+  line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 28px;
+  animation: hero-fade-up 0.7s ease-out 0.25s both;
+}
+.hero h1 em { font-style: italic; color: var(--lite); font-weight: 300; }
+
+.hero-sub {
+  font-size: clamp(16px, 2vw, 20px); line-height: 1.65; font-weight: 300;
+  color: var(--text-on-dark); max-width: 600px; margin: 0 auto 20px;
+  animation: hero-fade-up 0.7s ease-out 0.4s both;
+}
+
+.hero-proof {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.05em;
+  color: var(--text-muted-dark); margin-bottom: 48px;
+  animation: hero-fade-up 0.7s ease-out 0.5s both;
+}
+.hero-proof strong { color: var(--lite); font-weight: 600; }
+
+.hero-ctas {
+  display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;
+  animation: hero-fade-up 0.7s ease-out 0.6s both;
+}
+
+.btn-primary {
+  display: inline-block;
+  padding: 14px 32px; border-radius: 10px; font-size: 16px; font-weight: 600;
+  background: var(--lite); color: var(--ink); border: none; cursor: pointer;
+  font-family: var(--font-body); transition: all 0.2s;
+}
+.btn-primary:hover { background: #D8FF72; transform: translateY(-1px); }
+
+.btn-secondary {
+  display: inline-block;
+  padding: 14px 32px; border-radius: 10px; font-size: 16px; font-weight: 500;
+  background: transparent; color: var(--paper); border: 1px solid var(--border-dark);
+  cursor: pointer; font-family: var(--font-body); transition: all 0.2s;
+}
+.btn-secondary:hover { border-color: rgba(240,230,216,0.2); background: rgba(240,230,216,0.04); }
+
+@keyframes hero-fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ═══════════ 2. PILIERS ═══════════ */
+
+.pillars {
+  background: var(--ink); color: var(--paper);
+  padding: 100px 0; border-top: 1px solid var(--border-dark);
+}
+
+.pillars-header {
+  max-width: 640px; margin-bottom: 64px;
+}
+
+.section-tag {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; margin-bottom: 20px;
+}
+.pillars .section-tag { color: var(--lite-dim); }
+
+.pillars-header h2 {
+  font-family: var(--font-display); font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 400; line-height: 1.2; margin-bottom: 20px;
+}
+.pillars-header h2 .acc { color: var(--lite); font-style: italic; font-weight: 300; }
+
+.pillars-header p {
+  font-size: 16px; line-height: 1.75; color: var(--text-on-dark);
+}
+
+.pillars-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+}
+
+.pillar {
+  background: var(--ink-mid); padding: 44px 36px; position: relative;
+  transition: background 0.3s;
+}
+.pillar:hover { background: #2E3325; }
+
+.pillar-num {
+  font-family: var(--font-display); font-size: 56px; font-weight: 300;
+  color: rgba(200,255,60,0.05); position: absolute; top: 20px; right: 24px;
+}
+
+.pillar-tag {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--lite-dim); margin-bottom: 12px;
+}
+
+.pillar h3 {
+  font-family: var(--font-display); font-size: 22px; font-weight: 500;
+  line-height: 1.3; margin-bottom: 16px;
+}
+
+.pillar p {
+  font-size: 14px; line-height: 1.75; color: var(--text-on-dark);
+}
+
+.pillar-ref {
+  margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-dark);
+  font-family: var(--font-mono); font-size: 11px; color: var(--text-muted-dark);
+  font-style: italic;
+}
+
+
+/* ═══════════ 3. FONDATEURS & RECHERCHE ═══════════ */
+
+.research {
+  background: var(--paper-light); color: var(--ink); padding: 100px 0;
+}
+
+.research-grid {
+  display: grid; grid-template-columns: 1fr 1.2fr; gap: 80px; align-items: start;
+}
+
+.research .section-tag { color: var(--lite-deep); }
+
+.research-quote {
+  margin-top: 20px;
+}
+
+.research-quote blockquote {
+  font-family: var(--font-display); font-size: clamp(22px, 2.8vw, 32px);
+  font-weight: 400; line-height: 1.4; font-style: italic;
+  border-left: 3px solid var(--lite-deep); padding-left: 28px; margin-bottom: 16px;
+}
+.research-quote blockquote .qacc { color: var(--lite-deep); }
+
+.research-quote cite {
+  display: block; padding-left: 31px;
+  font-family: var(--font-body); font-size: 14px; font-style: normal;
+  color: var(--text-muted-light);
+}
+
+.research-content h3 {
+  font-family: var(--font-display); font-size: 28px; font-weight: 500;
+  margin-bottom: 8px; line-height: 1.3;
+}
+
+.research-role {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.05em;
+  color: var(--lite-deep); margin-bottom: 20px;
+}
+
+.research-bio {
+  font-size: 15px; line-height: 1.75; color: var(--text-muted-light);
+  margin-bottom: 32px;
+}
+
+.research-methods {
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+.method-card {
+  display: flex; gap: 16px; align-items: flex-start;
+  padding: 20px 24px; background: white; border-radius: 10px;
+  border: 1px solid var(--border-light);
+}
+
+.method-marker {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  background: rgba(107,138,26,0.1);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--lite-deep); font-size: 14px; margin-top: 2px;
+}
+
+.method-card h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.method-card p { font-size: 13px; line-height: 1.6; color: var(--text-muted-light); }
+
+
+/* ═══════════ 4. MODULES ═══════════ */
+
+.modules {
+  background: var(--ink); color: var(--paper); padding: 100px 0;
+}
+
+.modules .section-tag { color: var(--lite-dim); }
+
+.modules-header {
+  max-width: 640px; margin-bottom: 64px;
+}
+
+.modules-header h2 {
+  font-family: var(--font-display); font-size: clamp(28px, 3.5vw, 42px);
+  font-weight: 400; line-height: 1.2; margin-bottom: 16px;
+}
+
+.modules-header p {
+  font-size: 16px; line-height: 1.75; color: var(--text-on-dark);
+}
+
+.modules-list { display: flex; flex-direction: column; gap: 2px; }
+
+.module-item {
+  display: grid; grid-template-columns: 80px 1fr 1.2fr; gap: 40px;
+  background: var(--ink-mid); padding: 48px 40px; align-items: start;
+  transition: background 0.3s;
+}
+.module-item:hover { background: #2E3325; }
+
+.module-num {
+  font-family: var(--font-display); font-size: 48px; font-weight: 300;
+  color: rgba(200,255,60,0.1); line-height: 1;
+}
+
+.module-info h3 {
+  font-family: var(--font-display); font-size: 24px; font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.module-sub {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.05em;
+  color: var(--lite-dim); margin-bottom: 16px;
+}
+
+.module-info p {
+  font-size: 14px; line-height: 1.75; color: var(--text-on-dark);
+}
+
+.module-features {
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.module-feature {
+  display: flex; gap: 10px; align-items: flex-start;
+  font-size: 13px; line-height: 1.6; color: var(--text-on-dark);
+}
+
+.mf-dot {
+  width: 5px; height: 5px; border-radius: 50%; background: var(--lite-dim);
+  flex-shrink: 0; margin-top: 7px;
+}
+
+.module-insight {
+  margin-top: 20px; padding: 14px 18px;
+  background: rgba(200,255,60,0.03);
+  border-left: 2px solid var(--lite-deep);
+  border-radius: 0 6px 6px 0;
+  font-size: 13px; font-style: italic; line-height: 1.6;
+  color: var(--paper); font-family: var(--font-display);
+}
+
+
+/* ═══════════ 5. DASHBOARD ═══════════ */
+
+.dashboard-section {
+  background: var(--ink); color: var(--paper); padding: 100px 0;
+  border-top: 1px solid var(--border-dark);
+}
+
+.dashboard-section .section-tag { color: var(--lite-dim); }
+
+.dashboard-intro {
+  max-width: 640px; margin-bottom: 48px;
+}
+
+.dashboard-intro h2 {
+  font-family: var(--font-display); font-size: clamp(26px, 3vw, 38px);
+  font-weight: 400; line-height: 1.25; margin-bottom: 16px;
+}
+
+.dashboard-intro p {
+  font-size: 16px; line-height: 1.75; color: var(--text-on-dark);
+}
+
+.dash-frame {
+  background: var(--paper-light); border-radius: 16px; overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.3);
+}
+
+.dash-chrome {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 20px; background: var(--ink);
+}
+.dash-dots { display: flex; gap: 5px; }
+.dash-dots span { width: 10px; height: 10px; border-radius: 50%; }
+.dash-dots span:nth-child(1) { background: #ff5f57; }
+.dash-dots span:nth-child(2) { background: #febc2e; }
+.dash-dots span:nth-child(3) { background: #28c840; }
+.dash-url {
+  flex: 1; text-align: center; font-family: var(--font-mono);
+  font-size: 11px; color: var(--text-muted-dark);
+}
+
+.dash-body { display: grid; grid-template-columns: 200px 1fr; min-height: 440px; }
+
+.dash-sidebar {
+  background: var(--ink); padding: 24px 16px;
+}
+.dash-sidebar-logo {
+  font-family: var(--font-display); font-size: 18px; color: var(--paper);
+  margin-bottom: 28px; padding-left: 10px;
+}
+.dash-sidebar-logo .lite { color: var(--lite); font-style: italic; font-weight: 300; }
+
+.dash-nav {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: 6px; font-size: 12px;
+  color: var(--text-muted-dark); margin-bottom: 2px;
+}
+.dash-nav.active { background: rgba(200,255,60,0.08); color: var(--lite); }
+.dash-nav-icon {
+  width: 16px; height: 16px; border-radius: 3px; font-size: 9px;
+  background: rgba(240,230,216,0.05);
+  display: flex; align-items: center; justify-content: center;
+}
+.dash-nav.active .dash-nav-icon { background: rgba(200,255,60,0.15); }
+
+.dash-main { padding: 24px 28px; color: var(--ink); }
+
+.dash-header {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+}
+.dash-header h3 { font-size: 18px; font-weight: 600; }
+.dash-live {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.05em;
+  padding: 4px 12px; border-radius: 9999px;
+  background: rgba(107,138,26,0.15); color: var(--lite-deep);
+}
+
+.dash-kpis { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+
+.dash-kpi {
+  background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--paper-mid);
+}
+.dash-kpi-label {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--text-muted-light); margin-bottom: 6px; font-weight: 500;
+}
+.dash-kpi-val { font-size: 24px; font-weight: 700; color: var(--ink); }
+.dash-kpi-trend { font-family: var(--font-mono); font-size: 10px; margin-top: 3px; }
+.trend-up { color: var(--success); }
+.trend-down { color: var(--warm); }
+
+.dash-chart {
+  background: white; border-radius: 8px; border: 1px solid var(--paper-mid);
+  padding: 20px; margin-bottom: 16px;
+}
+.dash-chart-title { font-size: 12px; font-weight: 600; margin-bottom: 16px; }
+.dash-bars { display: flex; align-items: flex-end; gap: 4px; height: 100px; }
+.dash-bar { flex: 1; border-radius: 3px 3px 0 0; min-width: 0; }
+.db-g { background: var(--lite); opacity: 0.85; }
+.db-b { background: var(--signal); opacity: 0.6; }
+.db-o { background: var(--warm); opacity: 0.5; }
+
+.dash-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.dash-card {
+  background: white; border-radius: 8px; border: 1px solid var(--paper-mid); padding: 16px;
+}
+.dash-card-title { font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+.dash-risk {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 0; border-bottom: 1px solid var(--paper-mid);
+  font-size: 11px;
+}
+.dash-risk:last-child { border-bottom: none; }
+.dr-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dr-high { background: var(--warm); }
+.dr-med { background: var(--warning); }
+.dr-low { background: var(--success); }
+.dr-bar { flex: 1; height: 3px; background: var(--paper-mid); border-radius: 2px; overflow: hidden; }
+.dr-fill { height: 100%; border-radius: 2px; }
+
+
+/* ═══════════ 6. SECTEURS ═══════════ */
+
+.sectors {
+  background: var(--paper-light); color: var(--ink); padding: 100px 0;
+}
+
+.sectors .section-tag { color: var(--lite-deep); }
+
+.sectors-header {
+  max-width: 640px; margin-bottom: 64px;
+}
+
+.sectors-header h2 {
+  font-family: var(--font-display); font-size: clamp(28px, 3.5vw, 42px);
+  font-weight: 400; line-height: 1.2; margin-bottom: 16px;
+}
+
+.sectors-header p {
+  font-size: 16px; line-height: 1.75; color: var(--text-muted-light);
+}
+
+.sectors-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
+  margin-bottom: 64px;
+}
+
+.sector-card {
+  padding: 36px 32px; background: white; border-radius: 10px;
+  border: 1px solid var(--border-light); transition: all 0.2s;
+}
+.sector-card:hover { box-shadow: 0 4px 12px rgba(27,31,21,0.08); }
+
+.sector-card h3 {
+  font-family: var(--font-display); font-size: 20px; font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.sector-card p {
+  font-size: 14px; line-height: 1.7; color: var(--text-muted-light); margin-bottom: 16px;
+}
+
+.sector-clients {
+  font-family: var(--font-mono); font-size: 11px; color: var(--lite-deep);
+  letter-spacing: 0.02em;
+}
+
+.sectors-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  padding: 48px 0; border-top: 1px solid var(--border-light);
+}
+
+.stat-block { text-align: center; }
+.stat-val {
+  font-family: var(--font-display); font-size: 40px; font-weight: 400;
+  color: var(--lite-deep); margin-bottom: 8px;
+}
+.stat-label {
+  font-size: 14px; color: var(--text-muted-light); max-width: 200px; margin: 0 auto;
+}
+
+
+/* ═══════════ 7. CTA ═══════════ */
+
+.cta-section {
+  background: var(--ink); color: var(--paper); padding: 100px 0;
+}
+
+.cta-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start;
+}
+
+.cta-left .section-tag { color: var(--lite-dim); }
+
+.cta-left h2 {
+  font-family: var(--font-display); font-size: clamp(28px, 3.5vw, 42px);
+  font-weight: 400; line-height: 1.2; margin-bottom: 20px;
+}
+.cta-left h2 em { font-style: italic; color: var(--lite); font-weight: 300; }
+
+.cta-left p {
+  font-size: 16px; line-height: 1.75; color: var(--text-on-dark); margin-bottom: 32px;
+}
+
+.cta-checks { display: flex; flex-direction: column; gap: 12px; }
+.cta-check {
+  display: flex; gap: 12px; align-items: flex-start;
+  font-size: 14px; color: var(--text-on-dark);
+}
+.cta-check-icon {
+  width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+  background: rgba(200,255,60,0.1); color: var(--lite);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; margin-top: 1px;
+}
+
+.cta-form {
+  background: var(--ink-mid); border-radius: 16px; padding: 40px;
+  border: 1px solid var(--border-dark);
+}
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1 / -1; }
+
+.form-label {
+  font-size: 13px; font-weight: 500; color: var(--text-on-dark);
+}
+
+.form-input, .form-select {
+  padding: 12px 16px; border-radius: 10px;
+  border: 1px solid var(--border-dark); background: var(--ink);
+  font-family: var(--font-body); font-size: 15px; color: var(--paper);
+  outline: none; transition: border-color 0.2s;
+}
+.form-input::placeholder { color: var(--text-muted-dark); }
+.form-input:focus, .form-select:focus {
+  border-color: var(--lite);
+  box-shadow: 0 0 0 3px rgba(200,255,60,0.06);
+}
+
+.form-select {
+  appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%238A9080' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+}
+.form-select option { background: var(--ink); }
+
+.form-submit {
+  width: 100%; padding: 14px; border-radius: 10px; border: none;
+  background: var(--lite); color: var(--ink); font-family: var(--font-body);
+  font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  margin-top: 8px;
+}
+.form-submit:hover { background: #D8FF72; }
+
+.form-note {
+  text-align: center; margin-top: 16px;
+  font-size: 13px; color: var(--text-muted-dark);
+}
+
+
+/* ═══════════ FOOTER ═══════════ */
+
+footer {
+  background: var(--ink); color: var(--text-muted-dark);
+  padding: 60px 0 40px; border-top: 1px solid var(--border-dark);
+}
+
+.footer-top {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px;
+  margin-bottom: 48px;
+}
+
+.footer-brand-logo {
+  font-family: var(--font-display); font-size: 22px; color: var(--paper); margin-bottom: 12px;
+}
+.footer-brand-logo .lite { color: var(--lite); font-style: italic; font-weight: 300; }
+
+.footer-mission {
+  font-size: 14px; line-height: 1.7; color: var(--text-muted-dark); max-width: 320px;
+}
+
+.footer-col h4 {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--paper); margin-bottom: 16px;
+}
+
+.footer-col a {
+  display: block; font-size: 14px; color: var(--text-muted-dark);
+  margin-bottom: 10px; transition: color 0.2s;
+}
+.footer-col a:hover { color: var(--paper); }
+
+.footer-bottom {
+  padding-top: 32px; border-top: 1px solid var(--border-dark);
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 13px;
+}
+
+.footer-legal { display: flex; gap: 24px; }
+.footer-legal a { color: var(--text-muted-dark); transition: color 0.2s; }
+.footer-legal a:hover { color: var(--paper); }
+
+
+/* ═══════════ RESPONSIVE ═══════════ */
+
+@media (max-width: 900px) {
+  .pillars-grid { grid-template-columns: 1fr; }
+  .research-grid { grid-template-columns: 1fr; gap: 48px; }
+  .module-item { grid-template-columns: 1fr; gap: 20px; }
+  .module-num { font-size: 32px; }
+  .dash-body { grid-template-columns: 1fr; }
+  .dash-sidebar { display: none; }
+  .dash-kpis { grid-template-columns: repeat(2,1fr); }
+  .sectors-grid { grid-template-columns: 1fr; }
+  .sectors-stats { grid-template-columns: 1fr; gap: 32px; }
+  .cta-grid { grid-template-columns: 1fr; gap: 48px; }
+  .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+}
+
+@media (max-width: 480px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 32px; }
+  .hero { padding: 100px 20px 80px; }
+  .dash-kpis { grid-template-columns: 1fr; }
+  .dash-bottom { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .fade-up { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Aller au contenu principal</a>
+
+<!-- ═══════════ NAV ═══════════ -->
+<nav aria-label="Navigation principale">
+  <a href="#" class="nav-logo"><span class="lite">lite</span>change<span class="dot"></span></a>
+  <div class="nav-links">
+    <a href="#pillars">Méthode</a>
+    <a href="#research">Expertise</a>
+    <a href="#modules">Modules</a>
+    <a href="#sectors">Secteurs</a>
+    <a href="#demo" class="nav-cta">Demander une démo</a>
+  </div>
+  <button class="nav-burger" id="burger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mobileMenu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile menu -->
+<div class="nav-mobile" id="mobileMenu" aria-hidden="true">
+  <a href="#pillars">Méthode</a>
+  <a href="#research">Expertise</a>
+  <a href="#modules">Modules</a>
+  <a href="#sectors">Secteurs</a>
+  <a href="#demo" class="nav-cta">Demander une démo</a>
+</div>
+
+
+<!-- ═══════════ 1. HERO ═══════════ -->
+<section class="hero" id="hero">
+  <div class="hero-inner" id="main-content">
+    <div class="hero-badge"><span class="hb-dot"></span> Entreprise à mission · litechange.org</div>
+    <h1>Les institutions qui portent le&nbsp;pays méritent des transformations qui <em>réussissent</em></h1>
+    <p class="hero-sub">LiteChange rend le changement observable. Nous mesurons ce&nbsp;que les&nbsp;autres supposent — pour que chaque transformation devienne pilotable, mesurable, et&nbsp;imputable.</p>
+    <p class="hero-proof"><strong>70 %</strong> des transformations échouent faute d'observabilité. <strong>200+</strong> missions documentées.</p>
+    <div class="hero-ctas">
+      <a href="#demo" class="btn-primary">Demander une démo</a>
+      <a href="#pillars" class="btn-secondary">Découvrir la méthode</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ 2. PILIERS ═══════════ -->
+<section class="pillars" id="pillars">
+  <div class="container">
+    <div class="pillars-header fade-up">
+      <div class="section-tag">Trois piliers fondateurs</div>
+      <h2>Fondé sur la <span class="acc">science</span>, forgé par le <span class="acc">terrain</span>, construit pour <span class="acc">durer</span></h2>
+      <p>LiteChange naît de la conviction que le change management mérite mieux que des PowerPoints et de l'intuition. Trois expertises convergent pour rendre le changement enfin observable.</p>
+    </div>
+    <div class="pillars-grid">
+      <div class="pillar fade-up">
+        <span class="pillar-num">01</span>
+        <div class="pillar-tag">Recherche académique</div>
+        <h3>Science du changement</h3>
+        <p>Des modèles validés empiriquement, issus de la recherche en gestion du changement organisationnel. Pas des frameworks marketing — des protocoles testés sur le terrain académique et professionnel.</p>
+        <div class="pillar-ref">Réf. travaux de Laurent Giraud, advisor scientifique — conduite du changement, adoption organisationnelle</div>
+      </div>
+      <div class="pillar fade-up" data-delay="1">
+        <span class="pillar-num">02</span>
+        <div class="pillar-tag">Expertise terrain</div>
+        <h3>200+ transformations observées</h3>
+        <p>Des consultants seniors et product managers qui ont vu des transformations réussir et échouer dans les plus grandes institutions françaises. Chaque fonctionnalité est née d'un problème réel.</p>
+        <div class="pillar-ref">Conseil stratégique, product management, data governance</div>
+      </div>
+      <div class="pillar fade-up" data-delay="2">
+        <span class="pillar-num">03</span>
+        <div class="pillar-tag">Architecture & engineering</div>
+        <h3>Construit pour l'échelle</h3>
+        <p>Une équipe tech orientée stabilité, architecture propre et évolutivité. Chaque brique est pensée pour tenir sous la charge des plus grands déploiements institutionnels.</p>
+        <div class="pillar-ref">Scalabilité, API-first, clean architecture</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ 3. FONDATEURS & RECHERCHE ═══════════ -->
+<section class="research" id="research">
+  <div class="container">
+    <div class="research-grid">
+      <div class="research-left fade-up">
+        <div class="section-tag">Qui sommes-nous</div>
+        <div class="research-quote">
+          <blockquote>On a vu 200 transformations réussir ou échouer. À chaque fois, le problème était le même : personne ne <span class="qacc">voyait</span> ce qui se passait vraiment sur le terrain.</blockquote>
+          <cite>— Cyril Vegni, fondateur de LiteChange</cite>
+        </div>
+      </div>
+      <div class="research-content fade-up" data-delay="1">
+        <h3>Cyril Vegni</h3>
+        <div class="research-role">FONDATEUR · EXPERT CHANGE MANAGEMENT</div>
+        <p class="research-bio">Fondateur de plusieurs cabinets de conseil, Cyril est une figure reconnue du change management dans le monde des assurances, mutuelles, banques et retail. C'est cette expertise terrain — accumulée au contact des plus grandes institutions françaises — qui a donné naissance à LiteChange et à sa conviction : le changement doit être observable.</p>
+        <div class="research-methods">
+          <div class="method-card">
+            <div class="method-marker">◎</div>
+            <div>
+              <h4>Laurent Giraud — Advisor scientifique</h4>
+              <p>Chercheur en management du changement, ses travaux sur l'adoption organisationnelle fondent la méthodologie LiteChange. Méthode Autissier/Le Cam, Prosci ADKAR, Kotter — intégrés et opérationnalisés dans chaque module.</p>
+            </div>
+          </div>
+          <div class="method-card">
+            <div class="method-marker">△</div>
+            <div>
+              <h4>200+ transformations documentées</h4>
+              <p>Chaque mission enrichit la base de connaissance. Les modèles s'appuient sur ce corpus pour contextualiser chaque recommandation.</p>
+            </div>
+          </div>
+          <div class="method-card">
+            <div class="method-marker">◇</div>
+            <div>
+              <h4>Cofondateurs product & data</h4>
+              <p>Une équipe associée ultra-expérimentée, orientée stabilité, architecture propre et scalabilité — pour que l'outil tienne la charge des plus grands déploiements.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ 4. MODULES ═══════════ -->
+<section class="modules" id="modules">
+  <div class="container">
+    <div class="modules-header fade-up">
+      <div class="section-tag">4 modules</div>
+      <h2>Indépendants. Interconnectables. Activables à votre rythme.</h2>
+      <p>Entrez par le diagnostic. Activez le pilotage. Connectez le coaching. Chaque module fonctionne seul — et se renforce quand vous les combinez.</p>
+    </div>
+
+    <div class="modules-list">
+      <div class="module-item fade-up">
+        <div class="module-num">01</div>
+        <div class="module-info">
+          <h3>Diagnostic</h3>
+          <div class="module-sub">OBSERVER L'AMPLEUR RÉELLE AVANT D'AGIR</div>
+          <p>Cartographie des enjeux, évaluation de la maturité change, identification des frictions prioritaires. Le diagnostic produit un rapport actionnable avec des recommandations contextualisées.</p>
+          <div class="module-insight">Nos modèles, calibrés sur 200+ transformations documentées, identifient les signaux de résistance avant qu'ils ne deviennent des blocages.</div>
+        </div>
+        <div class="module-features">
+          <div class="module-feature"><span class="mf-dot"></span> Cartographie des parties prenantes et périmètre d'impact</div>
+          <div class="module-feature"><span class="mf-dot"></span> Lecture des données superficielles et profondes en temps réel</div>
+          <div class="module-feature"><span class="mf-dot"></span> Évaluation maturité change de l'organisation</div>
+          <div class="module-feature"><span class="mf-dot"></span> Identification des frictions et facteurs de risque prioritaires</div>
+          <div class="module-feature"><span class="mf-dot"></span> Rapport de diagnostic actionnable avec recommandations</div>
+        </div>
+      </div>
+
+      <div class="module-item fade-up">
+        <div class="module-num">02</div>
+        <div class="module-info">
+          <h3>Voie de la transformation</h3>
+          <div class="module-sub">LA COLONNE VERTÉBRALE STRATÉGIQUE</div>
+          <p>Co-construction de la feuille de route, formalisation de la vision, scénarisation des leviers de changement. La feuille de route se recalibre en continu selon les signaux terrain.</p>
+          <div class="module-insight">Dès qu'un pic de résistance est détecté dans le diagnostic ou le pilotage, la trajectoire se recalibre automatiquement.</div>
+        </div>
+        <div class="module-features">
+          <div class="module-feature"><span class="mf-dot"></span> Feuille de route : phases, jalons, acteurs, dépendances</div>
+          <div class="module-feature"><span class="mf-dot"></span> Vision et bénéfices attendus formalisés</div>
+          <div class="module-feature"><span class="mf-dot"></span> Leviers : communication, formation, coaching, influence</div>
+          <div class="module-feature"><span class="mf-dot"></span> Stratégie de gestion des résistances</div>
+          <div class="module-feature"><span class="mf-dot"></span> Mise à jour dynamique selon signaux terrain</div>
+        </div>
+      </div>
+
+      <div class="module-item fade-up">
+        <div class="module-num">03</div>
+        <div class="module-info">
+          <h3>Pilotage actif</h3>
+          <div class="module-sub">LA SALLE DE CONTRÔLE DE VOTRE TRANSFORMATION</div>
+          <p>Dashboard d'observabilité quotidien, détection des signaux faibles, alertes intelligentes, rapport CODIR automatisé. Le pilotage passe d'un tableau de bord passif à un système d'aide à la décision.</p>
+          <div class="module-insight">Ce que voient les CODIR de nos clients chaque lundi matin : adoption, friction, actions correctives — en un écran.</div>
+        </div>
+        <div class="module-features">
+          <div class="module-feature"><span class="mf-dot"></span> Dashboard : adoption, engagement, friction par unité</div>
+          <div class="module-feature"><span class="mf-dot"></span> Détection des signaux faibles : inertie, contournements</div>
+          <div class="module-feature"><span class="mf-dot"></span> Plan de mitigation avec statut temps réel</div>
+          <div class="module-feature"><span class="mf-dot"></span> Alertes déclenchées par seuils ou patterns récurrents</div>
+          <div class="module-feature"><span class="mf-dot"></span> Rapport CODIR automatisé et capitalisation</div>
+        </div>
+      </div>
+
+      <div class="module-item fade-up">
+        <div class="module-num">04</div>
+        <div class="module-info">
+          <h3>Coaching</h3>
+          <div class="module-sub">L'EXPERTISE HUMAINE LÀ OÙ LA DONNÉE NE SUFFIT PAS</div>
+          <p>Coaching individuel des sponsors, ateliers collectifs, formation des acteurs internes. Chaque session est préparée par l'analyse des données de pilotage — les chercheurs associés supervisent les cas complexes.</p>
+          <div class="module-insight">Les données de pilotage signalent les personnes ou unités en difficulté. Le coaching intervient là où l'impact sera le plus fort.</div>
+        </div>
+        <div class="module-features">
+          <div class="module-feature"><span class="mf-dot"></span> Coaching individuel sponsors et managers clés</div>
+          <div class="module-feature"><span class="mf-dot"></span> Ateliers collectifs d'ancrage des nouvelles pratiques</div>
+          <div class="module-feature"><span class="mf-dot"></span> Formation des Change Agents, RH, chefs de projet</div>
+          <div class="module-feature"><span class="mf-dot"></span> Supervision académique sur les cas complexes</div>
+          <div class="module-feature"><span class="mf-dot"></span> Protocoles adaptés : gouvernance, culture, réglementaire</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ 5. DASHBOARD ═══════════ -->
+<section class="dashboard-section" id="dashboard">
+  <div class="container">
+    <div class="dashboard-intro fade-up">
+      <div class="section-tag">Observabilité en temps réel</div>
+      <h2>Ce que voient les CODIR de nos clients chaque lundi matin</h2>
+      <p>Tout ce que votre transformation génère comme signal — visible, mesuré, actionnable. Un écran, les bonnes données, les bonnes décisions.</p>
+    </div>
+
+    <div class="dash-frame fade-up">
+      <div class="dash-chrome">
+        <div class="dash-dots"><span></span><span></span><span></span></div>
+        <div class="dash-url">app.litechange.org / migration-erp / dashboard</div>
+      </div>
+      <div class="dash-body">
+        <div class="dash-sidebar">
+          <div class="dash-sidebar-logo"><span class="lite">lite</span>change</div>
+          <div class="dash-nav active"><span class="dash-nav-icon">◎</span> Dashboard</div>
+          <div class="dash-nav"><span class="dash-nav-icon">△</span> Diagnostic</div>
+          <div class="dash-nav"><span class="dash-nav-icon">▢</span> Plans d'action</div>
+          <div class="dash-nav"><span class="dash-nav-icon">⚡</span> Alertes</div>
+          <div class="dash-nav"><span class="dash-nav-icon">◇</span> ROI Tracker</div>
+          <div class="dash-nav"><span class="dash-nav-icon">⊞</span> Modèles</div>
+        </div>
+        <div class="dash-main">
+          <div class="dash-header">
+            <h3>Migration ERP — Suivi J+47</h3>
+            <span class="dash-live">● Observing</span>
+          </div>
+          <div class="dash-kpis">
+            <div class="dash-kpi"><div class="dash-kpi-label">Adoption</div><div class="dash-kpi-val">73%</div><div class="dash-kpi-trend trend-up">↑ +4.2% vs J-7</div></div>
+            <div class="dash-kpi"><div class="dash-kpi-label">Zones à risque</div><div class="dash-kpi-val">4</div><div class="dash-kpi-trend trend-down">↑ +1 vs J-7</div></div>
+            <div class="dash-kpi"><div class="dash-kpi-label">Actions</div><div class="dash-kpi-val">12</div><div class="dash-kpi-trend trend-up">87% on track</div></div>
+            <div class="dash-kpi"><div class="dash-kpi-label">ROI estimé</div><div class="dash-kpi-val">+18%</div><div class="dash-kpi-trend trend-up">vs baseline Giraud</div></div>
+          </div>
+          <div class="dash-chart">
+            <div class="dash-chart-title">Adoption par direction — 8 dernières semaines</div>
+            <div class="dash-bars">
+              <div class="dash-bar db-g" style="height:38%"></div><div class="dash-bar db-b" style="height:28%"></div><div class="dash-bar db-o" style="height:15%"></div>
+              <div class="dash-bar db-g" style="height:48%"></div><div class="dash-bar db-b" style="height:38%"></div><div class="dash-bar db-o" style="height:22%"></div>
+              <div class="dash-bar db-g" style="height:56%"></div><div class="dash-bar db-b" style="height:46%"></div><div class="dash-bar db-o" style="height:18%"></div>
+              <div class="dash-bar db-g" style="height:65%"></div><div class="dash-bar db-b" style="height:55%"></div><div class="dash-bar db-o" style="height:28%"></div>
+              <div class="dash-bar db-g" style="height:72%"></div><div class="dash-bar db-b" style="height:60%"></div><div class="dash-bar db-o" style="height:20%"></div>
+              <div class="dash-bar db-g" style="height:78%"></div><div class="dash-bar db-b" style="height:66%"></div><div class="dash-bar db-o" style="height:24%"></div>
+              <div class="dash-bar db-g" style="height:84%"></div><div class="dash-bar db-b" style="height:72%"></div><div class="dash-bar db-o" style="height:30%"></div>
+              <div class="dash-bar db-g" style="height:90%"></div><div class="dash-bar db-b" style="height:76%"></div><div class="dash-bar db-o" style="height:22%"></div>
+            </div>
+          </div>
+          <div class="dash-bottom">
+            <div class="dash-card">
+              <div class="dash-card-title">Zones de friction</div>
+              <div class="dash-risk"><span class="dr-dot dr-high"></span>Dir. Commerciale<div class="dr-bar"><div class="dr-fill" style="width:82%;background:var(--warm);"></div></div></div>
+              <div class="dash-risk"><span class="dr-dot dr-med"></span>Serv. Logistique<div class="dr-bar"><div class="dr-fill" style="width:52%;background:var(--warning);"></div></div></div>
+              <div class="dash-risk"><span class="dr-dot dr-low"></span>Dir. Financière<div class="dr-bar"><div class="dr-fill" style="width:22%;background:var(--success);"></div></div></div>
+            </div>
+            <div class="dash-card">
+              <div class="dash-card-title">Actions de mitigation</div>
+              <div class="dash-risk"><span class="dr-dot dr-high"></span>Workshop terrain — Commerce (J+2)</div>
+              <div class="dash-risk"><span class="dr-dot dr-med"></span>Réseau ambassadeurs Logistique</div>
+              <div class="dash-risk"><span class="dr-dot dr-low"></span>Quick win Finance (terminé)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ 6. SECTEURS ═══════════ -->
+<section class="sectors" id="sectors">
+  <div class="container">
+    <div class="sectors-header fade-up">
+      <div class="section-tag">Secteurs cibles</div>
+      <h2>Conçu pour les institutions qui ne peuvent pas se permettre l'approximation</h2>
+      <p>Mutuelles, banques, opérateurs publics, administrations — des organisations dont la transformation réussie ou ratée impacte des millions de personnes.</p>
+    </div>
+
+    <div class="sectors-grid">
+      <div class="sector-card fade-up">
+        <h3>Mutuelles & Assureurs</h3>
+        <p>Fusions, digitalisation des parcours, transformation des métiers de la gestion de sinistres et de la relation adhérent.</p>
+        <div class="sector-clients">CNP Assurances · VyV · Groupama</div>
+      </div>
+      <div class="sector-card fade-up" data-delay="1">
+        <h3>Banques & Finances</h3>
+        <p>Réglementation, open banking, transformation des réseaux d'agences, programmes de conduite du changement à grande échelle.</p>
+        <div class="sector-clients">Natixis · Caisses régionales · BFI</div>
+      </div>
+      <div class="sector-card fade-up" data-delay="2">
+        <h3>Opérateurs publics</h3>
+        <p>Modernisation du service public, refonte des systèmes d'information, accompagnement des agents dans les transformations de l'agenda numérique de l'État.</p>
+        <div class="sector-clients">CPAM · Universités · Opérateurs nationaux</div>
+      </div>
+      <div class="sector-card fade-up" data-delay="3">
+        <h3>Administrations</h3>
+        <p>Réorganisations ministérielles, interopérabilité des systèmes, conduite du changement culturel dans des environnements à forte inertie institutionnelle.</p>
+        <div class="sector-clients">Ministères · Agences · Établissements publics</div>
+      </div>
+    </div>
+
+    <div class="sectors-stats fade-up">
+      <div class="stat-block">
+        <div class="stat-val">3 900</div>
+        <div class="stat-label">structures cibles en France</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-val">19 000</div>
+        <div class="stat-label">structures en Europe (CA >100M€)</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-val"><0,2%</div>
+        <div class="stat-label">du marché adressable visé à 2030</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ 7. CTA ═══════════ -->
+<section class="cta-section" id="demo">
+  <div class="container">
+    <div class="cta-grid">
+      <div class="cta-left fade-up">
+        <div class="section-tag">Passez à l'action</div>
+        <h2>Votre transformation mérite d'être <em>observée</em></h2>
+        <p>Réservez une démo de 30 minutes. Nous partons de votre projet en cours, pas d'un scénario générique.</p>
+        <div class="cta-checks">
+          <div class="cta-check"><span class="cta-check-icon">✓</span> Analyse de votre contexte transformation actuel</div>
+          <div class="cta-check"><span class="cta-check-icon">✓</span> Démonstration du module le plus adapté à votre enjeu</div>
+          <div class="cta-check"><span class="cta-check-icon">✓</span> Estimation d'un plan pilote en 4 semaines</div>
+        </div>
+      </div>
+      <form class="cta-form fade-up" data-delay="1" id="demoForm" aria-label="Formulaire de demande de démo">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="fname">Prénom</label>
+            <input class="form-input" type="text" id="fname" name="fname" placeholder="Prénom" required autocomplete="given-name">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lname">Nom</label>
+            <input class="form-input" type="text" id="lname" name="lname" placeholder="Nom" required autocomplete="family-name">
+          </div>
+          <div class="form-group full">
+            <label class="form-label" for="email">Email professionnel</label>
+            <input class="form-input" type="email" id="email" name="email" placeholder="prenom.nom@organisation.fr" required autocomplete="email">
+          </div>
+          <div class="form-group full">
+            <label class="form-label" for="org">Organisation</label>
+            <input class="form-input" type="text" id="org" name="org" placeholder="Nom de votre organisation" required autocomplete="organization">
+          </div>
+          <div class="form-group full">
+            <label class="form-label" for="module">Module d'intérêt</label>
+            <select class="form-select" id="module" name="module" required>
+              <option value="">Sélectionner un module</option>
+              <option value="diagnostic">Diagnostic</option>
+              <option value="voie">Voie de la transformation</option>
+              <option value="pilotage">Pilotage actif</option>
+              <option value="coaching">Coaching</option>
+              <option value="tous">Tous les modules (interconnectés)</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="form-submit">Réserver ma démo</button>
+        <div class="form-note">Réponse sous 24h · Aucun engagement</div>
+      </form>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer role="contentinfo">
+  <div class="container">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand-logo"><span class="lite">lite</span>change<span style="color:var(--lite);">.</span></div>
+        <p class="footer-mission">LiteChange est une entreprise à mission. Nous existons pour que les transformations des institutions françaises réussissent.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Modules</h4>
+        <a href="#modules">Diagnostic</a>
+        <a href="#modules">Voie de la transformation</a>
+        <a href="#modules">Pilotage actif</a>
+        <a href="#modules">Coaching</a>
+      </div>
+      <div class="footer-col">
+        <h4>Société</h4>
+        <a href="#research">Équipe & Recherche</a>
+        <a href="#pillars">Méthode</a>
+        <a href="#sectors">Secteurs</a>
+        <a href="#demo">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Ressources</h4>
+        <a href="#">Documentation</a>
+        <a href="#">Études de cas</a>
+        <a href="#">Publications</a>
+        <a href="#">Mentions légales</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 LiteChange · Entreprise à mission · Marque déposée WIPO · 30+ juridictions</span>
+      <div class="footer-legal">
+        <a href="#">Confidentialité</a>
+        <a href="#">CGU</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+// ── Nav scroll effect ──
+const navEl = document.querySelector('nav');
+window.addEventListener('scroll', () => {
+  navEl.classList.toggle('scrolled', window.scrollY > 40);
+}, { passive: true });
+
+// ── Mobile burger menu ──
+const burger = document.getElementById('burger');
+const mobileMenu = document.getElementById('mobileMenu');
+
+burger.addEventListener('click', () => {
+  const isOpen = burger.classList.toggle('open');
+  mobileMenu.classList.toggle('open', isOpen);
+  burger.setAttribute('aria-expanded', String(isOpen));
+  burger.setAttribute('aria-label', isOpen ? 'Fermer le menu' : 'Ouvrir le menu');
+  mobileMenu.setAttribute('aria-hidden', String(!isOpen));
+});
+
+mobileMenu.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    burger.classList.remove('open');
+    mobileMenu.classList.remove('open');
+    burger.setAttribute('aria-expanded', 'false');
+    burger.setAttribute('aria-label', 'Ouvrir le menu');
+    mobileMenu.setAttribute('aria-hidden', 'true');
+  });
+});
+
+// ── Intersection Observer for fade-up animations ──
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+</script>
+
+</body>
+</html>

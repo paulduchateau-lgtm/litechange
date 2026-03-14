@@ -1,0 +1,337 @@
+/* ═══════════════════════════════════════════════════════════════════
+   LITECHANGE.ORG — DESIGN TOKENS v1.0
+   Single source of truth for all LiteChange frontend projects.
+   Import this file at the root of every project.
+   
+   Usage:
+     @import url('litechange-tokens.css');
+     
+   Or in JS/React:
+     import './litechange-tokens.css';
+   ═══════════════════════════════════════════════════════════════════ */
+
+
+/* ── COLOR PRIMITIVES ──────────────────────────────────────────────
+   Raw color values. Never use these directly in components.
+   Always use semantic tokens below instead.
+   ──────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Olive Dark Family */
+  --lc-color-olive-950: #0E1009;
+  --lc-color-olive-900: #1B1F15;
+  --lc-color-olive-800: #2A2F22;
+  --lc-color-olive-700: #3A3F32;
+  --lc-color-olive-600: #4E5444;
+  --lc-color-olive-500: #6B7260;
+  --lc-color-olive-400: #8A9080;
+  --lc-color-olive-300: #A8AE9E;
+  --lc-color-olive-200: #C8CCBE;
+  --lc-color-olive-100: #E2E5DB;
+  --lc-color-olive-50:  #F0F2EC;
+
+  /* Warm Paper Family */
+  --lc-color-paper-950: #3A3428;
+  --lc-color-paper-900: #5C5244;
+  --lc-color-paper-800: #7A6E5E;
+  --lc-color-paper-700: #998B78;
+  --lc-color-paper-600: #B0A494;
+  --lc-color-paper-500: #C4B8A8;
+  --lc-color-paper-400: #D4C8B6;
+  --lc-color-paper-300: #E4D9C8;
+  --lc-color-paper-200: #F0E6D8;
+  --lc-color-paper-100: #F7F1E8;
+  --lc-color-paper-50:  #FDFAF6;
+
+  /* Lite Green Family */
+  --lc-color-lite-950: #2A3A06;
+  --lc-color-lite-900: #3D5A0A;
+  --lc-color-lite-800: #527A10;
+  --lc-color-lite-700: #6B8A1A;
+  --lc-color-lite-600: #84A422;
+  --lc-color-lite-500: #9ABF30;
+  --lc-color-lite-400: #B0D838;
+  --lc-color-lite-300: #C8FF3C;
+  --lc-color-lite-200: #D8FF72;
+  --lc-color-lite-100: #E8FFA8;
+  --lc-color-lite-50:  #F4FFD6;
+
+  /* Signal Blue Family */
+  --lc-color-signal-900: #1A3E54;
+  --lc-color-signal-700: #2D6888;
+  --lc-color-signal-500: #4A90B8;
+  --lc-color-signal-300: #7AB4D4;
+  --lc-color-signal-100: #C4DFF0;
+
+  /* Alert Warm Family */
+  --lc-color-warm-900: #5C2210;
+  --lc-color-warm-700: #8A3518;
+  --lc-color-warm-500: #C45A32;
+  --lc-color-warm-300: #E08A68;
+  --lc-color-warm-100: #F4D0C0;
+
+  /* Status */
+  --lc-color-success-700: #2A6B34;
+  --lc-color-success-500: #3A8A4A;
+  --lc-color-success-300: #68B474;
+  --lc-color-success-100: #D0F0D4;
+
+  --lc-color-warning-700: #8A6A1A;
+  --lc-color-warning-500: #D4A03A;
+  --lc-color-warning-300: #E8C46A;
+  --lc-color-warning-100: #FFF4D0;
+
+  /* Pure */
+  --lc-color-white: #FFFFFF;
+  --lc-color-black: #000000;
+}
+
+
+/* ── SEMANTIC TOKENS — LIGHT THEME ─────────────────────────────────
+   These are the tokens to use in components. They adapt per theme.
+   ──────────────────────────────────────────────────────────────── */
+
+:root,
+[data-theme="light"] {
+  /* Surfaces */
+  --lc-surface-primary:     var(--lc-color-paper-100);
+  --lc-surface-secondary:   var(--lc-color-white);
+  --lc-surface-tertiary:    var(--lc-color-paper-200);
+  --lc-surface-elevated:    var(--lc-color-white);
+  --lc-surface-sunken:      var(--lc-color-paper-300);
+  --lc-surface-overlay:     rgba(27, 31, 21, 0.5);
+
+  /* Text */
+  --lc-text-primary:        var(--lc-color-olive-900);
+  --lc-text-secondary:      var(--lc-color-olive-600);
+  --lc-text-tertiary:       var(--lc-color-paper-700);
+  --lc-text-disabled:       var(--lc-color-paper-500);
+  --lc-text-inverse:        var(--lc-color-paper-100);
+  --lc-text-on-accent:      var(--lc-color-olive-900);
+
+  /* Borders */
+  --lc-border-primary:      var(--lc-color-paper-300);
+  --lc-border-secondary:    var(--lc-color-paper-200);
+  --lc-border-focus:        var(--lc-color-lite-700);
+  --lc-border-error:        var(--lc-color-warm-500);
+
+  /* Accent */
+  --lc-accent-primary:      var(--lc-color-lite-700);
+  --lc-accent-primary-hover:var(--lc-color-lite-800);
+  --lc-accent-secondary:    var(--lc-color-lite-300);
+  --lc-accent-subtle:       rgba(107, 138, 26, 0.08);
+  --lc-accent-text:         var(--lc-color-lite-700);
+
+  /* Status */
+  --lc-status-success:      var(--lc-color-success-500);
+  --lc-status-success-bg:   var(--lc-color-success-100);
+  --lc-status-warning:      var(--lc-color-warning-500);
+  --lc-status-warning-bg:   var(--lc-color-warning-100);
+  --lc-status-error:        var(--lc-color-warm-500);
+  --lc-status-error-bg:     var(--lc-color-warm-100);
+  --lc-status-info:         var(--lc-color-signal-500);
+  --lc-status-info-bg:      var(--lc-color-signal-100);
+
+  /* Interactive */
+  --lc-interactive-primary:       var(--lc-color-lite-700);
+  --lc-interactive-primary-hover: var(--lc-color-lite-800);
+  --lc-interactive-primary-text:  var(--lc-color-white);
+  --lc-interactive-secondary:     transparent;
+  --lc-interactive-secondary-hover: var(--lc-color-paper-200);
+  --lc-interactive-secondary-text:  var(--lc-color-olive-900);
+  --lc-interactive-ghost-hover:   var(--lc-color-paper-200);
+
+  /* Shadows */
+  --lc-shadow-sm:  0 1px 2px rgba(27, 31, 21, 0.05);
+  --lc-shadow-md:  0 4px 12px rgba(27, 31, 21, 0.08);
+  --lc-shadow-lg:  0 12px 40px rgba(27, 31, 21, 0.1);
+  --lc-shadow-xl:  0 24px 80px rgba(27, 31, 21, 0.14);
+
+  /* Chart-specific */
+  --lc-chart-primary:    var(--lc-color-lite-300);
+  --lc-chart-secondary:  var(--lc-color-signal-500);
+  --lc-chart-tertiary:   var(--lc-color-warm-500);
+  --lc-chart-quaternary: var(--lc-color-lite-700);
+  --lc-chart-grid:       var(--lc-color-paper-300);
+  --lc-chart-axis:       var(--lc-color-paper-600);
+}
+
+
+/* ── SEMANTIC TOKENS — DARK THEME ──────────────────────────────────
+   Activated via [data-theme="dark"] on <html> or any container.
+   ──────────────────────────────────────────────────────────────── */
+
+[data-theme="dark"] {
+  /* Surfaces */
+  --lc-surface-primary:     var(--lc-color-olive-900);
+  --lc-surface-secondary:   var(--lc-color-olive-800);
+  --lc-surface-tertiary:    var(--lc-color-olive-950);
+  --lc-surface-elevated:    var(--lc-color-olive-800);
+  --lc-surface-sunken:      var(--lc-color-olive-950);
+  --lc-surface-overlay:     rgba(14, 16, 9, 0.7);
+
+  /* Text */
+  --lc-text-primary:        var(--lc-color-paper-200);
+  --lc-text-secondary:      var(--lc-color-paper-400);
+  --lc-text-tertiary:       var(--lc-color-olive-400);
+  --lc-text-disabled:       var(--lc-color-olive-600);
+  --lc-text-inverse:        var(--lc-color-olive-900);
+  --lc-text-on-accent:      var(--lc-color-olive-900);
+
+  /* Borders */
+  --lc-border-primary:      rgba(240, 230, 216, 0.1);
+  --lc-border-secondary:    rgba(240, 230, 216, 0.06);
+  --lc-border-focus:        var(--lc-color-lite-300);
+  --lc-border-error:        var(--lc-color-warm-300);
+
+  /* Accent */
+  --lc-accent-primary:      var(--lc-color-lite-300);
+  --lc-accent-primary-hover:var(--lc-color-lite-200);
+  --lc-accent-secondary:    var(--lc-color-lite-700);
+  --lc-accent-subtle:       rgba(200, 255, 60, 0.06);
+  --lc-accent-text:         var(--lc-color-lite-300);
+
+  /* Status */
+  --lc-status-success:      var(--lc-color-success-300);
+  --lc-status-success-bg:   rgba(58, 138, 74, 0.15);
+  --lc-status-warning:      var(--lc-color-warning-300);
+  --lc-status-warning-bg:   rgba(212, 160, 58, 0.15);
+  --lc-status-error:        var(--lc-color-warm-300);
+  --lc-status-error-bg:     rgba(196, 90, 50, 0.15);
+  --lc-status-info:         var(--lc-color-signal-300);
+  --lc-status-info-bg:      rgba(74, 144, 184, 0.15);
+
+  /* Interactive */
+  --lc-interactive-primary:       var(--lc-color-lite-300);
+  --lc-interactive-primary-hover: var(--lc-color-lite-200);
+  --lc-interactive-primary-text:  var(--lc-color-olive-900);
+  --lc-interactive-secondary:     transparent;
+  --lc-interactive-secondary-hover: rgba(240, 230, 216, 0.06);
+  --lc-interactive-secondary-text:  var(--lc-color-paper-200);
+  --lc-interactive-ghost-hover:   rgba(240, 230, 216, 0.04);
+
+  /* Shadows */
+  --lc-shadow-sm:  0 1px 2px rgba(0, 0, 0, 0.2);
+  --lc-shadow-md:  0 4px 12px rgba(0, 0, 0, 0.3);
+  --lc-shadow-lg:  0 12px 40px rgba(0, 0, 0, 0.35);
+  --lc-shadow-xl:  0 24px 80px rgba(0, 0, 0, 0.45);
+
+  /* Chart */
+  --lc-chart-primary:    var(--lc-color-lite-300);
+  --lc-chart-secondary:  var(--lc-color-signal-300);
+  --lc-chart-tertiary:   var(--lc-color-warm-300);
+  --lc-chart-quaternary: var(--lc-color-lite-500);
+  --lc-chart-grid:       rgba(240, 230, 216, 0.06);
+  --lc-chart-axis:       var(--lc-color-olive-500);
+}
+
+
+/* ── TYPOGRAPHY TOKENS ─────────────────────────────────────────────
+   Font families, sizes, line-heights, letter-spacings.
+   Use these variables in all components.
+   ──────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Font Families */
+  --lc-font-display:  'Source Serif 4', 'Georgia', serif;
+  --lc-font-body:     'DM Sans', 'Helvetica Neue', sans-serif;
+  --lc-font-mono:     'IBM Plex Mono', 'Menlo', monospace;
+
+  /* Font Sizes — Modular scale (1.25 ratio) */
+  --lc-text-xs:    0.6875rem;  /* 11px */
+  --lc-text-sm:    0.8125rem;  /* 13px */
+  --lc-text-base:  0.9375rem;  /* 15px */
+  --lc-text-md:    1.0625rem;  /* 17px */
+  --lc-text-lg:    1.25rem;    /* 20px */
+  --lc-text-xl:    1.5rem;     /* 24px */
+  --lc-text-2xl:   1.875rem;   /* 30px */
+  --lc-text-3xl:   2.375rem;   /* 38px */
+  --lc-text-4xl:   3rem;       /* 48px */
+  --lc-text-5xl:   3.75rem;    /* 60px */
+  --lc-text-6xl:   4.5rem;     /* 72px */
+
+  /* Line Heights */
+  --lc-leading-none:    1;
+  --lc-leading-tight:   1.15;
+  --lc-leading-snug:    1.3;
+  --lc-leading-normal:  1.5;
+  --lc-leading-relaxed: 1.65;
+  --lc-leading-loose:   1.8;
+
+  /* Font Weights */
+  --lc-weight-light:    300;
+  --lc-weight-regular:  400;
+  --lc-weight-medium:   500;
+  --lc-weight-semibold: 600;
+  --lc-weight-bold:     700;
+
+  /* Letter Spacing */
+  --lc-tracking-tight:    -0.02em;
+  --lc-tracking-normal:   0;
+  --lc-tracking-wide:     0.02em;
+  --lc-tracking-wider:    0.05em;
+  --lc-tracking-caps:     0.1em;
+  --lc-tracking-mono:     0.02em;
+
+
+  /* ── SPACING SCALE ───────────────────────────────────────────── */
+  --lc-space-0:   0;
+  --lc-space-1:   0.25rem;   /* 4px */
+  --lc-space-2:   0.5rem;    /* 8px */
+  --lc-space-3:   0.75rem;   /* 12px */
+  --lc-space-4:   1rem;      /* 16px */
+  --lc-space-5:   1.25rem;   /* 20px */
+  --lc-space-6:   1.5rem;    /* 24px */
+  --lc-space-8:   2rem;      /* 32px */
+  --lc-space-10:  2.5rem;    /* 40px */
+  --lc-space-12:  3rem;      /* 48px */
+  --lc-space-16:  4rem;      /* 64px */
+  --lc-space-20:  5rem;      /* 80px */
+  --lc-space-24:  6rem;      /* 96px */
+  --lc-space-32:  8rem;      /* 128px */
+
+
+  /* ── RADII ───────────────────────────────────────────────────── */
+  --lc-radius-sm:   6px;
+  --lc-radius-md:   10px;
+  --lc-radius-lg:   16px;
+  --lc-radius-xl:   24px;
+  --lc-radius-full: 9999px;
+
+
+  /* ── TRANSITIONS ─────────────────────────────────────────────── */
+  --lc-duration-fast:    120ms;
+  --lc-duration-normal:  200ms;
+  --lc-duration-slow:    350ms;
+  --lc-duration-slower:  500ms;
+
+  --lc-ease-default:  cubic-bezier(0.4, 0, 0.2, 1);
+  --lc-ease-in:       cubic-bezier(0.4, 0, 1, 1);
+  --lc-ease-out:      cubic-bezier(0, 0, 0.2, 1);
+  --lc-ease-bounce:   cubic-bezier(0.34, 1.56, 0.64, 1);
+
+
+  /* ── Z-INDEX SCALE ───────────────────────────────────────────── */
+  --lc-z-base:      0;
+  --lc-z-dropdown:  100;
+  --lc-z-sticky:    200;
+  --lc-z-overlay:   300;
+  --lc-z-modal:     400;
+  --lc-z-popover:   500;
+  --lc-z-toast:     600;
+  --lc-z-tooltip:   700;
+
+
+  /* ── BREAKPOINTS (reference — use in @media) ─────────────────── */
+  /* --lc-bp-sm:  640px  */
+  /* --lc-bp-md:  768px  */
+  /* --lc-bp-lg:  1024px */
+  /* --lc-bp-xl:  1280px */
+  /* --lc-bp-2xl: 1440px */
+
+
+  /* ── MAX WIDTHS ──────────────────────────────────────────────── */
+  --lc-max-prose:     680px;
+  --lc-max-content:   1140px;
+  --lc-max-wide:      1440px;
+}

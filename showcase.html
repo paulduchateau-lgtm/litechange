@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LiteChange — Component Showcase</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   DESIGN TOKENS (inline for portability)
+   ═══════════════════════════════════════════ */
+:root {
+  --lc-font-display: 'Source Serif 4', Georgia, serif;
+  --lc-font-body: 'DM Sans', 'Helvetica Neue', sans-serif;
+  --lc-font-mono: 'IBM Plex Mono', Menlo, monospace;
+  --lc-radius-sm: 6px; --lc-radius-md: 10px; --lc-radius-lg: 16px; --lc-radius-xl: 24px; --lc-radius-full: 9999px;
+  --lc-duration-fast: 120ms; --lc-duration-normal: 200ms; --lc-duration-slow: 350ms;
+  --lc-ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Light theme */
+:root, [data-theme="light"] {
+  --lc-surface-primary: #F7F1E8; --lc-surface-secondary: #FFFFFF; --lc-surface-tertiary: #F0E6D8;
+  --lc-surface-elevated: #FFFFFF; --lc-surface-sunken: #E4D9C8; --lc-surface-overlay: rgba(27,31,21,0.5);
+  --lc-text-primary: #1B1F15; --lc-text-secondary: #4E5444; --lc-text-tertiary: #998B78;
+  --lc-text-disabled: #C4B8A8; --lc-text-inverse: #F7F1E8;
+  --lc-border-primary: #E4D9C8; --lc-border-secondary: #F0E6D8; --lc-border-focus: #6B8A1A; --lc-border-error: #C45A32;
+  --lc-accent-primary: #6B8A1A; --lc-accent-primary-hover: #527A10; --lc-accent-secondary: #C8FF3C;
+  --lc-accent-subtle: rgba(107,138,26,0.08); --lc-accent-text: #6B8A1A;
+  --lc-interactive-primary: #6B8A1A; --lc-interactive-primary-hover: #527A10; --lc-interactive-primary-text: #FFFFFF;
+  --lc-interactive-secondary-hover: #F0E6D8; --lc-interactive-secondary-text: #1B1F15;
+  --lc-interactive-ghost-hover: #F0E6D8;
+  --lc-shadow-sm: 0 1px 2px rgba(27,31,21,0.05); --lc-shadow-md: 0 4px 12px rgba(27,31,21,0.08);
+  --lc-shadow-lg: 0 12px 40px rgba(27,31,21,0.1); --lc-shadow-xl: 0 24px 80px rgba(27,31,21,0.14);
+  --lc-status-success: #3A8A4A; --lc-status-success-bg: #D0F0D4;
+  --lc-status-warning: #D4A03A; --lc-status-warning-bg: #FFF4D0;
+  --lc-status-error: #C45A32; --lc-status-error-bg: #F4D0C0;
+  --lc-status-info: #4A90B8; --lc-status-info-bg: #C4DFF0;
+  --lc-chart-primary: #C8FF3C; --lc-chart-secondary: #4A90B8; --lc-chart-tertiary: #C45A32;
+  --lc-chart-grid: #E4D9C8; --lc-chart-axis: #B0A494;
+}
+
+/* Dark theme */
+[data-theme="dark"] {
+  --lc-surface-primary: #1B1F15; --lc-surface-secondary: #2A2F22; --lc-surface-tertiary: #0E1009;
+  --lc-surface-elevated: #2A2F22; --lc-surface-sunken: #0E1009; --lc-surface-overlay: rgba(14,16,9,0.7);
+  --lc-text-primary: #F0E6D8; --lc-text-secondary: #D4C8B6; --lc-text-tertiary: #8A9080;
+  --lc-text-disabled: #4E5444; --lc-text-inverse: #1B1F15;
+  --lc-border-primary: rgba(240,230,216,0.1); --lc-border-secondary: rgba(240,230,216,0.06);
+  --lc-border-focus: #C8FF3C; --lc-border-error: #E08A68;
+  --lc-accent-primary: #C8FF3C; --lc-accent-primary-hover: #D8FF72; --lc-accent-secondary: #6B8A1A;
+  --lc-accent-subtle: rgba(200,255,60,0.06); --lc-accent-text: #C8FF3C;
+  --lc-interactive-primary: #C8FF3C; --lc-interactive-primary-hover: #D8FF72; --lc-interactive-primary-text: #1B1F15;
+  --lc-interactive-secondary-hover: rgba(240,230,216,0.06); --lc-interactive-secondary-text: #F0E6D8;
+  --lc-interactive-ghost-hover: rgba(240,230,216,0.04);
+  --lc-shadow-sm: 0 1px 2px rgba(0,0,0,0.2); --lc-shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+  --lc-shadow-lg: 0 12px 40px rgba(0,0,0,0.35); --lc-shadow-xl: 0 24px 80px rgba(0,0,0,0.45);
+  --lc-status-success: #68B474; --lc-status-success-bg: rgba(58,138,74,0.15);
+  --lc-status-warning: #E8C46A; --lc-status-warning-bg: rgba(212,160,58,0.15);
+  --lc-status-error: #E08A68; --lc-status-error-bg: rgba(196,90,50,0.15);
+  --lc-status-info: #7AB4D4; --lc-status-info-bg: rgba(74,144,184,0.15);
+  --lc-chart-primary: #C8FF3C; --lc-chart-secondary: #7AB4D4; --lc-chart-tertiary: #E08A68;
+  --lc-chart-grid: rgba(240,230,216,0.06); --lc-chart-axis: #6B7260;
+}
+
+/* ── BASE ── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: var(--lc-font-body);
+  background: var(--lc-surface-primary);
+  color: var(--lc-text-primary);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+/* ── LAYOUT ── */
+.showcase { max-width: 1140px; margin: 0 auto; padding: 60px 40px; }
+
+.showcase-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 64px; padding-bottom: 32px;
+  border-bottom: 1px solid var(--lc-border-primary);
+}
+
+.showcase-logo {
+  font-family: var(--lc-font-display); font-size: 24px; font-weight: 400;
+}
+.showcase-logo .lite { color: var(--lc-accent-text); font-style: italic; font-weight: 300; }
+
+.theme-toggle {
+  display: flex; gap: 4px; padding: 4px;
+  background: var(--lc-surface-elevated); border-radius: var(--lc-radius-full);
+  border: 1px solid var(--lc-border-primary);
+}
+.theme-toggle button {
+  padding: 6px 16px; border: none; border-radius: var(--lc-radius-full);
+  font-family: var(--lc-font-mono); font-size: 11px; letter-spacing: 0.05em;
+  cursor: pointer; background: transparent; color: var(--lc-text-secondary);
+  transition: all var(--lc-duration-normal) var(--lc-ease-default);
+}
+.theme-toggle button.active {
+  background: var(--lc-accent-primary); color: var(--lc-text-inverse);
+}
+
+.section { margin-bottom: 80px; }
+
+.section-label {
+  font-family: var(--lc-font-mono); font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--lc-accent-text); margin-bottom: 32px;
+  display: flex; align-items: center; gap: 16px;
+}
+.section-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--lc-accent-subtle);
+}
+
+.component-row {
+  display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.component-group {
+  margin-bottom: 40px;
+}
+
+.component-group-label {
+  font-family: var(--lc-font-body); font-size: 13px; font-weight: 600;
+  color: var(--lc-text-secondary); margin-bottom: 16px;
+  text-transform: uppercase; letter-spacing: 0.03em;
+}
+
+/* ═══════════════════════════════════════════
+   COMPONENT DEFINITIONS
+   ═══════════════════════════════════════════ */
+
+/* ── BUTTONS ── */
+.lc-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--lc-font-body); font-weight: 500;
+  border-radius: var(--lc-radius-md); cursor: pointer;
+  transition: all var(--lc-duration-normal) var(--lc-ease-default);
+  border: 1px solid transparent; text-decoration: none;
+}
+.lc-btn-sm { padding: 6px 16px; font-size: 13px; }
+.lc-btn-md { padding: 10px 24px; font-size: 15px; }
+.lc-btn-lg { padding: 14px 32px; font-size: 17px; }
+
+.lc-btn-primary {
+  background: var(--lc-interactive-primary); color: var(--lc-interactive-primary-text);
+}
+.lc-btn-primary:hover { background: var(--lc-interactive-primary-hover); }
+
+.lc-btn-secondary {
+  background: transparent; border-color: var(--lc-border-primary);
+  color: var(--lc-interactive-secondary-text);
+}
+.lc-btn-secondary:hover { background: var(--lc-interactive-secondary-hover); }
+
+.lc-btn-ghost {
+  background: transparent; color: var(--lc-text-secondary);
+}
+.lc-btn-ghost:hover { background: var(--lc-interactive-ghost-hover); }
+
+.lc-btn-danger {
+  background: var(--lc-status-error); color: white;
+}
+.lc-btn-danger:hover { opacity: 0.9; }
+
+.lc-btn:disabled, .lc-btn[disabled] {
+  opacity: 0.4; cursor: not-allowed; pointer-events: none;
+}
+
+/* ── BADGES ── */
+.lc-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px; border-radius: var(--lc-radius-full);
+  font-family: var(--lc-font-mono); font-size: 10px;
+  letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500;
+}
+.lc-badge-success { background: var(--lc-status-success-bg); color: var(--lc-status-success); }
+.lc-badge-warning { background: var(--lc-status-warning-bg); color: var(--lc-status-warning); }
+.lc-badge-error   { background: var(--lc-status-error-bg);   color: var(--lc-status-error); }
+.lc-badge-info    { background: var(--lc-status-info-bg);    color: var(--lc-status-info); }
+.lc-badge-accent  { background: var(--lc-accent-subtle);     color: var(--lc-accent-text); }
+
+.lc-badge-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: currentColor;
+}
+
+/* ── INPUTS ── */
+.lc-input-group { display: flex; flex-direction: column; gap: 6px; }
+.lc-input-label {
+  font-family: var(--lc-font-body); font-size: 13px; font-weight: 500;
+  color: var(--lc-text-secondary);
+}
+.lc-input {
+  padding: 10px 16px; border-radius: var(--lc-radius-md);
+  border: 1px solid var(--lc-border-primary); background: var(--lc-surface-elevated);
+  font-family: var(--lc-font-body); font-size: 15px; color: var(--lc-text-primary);
+  transition: all var(--lc-duration-normal) var(--lc-ease-default);
+  outline: none; width: 280px;
+}
+.lc-input::placeholder { color: var(--lc-text-disabled); }
+.lc-input:focus {
+  border-color: var(--lc-border-focus);
+  box-shadow: 0 0 0 3px var(--lc-accent-subtle);
+}
+.lc-input-error { border-color: var(--lc-border-error) !important; }
+.lc-input-help {
+  font-size: 12px; color: var(--lc-text-tertiary);
+}
+.lc-input-error-text { font-size: 12px; color: var(--lc-status-error); }
+
+/* ── SELECT ── */
+.lc-select {
+  padding: 10px 36px 10px 16px; border-radius: var(--lc-radius-md);
+  border: 1px solid var(--lc-border-primary); background: var(--lc-surface-elevated);
+  font-family: var(--lc-font-body); font-size: 15px; color: var(--lc-text-primary);
+  appearance: none; outline: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%238A9080' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+}
+.lc-select:focus {
+  border-color: var(--lc-border-focus);
+  box-shadow: 0 0 0 3px var(--lc-accent-subtle);
+}
+
+/* ── CARDS ── */
+.lc-card {
+  background: var(--lc-surface-elevated);
+  border: 1px solid var(--lc-border-secondary);
+  border-radius: var(--lc-radius-md);
+  padding: 24px; box-shadow: var(--lc-shadow-sm);
+  transition: all var(--lc-duration-normal) var(--lc-ease-default);
+}
+.lc-card-clickable:hover {
+  box-shadow: var(--lc-shadow-md); border-color: var(--lc-border-primary);
+  cursor: pointer;
+}
+
+/* ── KPI CARD ── */
+.lc-kpi {
+  background: var(--lc-surface-elevated);
+  border: 1px solid var(--lc-border-secondary);
+  border-radius: var(--lc-radius-md); padding: 20px;
+  min-width: 180px;
+}
+.lc-kpi-label {
+  font-family: var(--lc-font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--lc-text-tertiary); margin-bottom: 8px; font-weight: 500;
+}
+.lc-kpi-value {
+  font-family: var(--lc-font-body); font-size: 28px; font-weight: 700;
+  color: var(--lc-text-primary); line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.lc-kpi-trend {
+  font-family: var(--lc-font-mono); font-size: 11px; margin-top: 6px;
+}
+.lc-kpi-trend-up { color: var(--lc-status-success); }
+.lc-kpi-trend-down { color: var(--lc-status-error); }
+.lc-kpi-trend-neutral { color: var(--lc-text-tertiary); }
+
+/* ── TABLE ── */
+.lc-table { width: 100%; border-collapse: collapse; }
+.lc-table th {
+  font-family: var(--lc-font-mono); font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--lc-text-secondary);
+  background: var(--lc-surface-tertiary); padding: 12px 16px; text-align: left;
+  border-bottom: 1px solid var(--lc-border-primary); font-weight: 500;
+}
+.lc-table td {
+  padding: 14px 16px; border-bottom: 1px solid var(--lc-border-secondary);
+  font-size: 14px; color: var(--lc-text-primary);
+}
+.lc-table tr:hover td { background: var(--lc-accent-subtle); }
+.lc-table .num {
+  font-family: var(--lc-font-mono); font-size: 13px;
+  font-variant-numeric: tabular-nums; text-align: right;
+  letter-spacing: 0.1em;
+}
+
+/* ── ALERTS ── */
+.lc-alert {
+  display: flex; gap: 12px; padding: 14px 18px;
+  border-radius: 0 var(--lc-radius-sm) var(--lc-radius-sm) 0;
+  border-left: 3px solid; font-size: 14px; line-height: 1.6;
+}
+.lc-alert-success { border-color: var(--lc-status-success); background: var(--lc-status-success-bg); color: var(--lc-status-success); }
+.lc-alert-warning { border-color: var(--lc-status-warning); background: var(--lc-status-warning-bg); color: var(--lc-status-warning); }
+.lc-alert-error   { border-color: var(--lc-status-error);   background: var(--lc-status-error-bg);   color: var(--lc-status-error); }
+.lc-alert-info    { border-color: var(--lc-status-info);    background: var(--lc-status-info-bg);    color: var(--lc-status-info); }
+
+/* ── RISK INDICATORS ── */
+.lc-risk-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid var(--lc-border-secondary);
+  font-size: 13px;
+}
+.lc-risk-item:last-child { border-bottom: none; }
+.lc-risk-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.lc-risk-dot-high { background: var(--lc-status-error); }
+.lc-risk-dot-med  { background: var(--lc-status-warning); }
+.lc-risk-dot-low  { background: var(--lc-status-success); }
+.lc-risk-bar {
+  flex: 1; height: 4px; background: var(--lc-border-secondary);
+  border-radius: var(--lc-radius-full); overflow: hidden;
+}
+.lc-risk-bar-fill { height: 100%; border-radius: var(--lc-radius-full); }
+
+/* ── MODAL ── */
+.lc-modal-demo {
+  background: var(--lc-surface-elevated); border-radius: var(--lc-radius-lg);
+  box-shadow: var(--lc-shadow-xl); max-width: 480px; padding: 32px;
+  border: 1px solid var(--lc-border-secondary);
+}
+.lc-modal-title {
+  font-family: var(--lc-font-display); font-size: 24px; font-weight: 500;
+  margin-bottom: 12px;
+}
+.lc-modal-body {
+  font-size: 15px; line-height: 1.65; color: var(--lc-text-secondary); margin-bottom: 32px;
+}
+.lc-modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+
+/* ── BLOCKQUOTE ── */
+.lc-blockquote {
+  border-left: 3px solid var(--lc-accent-primary); padding-left: 24px;
+}
+.lc-blockquote p {
+  font-family: var(--lc-font-display); font-size: 20px; font-weight: 400;
+  line-height: 1.5; color: var(--lc-text-primary); font-style: italic;
+}
+.lc-blockquote cite {
+  display: block; margin-top: 12px; font-family: var(--lc-font-body);
+  font-size: 14px; color: var(--lc-text-tertiary); font-style: normal;
+}
+
+/* ── SIDEBAR NAV ── */
+.lc-sidebar-demo {
+  background: var(--lc-surface-tertiary); width: 220px; padding: 24px 16px;
+  border-radius: var(--lc-radius-md); border: 1px solid var(--lc-border-secondary);
+}
+.lc-sidebar-logo {
+  font-family: var(--lc-font-display); font-size: 18px; padding-left: 10px;
+  margin-bottom: 24px;
+}
+.lc-sidebar-logo .lite { color: var(--lc-accent-text); font-style: italic; font-weight: 300; }
+.lc-nav-item {
+  display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+  border-radius: var(--lc-radius-sm); font-size: 13px;
+  color: var(--lc-text-secondary); margin-bottom: 2px; cursor: pointer;
+  transition: all var(--lc-duration-normal) var(--lc-ease-default);
+  text-decoration: none;
+}
+.lc-nav-item:hover { background: var(--lc-interactive-ghost-hover); }
+.lc-nav-item-active {
+  background: var(--lc-accent-subtle) !important; color: var(--lc-accent-text);
+}
+.lc-nav-icon {
+  width: 18px; height: 18px; border-radius: 4px; display: flex;
+  align-items: center; justify-content: center; font-size: 10px;
+  background: var(--lc-accent-subtle);
+}
+
+/* ── CHART BARS ── */
+.lc-chart-demo {
+  background: var(--lc-surface-elevated); border: 1px solid var(--lc-border-secondary);
+  border-radius: var(--lc-radius-md); padding: 24px;
+}
+.lc-chart-title {
+  font-size: 13px; font-weight: 600; margin-bottom: 16px;
+}
+.lc-bars { display: flex; align-items: flex-end; gap: 4px; height: 120px; }
+.lc-bar { flex: 1; border-radius: 3px 3px 0 0; min-width: 0; transition: opacity 0.2s; }
+.lc-bar:hover { opacity: 0.8; }
+.lc-bar-1 { background: var(--lc-chart-primary); }
+.lc-bar-2 { background: var(--lc-chart-secondary); }
+.lc-bar-3 { background: var(--lc-chart-tertiary); }
+.lc-chart-legend {
+  display: flex; gap: 20px; margin-top: 16px; font-size: 12px; color: var(--lc-text-tertiary);
+}
+.lc-legend-dot { width: 8px; height: 8px; border-radius: 2px; display: inline-block; margin-right: 6px; vertical-align: middle; }
+
+/* ── TYPOGRAPHY SPECIMENS ── */
+.type-specimen { margin-bottom: 32px; }
+.type-specimen-label {
+  font-family: var(--lc-font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--lc-text-tertiary); margin-bottom: 8px;
+}
+
+/* ── COLOR GRID ── */
+.color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
+.color-chip {
+  aspect-ratio: 1; border-radius: var(--lc-radius-sm); position: relative;
+  border: 1px solid var(--lc-border-secondary);
+}
+.color-chip-label {
+  position: absolute; bottom: 6px; left: 8px;
+  font-family: var(--lc-font-mono); font-size: 8px; letter-spacing: 0.05em;
+  background: rgba(0,0,0,0.4); color: white; padding: 2px 5px; border-radius: 3px;
+}
+
+/* ── CHECKBOX / TOGGLE ── */
+.lc-toggle-wrap { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--lc-text-secondary); }
+.lc-toggle {
+  width: 40px; height: 22px; border-radius: 11px; background: var(--lc-border-primary);
+  position: relative; cursor: pointer; transition: background var(--lc-duration-normal);
+}
+.lc-toggle.active { background: var(--lc-accent-primary); }
+.lc-toggle-knob {
+  width: 16px; height: 16px; border-radius: 50%; background: white;
+  position: absolute; top: 3px; left: 3px;
+  transition: transform var(--lc-duration-normal) var(--lc-ease-default);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.lc-toggle.active .lc-toggle-knob { transform: translateX(18px); }
+
+.lc-checkbox-wrap { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--lc-text-secondary); cursor: pointer; }
+.lc-checkbox {
+  width: 18px; height: 18px; border-radius: 4px; border: 2px solid var(--lc-border-primary);
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--lc-duration-fast); flex-shrink: 0;
+}
+.lc-checkbox.checked {
+  background: var(--lc-accent-primary); border-color: var(--lc-accent-primary);
+  color: var(--lc-text-inverse);
+}
+
+/* ── TABS ── */
+.lc-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--lc-border-primary); }
+.lc-tab {
+  padding: 10px 20px; font-size: 14px; font-weight: 500;
+  color: var(--lc-text-secondary); cursor: pointer; border-bottom: 2px solid transparent;
+  margin-bottom: -1px; transition: all var(--lc-duration-normal);
+  background: none; border-top: none; border-left: none; border-right: none;
+  font-family: var(--lc-font-body);
+}
+.lc-tab:hover { color: var(--lc-text-primary); }
+.lc-tab-active {
+  color: var(--lc-accent-text) !important; border-bottom-color: var(--lc-accent-primary);
+}
+
+/* ── TOOLTIP ── */
+.lc-tooltip-wrap { position: relative; display: inline-block; }
+.lc-tooltip {
+  position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+  background: var(--lc-surface-elevated); padding: 8px 14px; border-radius: var(--lc-radius-sm);
+  box-shadow: var(--lc-shadow-md); font-size: 13px; white-space: nowrap;
+  border: 1px solid var(--lc-border-primary); pointer-events: none;
+}
+
+/* ── ACCESSIBILITY ── */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+:focus-visible {
+  outline: 2px solid var(--lc-accent-primary, #C8FF3C);
+  outline-offset: 2px;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .showcase { padding: 40px 20px; }
+  .component-row { flex-direction: column; }
+  .lc-input { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="showcase">
+
+  <!-- HEADER + THEME TOGGLE -->
+  <header class="showcase-header">
+    <div class="showcase-logo"><span class="lite">lite</span>change <span style="font-family:var(--lc-font-mono);font-size:11px;color:var(--lc-text-tertiary);margin-left:8px;">DESIGN SYSTEM v1.0</span></div>
+    <div class="theme-toggle" role="group" aria-label="Sélection du thème">
+      <button onclick="setTheme('light')" aria-pressed="false">LIGHT</button>
+      <button onclick="setTheme('dark')" class="active" aria-pressed="true">DARK</button>
+    </div>
+  </header>
+
+  <!-- ═══════ COLORS ═══════ -->
+  <div class="section">
+    <div class="section-label">Palette de couleurs</div>
+
+    <div class="component-group">
+      <div class="component-group-label">Olive (Dark surfaces)</div>
+      <div class="color-grid">
+        <div class="color-chip" style="background:#0E1009"><span class="color-chip-label">950</span></div>
+        <div class="color-chip" style="background:#1B1F15"><span class="color-chip-label">900</span></div>
+        <div class="color-chip" style="background:#2A2F22"><span class="color-chip-label">800</span></div>
+        <div class="color-chip" style="background:#3A3F32"><span class="color-chip-label">700</span></div>
+        <div class="color-chip" style="background:#4E5444"><span class="color-chip-label">600</span></div>
+        <div class="color-chip" style="background:#6B7260"><span class="color-chip-label">500</span></div>
+        <div class="color-chip" style="background:#8A9080"><span class="color-chip-label">400</span></div>
+        <div class="color-chip" style="background:#A8AE9E"><span class="color-chip-label">300</span></div>
+        <div class="color-chip" style="background:#C8CCBE"><span class="color-chip-label">200</span></div>
+        <div class="color-chip" style="background:#E2E5DB"><span class="color-chip-label">100</span></div>
+      </div>
+    </div>
+
+    <div class="component-group">
+      <div class="component-group-label">Paper (Light surfaces)</div>
+      <div class="color-grid">
+        <div class="color-chip" style="background:#3A3428"><span class="color-chip-label">950</span></div>
+        <div class="color-chip" style="background:#5C5244"><span class="color-chip-label">900</span></div>
+        <div class="color-chip" style="background:#998B78"><span class="color-chip-label">700</span></div>
+        <div class="color-chip" style="background:#C4B8A8"><span class="color-chip-label">500</span></div>
+        <div class="color-chip" style="background:#E4D9C8"><span class="color-chip-label">300</span></div>
+        <div class="color-chip" style="background:#F0E6D8"><span class="color-chip-label">200</span></div>
+        <div class="color-chip" style="background:#F7F1E8"><span class="color-chip-label">100</span></div>
+        <div class="color-chip" style="background:#FDFAF6"><span class="color-chip-label">50</span></div>
+      </div>
+    </div>
+
+    <div class="component-group">
+      <div class="component-group-label">Lite Green (Accent)</div>
+      <div class="color-grid">
+        <div class="color-chip" style="background:#2A3A06"><span class="color-chip-label">950</span></div>
+        <div class="color-chip" style="background:#527A10"><span class="color-chip-label">800</span></div>
+        <div class="color-chip" style="background:#6B8A1A"><span class="color-chip-label">700</span></div>
+        <div class="color-chip" style="background:#9ABF30"><span class="color-chip-label">500</span></div>
+        <div class="color-chip" style="background:#C8FF3C"><span class="color-chip-label">300</span></div>
+        <div class="color-chip" style="background:#D8FF72"><span class="color-chip-label">200</span></div>
+        <div class="color-chip" style="background:#E8FFA8"><span class="color-chip-label">100</span></div>
+        <div class="color-chip" style="background:#F4FFD6"><span class="color-chip-label">50</span></div>
+      </div>
+    </div>
+
+    <div class="component-group">
+      <div class="component-group-label">Status</div>
+      <div class="color-grid">
+        <div class="color-chip" style="background:#4A90B8"><span class="color-chip-label">Signal</span></div>
+        <div class="color-chip" style="background:#C45A32"><span class="color-chip-label">Warm</span></div>
+        <div class="color-chip" style="background:#3A8A4A"><span class="color-chip-label">Success</span></div>
+        <div class="color-chip" style="background:#D4A03A"><span class="color-chip-label">Warning</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ TYPOGRAPHY ═══════ -->
+  <div class="section">
+    <div class="section-label">Typographie</div>
+
+    <div class="type-specimen">
+      <div class="type-specimen-label">Source Serif 4 — Display</div>
+      <div style="font-family:var(--lc-font-display);font-size:48px;font-weight:300;line-height:1.1;">Éclairer les transformations<br>des institutions qui <em style="color:var(--lc-accent-text)">comptent</em></div>
+    </div>
+    <div class="type-specimen">
+      <div class="type-specimen-label">DM Sans — Body</div>
+      <div style="font-size:15px;line-height:1.65;color:var(--lc-text-secondary);max-width:600px;">Diagnostiquer les enjeux, fabriquer des plans d'action contextualisés, détecter les zones de friction en interne, proposer des actions de mitigation, et rendre observable tous ces sujets peu tangibles grâce à des interfaces très claires.</div>
+    </div>
+    <div class="type-specimen">
+      <div class="type-specimen-label">IBM Plex Mono — Data</div>
+      <div style="font-family:var(--lc-font-mono);font-size:13px;line-height:2;color:var(--lc-accent-text);">ADOPTION: 73.2% | FRICTION_ZONES: 4 | ROI_INDEX: +18.6%<br>SRC: GIRAUD_MODEL_v3 | STATUS: OBSERVING</div>
+    </div>
+  </div>
+
+  <!-- ═══════ BUTTONS ═══════ -->
+  <div class="section">
+    <div class="section-label">Boutons</div>
+
+    <div class="component-group">
+      <div class="component-group-label">Variants</div>
+      <div class="component-row">
+        <button class="lc-btn lc-btn-md lc-btn-primary">Primary</button>
+        <button class="lc-btn lc-btn-md lc-btn-secondary">Secondary</button>
+        <button class="lc-btn lc-btn-md lc-btn-ghost">Ghost</button>
+        <button class="lc-btn lc-btn-md lc-btn-danger">Danger</button>
+        <button class="lc-btn lc-btn-md lc-btn-primary" disabled>Disabled</button>
+      </div>
+    </div>
+    <div class="component-group">
+      <div class="component-group-label">Sizes</div>
+      <div class="component-row" style="align-items:center;">
+        <button class="lc-btn lc-btn-sm lc-btn-primary">Small</button>
+        <button class="lc-btn lc-btn-md lc-btn-primary">Medium</button>
+        <button class="lc-btn lc-btn-lg lc-btn-primary">Large</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ BADGES ═══════ -->
+  <div class="section">
+    <div class="section-label">Badges</div>
+    <div class="component-row">
+      <span class="lc-badge lc-badge-success"><span class="lc-badge-dot"></span> On Track</span>
+      <span class="lc-badge lc-badge-warning"><span class="lc-badge-dot"></span> At Risk</span>
+      <span class="lc-badge lc-badge-error"><span class="lc-badge-dot"></span> Critical</span>
+      <span class="lc-badge lc-badge-info"><span class="lc-badge-dot"></span> In Review</span>
+      <span class="lc-badge lc-badge-accent"><span class="lc-badge-dot"></span> Observing</span>
+    </div>
+  </div>
+
+  <!-- ═══════ INPUTS ═══════ -->
+  <div class="section">
+    <div class="section-label">Inputs</div>
+    <div class="component-row">
+      <div class="lc-input-group">
+        <label class="lc-input-label" for="sc-project">Nom du projet</label>
+        <input class="lc-input" type="text" id="sc-project" placeholder="Ex: Migration ERP" aria-describedby="sc-project-help">
+        <span class="lc-input-help" id="sc-project-help">Identifiant unique du chantier de change</span>
+      </div>
+      <div class="lc-input-group">
+        <label class="lc-input-label" for="sc-direction">Direction responsable</label>
+        <select class="lc-select" id="sc-direction" style="width:280px;">
+          <option>Direction Générale</option>
+          <option>Direction Commerciale</option>
+          <option>Direction Financière</option>
+          <option>DSI</option>
+        </select>
+      </div>
+      <div class="lc-input-group">
+        <label class="lc-input-label" for="sc-budget">Budget (erreur)</label>
+        <input class="lc-input lc-input-error" type="text" id="sc-budget" value="-500" aria-invalid="true" aria-describedby="sc-budget-error">
+        <span class="lc-input-error-text" id="sc-budget-error">Le budget ne peut pas être négatif</span>
+      </div>
+    </div>
+    <div class="component-row" style="margin-top:24px;">
+      <div class="lc-toggle-wrap">
+        <button type="button" class="lc-toggle active" role="switch" aria-checked="true" aria-label="Alertes en temps réel" onclick="var on=this.classList.toggle('active');this.setAttribute('aria-checked',on)"><div class="lc-toggle-knob"></div></button>
+        Alertes en temps réel
+      </div>
+      <label class="lc-checkbox-wrap">
+        <input type="checkbox" checked class="sr-only" onchange="this.nextElementSibling.classList.toggle('checked',this.checked)">
+        <span class="lc-checkbox checked" aria-hidden="true">&#10003;</span>
+        Inclure dans le rapport
+      </label>
+    </div>
+  </div>
+
+  <!-- ═══════ TABS ═══════ -->
+  <div class="section">
+    <div class="section-label">Tabs</div>
+    <div class="lc-tabs" role="tablist" aria-label="Navigation modules">
+      <button class="lc-tab lc-tab-active" role="tab" aria-selected="true" tabindex="0">Dashboard</button>
+      <button class="lc-tab" role="tab" aria-selected="false" tabindex="-1">Diagnostic</button>
+      <button class="lc-tab" role="tab" aria-selected="false" tabindex="-1">Plans d'action</button>
+      <button class="lc-tab" role="tab" aria-selected="false" tabindex="-1">ROI Tracker</button>
+    </div>
+  </div>
+
+  <!-- ═══════ KPI CARDS ═══════ -->
+  <div class="section">
+    <div class="section-label">KPI Cards</div>
+    <div class="component-row">
+      <div class="lc-kpi">
+        <div class="lc-kpi-label">Adoption globale</div>
+        <div class="lc-kpi-value">73%</div>
+        <div class="lc-kpi-trend lc-kpi-trend-up">↑ +4.2% vs J-7</div>
+      </div>
+      <div class="lc-kpi">
+        <div class="lc-kpi-label">Zones à risque</div>
+        <div class="lc-kpi-value">4</div>
+        <div class="lc-kpi-trend lc-kpi-trend-down">↑ +1 vs J-7</div>
+      </div>
+      <div class="lc-kpi">
+        <div class="lc-kpi-label">ROI estimé</div>
+        <div class="lc-kpi-value">+18%</div>
+        <div class="lc-kpi-trend lc-kpi-trend-up">vs baseline Giraud</div>
+      </div>
+      <div class="lc-kpi">
+        <div class="lc-kpi-label">Actions actives</div>
+        <div class="lc-kpi-value">12</div>
+        <div class="lc-kpi-trend lc-kpi-trend-neutral">87% on track</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ TABLE ═══════ -->
+  <div class="section">
+    <div class="section-label">Tables</div>
+    <div class="lc-card" style="padding:0;overflow:hidden;">
+      <table class="lc-table">
+        <thead>
+          <tr><th>Direction</th><th>Adoption</th><th>Friction</th><th class="num">Δ 7j</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Direction Financière</td><td>82%</td>
+            <td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--lc-status-success);margin-right:6px;vertical-align:middle;"></span>Faible</td>
+            <td class="num" style="color:var(--lc-status-success)">+5.2%</td>
+            <td><span class="lc-badge lc-badge-success" style="font-size:9px;padding:2px 8px;">On Track</span></td>
+          </tr>
+          <tr>
+            <td>Direction Commerciale</td><td>41%</td>
+            <td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--lc-status-error);margin-right:6px;vertical-align:middle;"></span>Élevée</td>
+            <td class="num" style="color:var(--lc-status-error)">-3.1%</td>
+            <td><span class="lc-badge lc-badge-error" style="font-size:9px;padding:2px 8px;">Critical</span></td>
+          </tr>
+          <tr>
+            <td>Service Logistique</td><td>58%</td>
+            <td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--lc-status-warning);margin-right:6px;vertical-align:middle;"></span>Modérée</td>
+            <td class="num" style="color:var(--lc-status-warning)">+0.8%</td>
+            <td><span class="lc-badge lc-badge-warning" style="font-size:9px;padding:2px 8px;">At Risk</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════ CHARTS ═══════ -->
+  <div class="section">
+    <div class="section-label">Charts & Data Viz</div>
+    <div class="lc-chart-demo" style="max-width:600px;">
+      <div class="lc-chart-title">Adoption par semaine</div>
+      <div class="lc-bars">
+        <div class="lc-bar lc-bar-1" style="height:30%"></div>
+        <div class="lc-bar lc-bar-2" style="height:22%"></div>
+        <div class="lc-bar lc-bar-3" style="height:12%"></div>
+        <div class="lc-bar lc-bar-1" style="height:42%"></div>
+        <div class="lc-bar lc-bar-2" style="height:35%"></div>
+        <div class="lc-bar lc-bar-3" style="height:20%"></div>
+        <div class="lc-bar lc-bar-1" style="height:55%"></div>
+        <div class="lc-bar lc-bar-2" style="height:45%"></div>
+        <div class="lc-bar lc-bar-3" style="height:15%"></div>
+        <div class="lc-bar lc-bar-1" style="height:68%"></div>
+        <div class="lc-bar lc-bar-2" style="height:58%"></div>
+        <div class="lc-bar lc-bar-3" style="height:25%"></div>
+        <div class="lc-bar lc-bar-1" style="height:80%"></div>
+        <div class="lc-bar lc-bar-2" style="height:65%"></div>
+        <div class="lc-bar lc-bar-3" style="height:18%"></div>
+        <div class="lc-bar lc-bar-1" style="height:90%"></div>
+        <div class="lc-bar lc-bar-2" style="height:72%"></div>
+        <div class="lc-bar lc-bar-3" style="height:22%"></div>
+      </div>
+      <div class="lc-chart-legend">
+        <span><span class="lc-legend-dot" style="background:var(--lc-chart-primary)"></span>DSI</span>
+        <span><span class="lc-legend-dot" style="background:var(--lc-chart-secondary)"></span>Finance</span>
+        <span><span class="lc-legend-dot" style="background:var(--lc-chart-tertiary)"></span>Commerce</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ RISK INDICATORS ═══════ -->
+  <div class="section">
+    <div class="section-label">Risk Indicators</div>
+    <div class="lc-card" style="max-width:400px;">
+      <div style="font-size:13px;font-weight:600;margin-bottom:12px;">Zones de friction</div>
+      <div class="lc-risk-item">
+        <span class="lc-risk-dot lc-risk-dot-high"></span>
+        <span style="flex:0 0 140px;">Dir. Commerciale</span>
+        <div class="lc-risk-bar"><div class="lc-risk-bar-fill" style="width:82%;background:var(--lc-status-error);"></div></div>
+      </div>
+      <div class="lc-risk-item">
+        <span class="lc-risk-dot lc-risk-dot-med"></span>
+        <span style="flex:0 0 140px;">Serv. Logistique</span>
+        <div class="lc-risk-bar"><div class="lc-risk-bar-fill" style="width:54%;background:var(--lc-status-warning);"></div></div>
+      </div>
+      <div class="lc-risk-item">
+        <span class="lc-risk-dot lc-risk-dot-low"></span>
+        <span style="flex:0 0 140px;">Dir. Financière</span>
+        <div class="lc-risk-bar"><div class="lc-risk-bar-fill" style="width:22%;background:var(--lc-status-success);"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ ALERTS ═══════ -->
+  <div class="section">
+    <div class="section-label">Alertes</div>
+    <div style="display:flex;flex-direction:column;gap:12px;max-width:600px;">
+      <div class="lc-alert lc-alert-success">Adoption DSI en hausse de 12% — objectif J+60 atteignable.</div>
+      <div class="lc-alert lc-alert-warning">Logistique : engagement managers intermédiaires insuffisant (réf. Giraud, seuil J+15).</div>
+      <div class="lc-alert lc-alert-error">Zone rouge : Direction Commerciale — friction critique détectée. Plan de mitigation requis.</div>
+      <div class="lc-alert lc-alert-info">Nouveau modèle disponible : Giraud v3.2 — calibration ajustée pour le secteur banque/assurance.</div>
+    </div>
+  </div>
+
+  <!-- ═══════ BLOCKQUOTE ═══════ -->
+  <div class="section">
+    <div class="section-label">Citations & Références</div>
+    <div class="lc-blockquote" style="max-width:600px;">
+      <p>L'adoption chute de 34% quand les managers intermédiaires ne sont pas embarqués avant J+15.</p>
+      <cite>— Giraud, L. (2019). Conduite du changement et observabilité organisationnelle.</cite>
+    </div>
+  </div>
+
+  <!-- ═══════ SIDEBAR ═══════ -->
+  <div class="section">
+    <div class="section-label">Sidebar Navigation</div>
+    <nav class="lc-sidebar-demo" aria-label="Navigation latérale">
+      <div class="lc-sidebar-logo"><span class="lite">lite</span>change</div>
+      <a href="#" class="lc-nav-item lc-nav-item-active" aria-current="page"><span class="lc-nav-icon" aria-hidden="true">&#9678;</span> Dashboard</a>
+      <a href="#" class="lc-nav-item"><span class="lc-nav-icon" aria-hidden="true">&#9651;</span> Diagnostic</a>
+      <a href="#" class="lc-nav-item"><span class="lc-nav-icon" aria-hidden="true">&#9634;</span> Plans d'action</a>
+      <a href="#" class="lc-nav-item"><span class="lc-nav-icon" aria-hidden="true">&#9889;</span> Alertes</a>
+      <a href="#" class="lc-nav-item"><span class="lc-nav-icon" aria-hidden="true">&#9671;</span> ROI Tracker</a>
+      <a href="#" class="lc-nav-item"><span class="lc-nav-icon" aria-hidden="true">&#8862;</span> Modèles</a>
+    </nav>
+  </div>
+
+  <!-- ═══════ MODAL ═══════ -->
+  <div class="section">
+    <div class="section-label">Modal</div>
+    <div class="lc-modal-demo">
+      <div class="lc-modal-title">Lancer le diagnostic</div>
+      <div class="lc-modal-body">Cette action va scanner les indicateurs d'adoption et de friction sur l'ensemble du périmètre. Le diagnostic prend environ 30 secondes.</div>
+      <div class="lc-modal-actions">
+        <button class="lc-btn lc-btn-md lc-btn-secondary">Annuler</button>
+        <button class="lc-btn lc-btn-md lc-btn-primary">Lancer le scan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ TOOLTIP ═══════ -->
+  <div class="section">
+    <div class="section-label">Tooltip</div>
+    <div class="lc-tooltip-wrap">
+      <div class="lc-tooltip">Taux d'adoption mesuré sur les 7 derniers jours</div>
+      <span class="lc-badge lc-badge-accent" style="cursor:help;">Hover me</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.querySelectorAll('.theme-toggle button').forEach(btn => {
+    const isActive = btn.textContent === theme.toUpperCase();
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-pressed', String(isActive));
+  });
+}
+</script>
+
+</body>
+</html>
