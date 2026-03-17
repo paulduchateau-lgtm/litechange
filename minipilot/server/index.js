@@ -1,0 +1,1400 @@
+import dotenv from "dotenv";
+import express from "express";
+import cors from "cors";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+
+// Load .env from the server directory (not cwd)
+const __filename_env = fileURLToPath(import.meta.url);
+dotenv.config({ path: path.join(path.dirname(__filename_env), ".env"), override: true });
+import * as XLSX from "xlsx";
+import { parse as csvParse } from "csv-parse/sync";
+import Database from "better-sqlite3";
+import Anthropic from "@anthropic-ai/sdk";
+import { v4 as uuidv4 } from "uuid";
+
+// ─── Paths ───────────────────────────────────────────────────────────────────
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const IS_VERCEL = !!process.env.VERCEL;
+const UPLOADS_DIR = IS_VERCEL ? path.join("/tmp", "uploads") : path.join(__dirname, "uploads");
+const DB_PATH = IS_VERCEL ? path.join("/tmp", "minipilot.db") : path.join(__dirname, "minipilot.db");
+
+if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+
+// ─── Database setup ───────────────────────────────────────────────────────────
+
+const db = new Database(DB_PATH);
+db.pragma("journal_mode = WAL");
+db.pragma("foreign_keys = ON");
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS uploaded_files (
+    id TEXT PRIMARY KEY,
+    name TEXT,
+    type TEXT,
+    size INTEGER,
+    columns TEXT,
+    row_count INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS data_rows (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    file_id TEXT,
+    sheet_name TEXT,
+    row_data TEXT,
+    FOREIGN KEY (file_id) REFERENCES uploaded_files(id)
+  );
+
+  CREATE TABLE IF NOT EXISTS clean_data (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    table_name TEXT,
+    columns TEXT,
+    row_data TEXT,
+    source_file_id TEXT
+  );
+
+  CREATE TABLE IF NOT EXISTS project_context (
+    id INTEGER PRIMARY KEY DEFAULT 1,
+    project_name TEXT,
+    industry TEXT,
+    objectives TEXT,
+    questionnaire TEXT,
+    free_text TEXT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS reports (
+    id TEXT PRIMARY KEY,
+    title TEXT,
+    subtitle TEXT,
+    objective TEXT,
+    color TEXT,
+    icon TEXT DEFAULT 'BarChart3',
+    kpis TEXT,
+    sections TEXT,
+    shared INTEGER DEFAULT 0,
+    starred INTEGER DEFAULT 0,
+    source TEXT DEFAULT 'ai',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS usage_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    action TEXT,
+    query TEXT,
+    themes TEXT,
+    user_id TEXT DEFAULT 'default',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+`);
+
+// ─── Anthropic client ─────────────────────────────────────────────────────────
+
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+// ─── Express app ─────────────────────────────────────────────────────────────
+
+const app = express();
+const ALLOWED_ORIGINS = IS_VERCEL
+  ? [/\.vercel\.app$/, /localhost/]
+  : ["http://localhost:5173", "http://localhost:5183", "http://localhost:5174"];
+app.use(cors({ origin: ALLOWED_ORIGINS }));
+app.use(express.json({ limit: "10mb" }));
+
+// ─── Multer config ────────────────────────────────────────────────────────────
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, UPLOADS_DIR),
+  filename: (req, file, cb) => {
+    const safe = file.originalname.replace(/[^a-zA-Z0-9._-]/g, "_");
+    cb(null, `${uuidv4()}_${safe}`);
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 50 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowed = [
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-excel",
+      "text/csv",
+      "application/json",
+      "text/plain",
+    ];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (allowed.includes(file.mimetype) || [".xlsx", ".xls", ".csv", ".json"].includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error(`Type de fichier non supporté : ${file.mimetype}`));
+    }
+  },
+});
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+/**
+ * Normalize a column name: strip accents, lowercase, replace spaces/specials
+ * with underscores.
+ */
+function normalizeColumnName(name) {
+  return String(name)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
+/**
+ * Convert French number strings like "1 234,56" to JS number 1234.56.
+ * Returns the original value if conversion is not applicable.
+ */
+function parseFrenchNumber(val) {
+  if (typeof val === "number") return val;
+  if (typeof val !== "string") return val;
+  const cleaned = val.replace(/\s/g, "").replace(",", ".");
+  const n = Number(cleaned);
+  return isNaN(n) ? val : n;
+}
+
+/**
+ * Detect whether a string looks like a date.
+ */
+function looksLikeDate(val) {
+  if (typeof val !== "string") return false;
+  // ISO dates or DD/MM/YYYY or DD-MM-YYYY
+  return /^\d{4}-\d{2}-\d{2}/.test(val) || /^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}$/.test(val);
+}
+
+/**
+ * Normalize a date string to ISO format YYYY-MM-DD.
+ */
+function normalizeDate(val) {
+  if (/^\d{4}-\d{2}-\d{2}/.test(val)) return val.slice(0, 10);
+  // DD/MM/YYYY or DD-MM-YYYY
+  const m = val.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if (m) return `${m[3]}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}`;
+  return val;
+}
+
+/**
+ * Detect column type from a sample of non-null values.
+ */
+function detectType(samples) {
+  if (samples.length === 0) return "string";
+  const allNum = samples.every(v => {
+    const n = parseFrenchNumber(v);
+    return typeof n === "number";
+  });
+  if (allNum) return "number";
+  const allDate = samples.every(v => looksLikeDate(String(v)));
+  if (allDate) return "date";
+  return "string";
+}
+
+/**
+ * Extract 1-3 keyword themes from a French query string (simple noun heuristic).
+ */
+function extractThemes(query) {
+  const stopwords = new Set([
+    "le","la","les","de","du","des","un","une","et","ou","en","au","aux","par",
+    "sur","dans","avec","pour","qui","que","quoi","quelle","quel","quels","quelles",
+    "est","sont","était","avez","avoir","être","faire","quel","je","tu","il","elle",
+    "nous","vous","ils","me","te","se","mon","ma","mes","ton","ta","tes","son","sa",
+    "ses","notre","votre","leur","leurs","ce","cet","cette","ces","plus","moins",
+    "très","bien","tout","tous","toute","toutes","comment","pourquoi","quand","où",
+    "combien","quelle","quel","analyse","rapport","données","montrer","afficher",
+    "voir","regarder","donner","obtenir","vouloir","pouvoir","souhaitez","besoin",
+  ]);
+
+  const words = query
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z\s]/g, " ")
+    .split(/\s+/)
+    .filter(w => w.length > 3 && !stopwords.has(w));
+
+  // Deduplicate and take up to 3
+  return [...new Set(words)].slice(0, 3);
+}
+
+/**
+ * Build a compact data summary for AI prompts: schema + sample rows.
+ */
+function buildDataSummary(maxSampleRows = 5) {
+  const tables = db
+    .prepare("SELECT DISTINCT table_name FROM clean_data")
+    .all()
+    .map(r => r.table_name);
+
+  if (tables.length === 0) {
+    // Fall back to raw uploaded files
+    const files = db.prepare("SELECT * FROM uploaded_files").all();
+    return files.map(f => ({
+      name: f.name,
+      columns: JSON.parse(f.columns || "[]"),
+      rowCount: f.row_count,
+      sample: db
+        .prepare("SELECT row_data FROM data_rows WHERE file_id = ? LIMIT ?")
+        .all(f.id, maxSampleRows)
+        .map(r => JSON.parse(r.row_data)),
+    }));
+  }
+
+  return tables.map(tableName => {
+    const colsRow = db
+      .prepare("SELECT columns FROM clean_data WHERE table_name = ? LIMIT 1")
+      .get(tableName);
+    const cols = colsRow ? JSON.parse(colsRow.columns) : [];
+    const rowCount = db
+      .prepare("SELECT COUNT(*) AS cnt FROM clean_data WHERE table_name = ?")
+      .get(tableName).cnt;
+    const sample = db
+      .prepare("SELECT row_data FROM clean_data WHERE table_name = ? LIMIT ?")
+      .all(tableName, maxSampleRows)
+      .map(r => JSON.parse(r.row_data));
+    return { name: tableName, columns: cols, rowCount, sample };
+  });
+}
+
+/**
+ * Build a column stats summary for AI prompts.
+ */
+function buildColumnStats() {
+  const tables = db
+    .prepare("SELECT DISTINCT table_name FROM clean_data")
+    .all()
+    .map(r => r.table_name);
+
+  const result = {};
+  for (const tableName of tables) {
+    const colsRow = db
+      .prepare("SELECT columns FROM clean_data WHERE table_name = ? LIMIT 1")
+      .get(tableName);
+    const cols = colsRow ? JSON.parse(colsRow.columns) : [];
+    const rows = db
+      .prepare("SELECT row_data FROM clean_data WHERE table_name = ?")
+      .all(tableName)
+      .map(r => JSON.parse(r.row_data));
+
+    const stats = {};
+    for (const col of cols) {
+      const key = col.name;
+      const values = rows.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== "");
+      const nullCount = rows.length - values.length;
+
+      if (col.type === "number") {
+        const nums = values.map(Number).filter(n => !isNaN(n));
+        stats[key] = {
+          type: "number",
+          nullCount,
+          min: nums.length ? Math.min(...nums) : null,
+          max: nums.length ? Math.max(...nums) : null,
+          avg: nums.length ? Math.round((nums.reduce((a, b) => a + b, 0) / nums.length) * 100) / 100 : null,
+        };
+      } else {
+        const unique = new Set(values).size;
+        stats[key] = {
+          type: col.type,
+          nullCount,
+          uniqueCount: unique,
+          sampleValues: [...new Set(values)].slice(0, 5),
+        };
+      }
+    }
+    result[tableName] = stats;
+  }
+  return result;
+}
+
+// ─── Routes ───────────────────────────────────────────────────────────────────
+
+// ── POST /api/upload ──────────────────────────────────────────────────────────
+
+app.post("/api/upload", upload.array("files", 10), async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: "Aucun fichier reçu." });
+    }
+
+    const result = [];
+
+    for (const file of req.files) {
+      const ext = path.extname(file.originalname).toLowerCase();
+      const fileId = uuidv4();
+      let rows = [];
+      let columns = [];
+
+      // Parse file first to get columns and rows
+      if (ext === ".xlsx" || ext === ".xls") {
+        const workbook = XLSX.readFile(file.path);
+        for (const sheetName of workbook.SheetNames) {
+          const sheet = workbook.Sheets[sheetName];
+          const sheetRows = XLSX.utils.sheet_to_json(sheet, { defval: null });
+          if (sheetRows.length === 0) continue;
+          if (columns.length === 0) columns = Object.keys(sheetRows[0]);
+          rows = rows.concat(sheetRows.map(r => ({ _sheet: sheetName, ...r })));
+        }
+      } else if (ext === ".csv") {
+        const rawContent = fs.readFileSync(file.path, "utf8");
+        const delimiters = [",", ";", "\t", "|"];
+        let bestDelimiter = ",";
+        let bestCount = 0;
+        for (const d of delimiters) {
+          const count = (rawContent.slice(0, 2000).match(new RegExp(`\\${d}`, "g")) || []).length;
+          if (count > bestCount) { bestCount = count; bestDelimiter = d; }
+        }
+        const parsed = csvParse(rawContent, {
+          delimiter: bestDelimiter, columns: true,
+          skip_empty_lines: true, trim: true, relax_quotes: true,
+        });
+        if (parsed.length > 0) columns = Object.keys(parsed[0]);
+        rows = parsed.map(r => ({ _sheet: "sheet1", ...r }));
+      } else if (ext === ".json") {
+        const rawContent = fs.readFileSync(file.path, "utf8");
+        const parsed = JSON.parse(rawContent);
+        const dataArray = Array.isArray(parsed) ? parsed : [parsed];
+        if (dataArray.length > 0) columns = Object.keys(dataArray[0]);
+        rows = dataArray.map(r => ({ _sheet: "sheet1", ...r }));
+      }
+
+      // Insert parent record FIRST (before data_rows to satisfy FK constraint)
+      db.prepare(
+        "INSERT INTO uploaded_files (id, name, type, size, columns, row_count) VALUES (?, ?, ?, ?, ?, ?)"
+      ).run(fileId, file.originalname, ext.replace(".", ""), file.size, JSON.stringify(columns), rows.length);
+
+      // Now insert data rows
+      const insertRow = db.prepare(
+        "INSERT INTO data_rows (file_id, sheet_name, row_data) VALUES (?, ?, ?)"
+      );
+      const insertMany = db.transaction(items => {
+        for (const row of items) {
+          const sheet = row._sheet || "sheet1";
+          const { _sheet, ...data } = row;
+          insertRow.run(fileId, sheet, JSON.stringify(data));
+        }
+      });
+      insertMany(rows);
+
+      result.push({
+        id: fileId,
+        name: file.originalname,
+        type: ext.replace(".", ""),
+        rows: rows.length,
+        columns,
+      });
+    }
+
+    db.prepare("INSERT OR REPLACE INTO usage_logs (action, query, themes, user_id) VALUES (?, ?, ?, ?)")
+      .run("upload", `Uploaded ${req.files.length} file(s)`, JSON.stringify(req.files.map(f => f.originalname)), "default");
+
+    // Compute aggregate stats for the response
+    const totalRows = result.reduce((sum, f) => sum + f.rows, 0);
+    const allCols = new Set();
+    result.forEach(f => f.columns.forEach(c => allCols.add(c)));
+
+    res.json({ files: result, stats: { totalRows, totalCols: allCols.size } });
+  } catch (err) {
+    console.error("[POST /api/upload]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── POST /api/context ─────────────────────────────────────────────────────────
+
+app.post("/api/context", (req, res) => {
+  try {
+    const { projectName, industry, objectives, questionnaire, freeText } = req.body;
+    db.prepare(`
+      INSERT INTO project_context (id, project_name, industry, objectives, questionnaire, free_text, updated_at)
+      VALUES (1, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      ON CONFLICT(id) DO UPDATE SET
+        project_name = excluded.project_name,
+        industry = excluded.industry,
+        objectives = excluded.objectives,
+        questionnaire = excluded.questionnaire,
+        free_text = excluded.free_text,
+        updated_at = CURRENT_TIMESTAMP
+    `).run(
+      projectName || null,
+      industry || null,
+      objectives || null,
+      questionnaire ? JSON.stringify(questionnaire) : null,
+      freeText || null
+    );
+    const saved = db.prepare("SELECT * FROM project_context WHERE id = 1").get();
+    res.json({ context: formatContext(saved) });
+  } catch (err) {
+    console.error("[POST /api/context]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /api/context ──────────────────────────────────────────────────────────
+
+app.get("/api/context", (req, res) => {
+  try {
+    const row = db.prepare("SELECT * FROM project_context WHERE id = 1").get();
+    if (!row) return res.json({ context: null });
+    res.json({ context: formatContext(row) });
+  } catch (err) {
+    console.error("[GET /api/context]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── PUT /api/context ──────────────────────────────────────────────────────────
+
+app.put("/api/context", (req, res) => {
+  try {
+    const { projectName, industry, objectives, questionnaire, freeText } = req.body;
+    const existing = db.prepare("SELECT * FROM project_context WHERE id = 1").get();
+    if (!existing) {
+      return res.status(404).json({ error: "Contexte introuvable. Utilisez POST pour créer." });
+    }
+    db.prepare(`
+      UPDATE project_context SET
+        project_name = ?,
+        industry = ?,
+        objectives = ?,
+        questionnaire = ?,
+        free_text = ?,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = 1
+    `).run(
+      projectName ?? existing.project_name,
+      industry ?? existing.industry,
+      objectives ?? existing.objectives,
+      questionnaire ? JSON.stringify(questionnaire) : existing.questionnaire,
+      freeText ?? existing.free_text
+    );
+    const updated = db.prepare("SELECT * FROM project_context WHERE id = 1").get();
+    res.json({ context: formatContext(updated) });
+  } catch (err) {
+    console.error("[PUT /api/context]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+function formatContext(row) {
+  if (!row) return null;
+  return {
+    projectName: row.project_name,
+    industry: row.industry,
+    objectives: row.objectives,
+    questionnaire: row.questionnaire ? JSON.parse(row.questionnaire) : null,
+    freeText: row.free_text,
+    updatedAt: row.updated_at,
+  };
+}
+
+// ── POST /api/transform ───────────────────────────────────────────────────────
+
+app.post("/api/transform", (req, res) => {
+  try {
+    // Clear previous clean_data
+    db.prepare("DELETE FROM clean_data").run();
+
+    const files = db.prepare("SELECT * FROM uploaded_files").all();
+    if (files.length === 0) {
+      return res.status(400).json({ error: "Aucun fichier importé. Commencez par /api/upload." });
+    }
+
+    const tableSummaries = [];
+    const tablesByCommonKey = {}; // key: column_name -> [{tableName, rows}]
+
+    for (const file of files) {
+      const rawRows = db
+        .prepare("SELECT row_data FROM data_rows WHERE file_id = ?")
+        .all(file.id)
+        .map(r => JSON.parse(r.row_data));
+
+      if (rawRows.length === 0) continue;
+
+      // Remove completely empty rows
+      const nonEmptyRows = rawRows.filter(row =>
+        Object.values(row).some(v => v !== null && v !== undefined && v !== "")
+      );
+      if (nonEmptyRows.length === 0) continue;
+
+      // Normalize column names
+      const originalKeys = Object.keys(nonEmptyRows[0]);
+      const keyMap = {};
+      for (const k of originalKeys) {
+        keyMap[k] = normalizeColumnName(k);
+      }
+
+      // Remap rows
+      const remapped = nonEmptyRows.map(row => {
+        const newRow = {};
+        for (const [origKey, normKey] of Object.entries(keyMap)) {
+          let val = row[origKey];
+          if (typeof val === "string") val = val.trim();
+          newRow[normKey] = val;
+        }
+        return newRow;
+      });
+
+      // Detect column types from a sample
+      const normalizedKeys = Object.values(keyMap);
+      const columns = normalizedKeys.map(key => {
+        const sampleVals = remapped
+          .map(r => r[key])
+          .filter(v => v !== null && v !== undefined && v !== "")
+          .slice(0, 50);
+        const type = detectType(sampleVals);
+        return { name: key, type, nullable: remapped.some(r => r[key] === null || r[key] === undefined || r[key] === "") };
+      });
+
+      // Convert types in rows
+      const converted = remapped.map(row => {
+        const newRow = {};
+        for (const col of columns) {
+          let val = row[col.name];
+          if (val === null || val === undefined || val === "") {
+            newRow[col.name] = null;
+          } else if (col.type === "number") {
+            newRow[col.name] = parseFrenchNumber(val);
+          } else if (col.type === "date") {
+            newRow[col.name] = normalizeDate(String(val));
+          } else {
+            newRow[col.name] = String(val).trim();
+          }
+        }
+        return newRow;
+      });
+
+      const tableName = normalizeColumnName(path.basename(file.name, path.extname(file.name)));
+      const colsJson = JSON.stringify(columns);
+
+      const insertClean = db.prepare(
+        "INSERT INTO clean_data (table_name, columns, row_data, source_file_id) VALUES (?, ?, ?, ?)"
+      );
+      const insertMany = db.transaction(items => {
+        for (const row of items) {
+          insertClean.run(tableName, colsJson, JSON.stringify(row), file.id);
+        }
+      });
+      insertMany(converted);
+
+      // Collect stats for response
+      const colStats = columns.map(col => {
+        const vals = converted.map(r => r[col.name]).filter(v => v !== null && v !== undefined && v !== "");
+        const nullCount = converted.length - vals.length;
+        const sampleValues = col.type === "string"
+          ? [...new Set(vals)].slice(0, 5)
+          : vals.slice(0, 5);
+        return { name: col.name, type: col.type, nullCount, sampleValues };
+      });
+
+      tableSummaries.push({
+        name: tableName,
+        columns: colStats,
+        rowCount: converted.length,
+      });
+
+      // Record potential join columns
+      for (const col of columns) {
+        if (!tablesByCommonKey[col.name]) tablesByCommonKey[col.name] = [];
+        tablesByCommonKey[col.name].push(tableName);
+      }
+    }
+
+    // Identify common columns for potential merge
+    const commonCols = Object.entries(tablesByCommonKey)
+      .filter(([, tables]) => tables.length > 1)
+      .map(([col, tables]) => ({ column: col, tables }));
+
+    // Compute summary stats for the frontend component
+    const totalRows = tableSummaries.reduce((s, t) => s + t.rowCount, 0);
+    const allCols = tableSummaries.flatMap(t => t.columns);
+    const totalCols = allCols.length;
+    const numericCols = allCols.filter(c => c.type === "number").length;
+    const textCols = allCols.filter(c => c.type === "string").length;
+    const dateCols = allCols.filter(c => c.type === "date").length;
+    const totalNulls = allCols.reduce((s, c) => s + (c.nullCount || 0), 0);
+
+    const response = {
+      tables: tableSummaries,
+      // Summary fields expected by OnboardingTransform component
+      cleanedRows: totalRows,
+      typedCols: totalCols,
+      numericCols,
+      textCols,
+      dateCols,
+      nullValues: totalNulls,
+      mergedColumn: commonCols.length > 0 ? commonCols[0].column : null,
+    };
+    if (commonCols.length > 0) {
+      response.mergeOpportunities = commonCols;
+    }
+
+    res.json(response);
+  } catch (err) {
+    console.error("[POST /api/transform]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /api/data/preview ─────────────────────────────────────────────────────
+
+app.get("/api/data/preview", (req, res) => {
+  try {
+    const tables = db.prepare("SELECT DISTINCT table_name FROM clean_data").all().map(r => r.table_name);
+
+    if (tables.length === 0) {
+      return res.json({ columns: [], rows: [], totalRows: 0, tables: 0 });
+    }
+
+    // Flatten: merge all tables into a single preview (MVP = typically 1 table)
+    let allColumns = [];
+    let allRows = [];
+    let totalRows = 0;
+
+    for (const tableName of tables) {
+      // Get columns definition
+      const colsRow = db
+        .prepare("SELECT columns FROM clean_data WHERE table_name = ? LIMIT 1")
+        .get(tableName);
+      const cols = colsRow ? JSON.parse(colsRow.columns) : [];
+
+      // Merge columns (avoid duplicates by key)
+      const existingKeys = new Set(allColumns.map(c => c.key || c.name));
+      for (const col of cols) {
+        const key = col.key || col.name;
+        if (!existingKeys.has(key)) {
+          allColumns.push({ key, label: col.label || col.name, type: col.type || "text" });
+          existingKeys.add(key);
+        }
+      }
+
+      // Get rows (limit 50 for preview)
+      const rows = db
+        .prepare("SELECT row_data FROM clean_data WHERE table_name = ? LIMIT 50")
+        .all(tableName)
+        .map(r => JSON.parse(r.row_data));
+      allRows.push(...rows);
+
+      // Total count
+      const count = db
+        .prepare("SELECT COUNT(*) AS cnt FROM clean_data WHERE table_name = ?")
+        .get(tableName).cnt;
+      totalRows += count;
+    }
+
+    res.json({
+      columns: allColumns,
+      rows: allRows.slice(0, 50),
+      totalRows,
+      tables: tables.length,
+    });
+  } catch (err) {
+    console.error("[GET /api/data/preview]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /api/data/columns ──────────────────────────────────────────────────────
+
+app.get("/api/data/columns", (req, res) => {
+  try {
+    const tables = db.prepare("SELECT DISTINCT table_name FROM clean_data").all().map(r => r.table_name);
+    const result = {};
+    for (const tableName of tables) {
+      const colsRow = db
+        .prepare("SELECT columns FROM clean_data WHERE table_name = ? LIMIT 1")
+        .get(tableName);
+      result[tableName] = colsRow ? JSON.parse(colsRow.columns) : [];
+    }
+    res.json({ columns: result });
+  } catch (err) {
+    console.error("[GET /api/data/columns]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /api/data/stats ───────────────────────────────────────────────────────
+
+app.get("/api/data/stats", (req, res) => {
+  try {
+    const allStats = buildColumnStats();
+    // Flatten: merge stats from all tables into a single object keyed by column name
+    const flat = {};
+    for (const tableName of Object.keys(allStats)) {
+      Object.assign(flat, allStats[tableName]);
+    }
+    res.json(flat);
+  } catch (err) {
+    console.error("[GET /api/data/stats]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── POST /api/ai/suggest-reports ──────────────────────────────────────────────
+
+app.post("/api/ai/suggest-reports", async (req, res) => {
+  try {
+    const context = db.prepare("SELECT * FROM project_context WHERE id = 1").get();
+    const dataSummary = buildDataSummary(5);
+    const colStats = buildColumnStats();
+
+    if (dataSummary.length === 0) {
+      return res.status(400).json({ error: "Aucune donnée disponible. Importez et transformez des fichiers d'abord." });
+    }
+
+    const contextText = context
+      ? `Projet : ${context.project_name || "non renseigné"}
+Secteur : ${context.industry || "non renseigné"}
+Objectifs : ${context.objectives || "non renseignés"}
+Texte libre : ${context.free_text || "—"}`
+      : "Aucun contexte projet renseigné.";
+
+    const schemaText = dataSummary.map(t => {
+      const cols = t.columns.map(c => `  - ${c.name} (${c.type})`).join("\n");
+      return `Table "${t.name}" — ${t.rowCount} lignes :\n${cols}\nExemple : ${JSON.stringify(t.sample?.[0] || {})}`;
+    }).join("\n\n");
+
+    const statsText = Object.entries(colStats).map(([table, cols]) => {
+      const entries = Object.entries(cols).map(([col, s]) =>
+        s.type === "number"
+          ? `  ${col}: min=${s.min}, max=${s.max}, avg=${s.avg}, nulls=${s.nullCount}`
+          : `  ${col}: ${s.uniqueCount} valeurs uniques, exemples=${JSON.stringify(s.sampleValues)}, nulls=${s.nullCount}`
+      ).join("\n");
+      return `Table "${table}" :\n${entries}`;
+    }).join("\n\n");
+
+    const prompt = `Tu es un expert en data analytics pour les mutuelles santé collectives françaises.
+
+CONTEXTE PROJET :
+${contextText}
+
+SCHÉMA ET DONNÉES :
+${schemaText}
+
+STATISTIQUES PAR COLONNE :
+${statsText}
+
+Ta mission : suggérer 5 à 8 rapports analytiques pertinents pour ce jeu de données.
+Chaque suggestion doit être directement exploitable avec les colonnes disponibles.
+
+Réponds UNIQUEMENT avec un JSON valide, sans markdown, sans explication, dans ce format exact :
+{
+  "suggestions": [
+    {
+      "id": "suggestion_1",
+      "title": "Titre du rapport",
+      "description": "Description concise de l'analyse et de sa valeur métier",
+      "type": "bar|composed|grouped_bar|area_multi|pie_multi|table",
+      "columns": ["col1", "col2"],
+      "kpis": ["KPI à calculer 1", "KPI à calculer 2"],
+      "sections": ["Titre section 1", "Titre section 2"]
+    }
+  ]
+}`;
+
+    const message = await anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 2000,
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    const rawText = message.content[0].text.trim();
+    // Strip possible markdown code fences
+    const jsonText = rawText.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
+    const parsed = JSON.parse(jsonText);
+
+    db.prepare("INSERT INTO usage_logs (action, query, themes, user_id) VALUES (?, ?, ?, ?)")
+      .run("report_suggest", "AI suggest-reports", JSON.stringify(["suggestion", "rapport", "analyse"]), "default");
+
+    res.json(parsed);
+  } catch (err) {
+    console.error("[POST /api/ai/suggest-reports]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── POST /api/ai/generate-report ──────────────────────────────────────────────
+
+app.post("/api/ai/generate-report", async (req, res) => {
+  try {
+    const { suggestion } = req.body;
+    if (!suggestion) {
+      return res.status(400).json({ error: "Paramètre 'suggestion' manquant." });
+    }
+
+    const context = db.prepare("SELECT * FROM project_context WHERE id = 1").get();
+    const dataSummary = buildDataSummary(20);
+    const colStats = buildColumnStats();
+
+    const contextText = context
+      ? `Projet : ${context.project_name || "—"}\nSecteur : ${context.industry || "—"}\nObjectifs : ${context.objectives || "—"}`
+      : "Aucun contexte renseigné.";
+
+    const dataText = dataSummary.map(t =>
+      `Table "${t.name}" (${t.rowCount} lignes) :\nColonnes : ${t.columns.map(c => `${c.name}(${c.type})`).join(", ")}\nExemples :\n${t.sample.map(r => JSON.stringify(r)).join("\n")}`
+    ).join("\n\n");
+
+    const statsText = Object.entries(colStats).map(([table, cols]) => {
+      const entries = Object.entries(cols).map(([col, s]) =>
+        s.type === "number"
+          ? `  ${col}: min=${s.min}, max=${s.max}, avg=${s.avg}`
+          : `  ${col}: ${s.uniqueCount} valeurs uniques`
+      ).join("\n");
+      return `Table "${table}" :\n${entries}`;
+    }).join("\n\n");
+
+    const prompt = `Tu es un expert data pour mutuelles santé collectives françaises.
+
+CONTEXTE :
+${contextText}
+
+RAPPORT À GÉNÉRER :
+Titre : ${suggestion.title}
+Description : ${suggestion.description}
+Type principal : ${suggestion.type}
+Colonnes clés : ${(suggestion.columns || []).join(", ")}
+KPIs demandés : ${(suggestion.kpis || []).join(", ")}
+
+DONNÉES DISPONIBLES :
+${dataText}
+
+STATISTIQUES :
+${statsText}
+
+Génère un rapport analytique complet avec des données RÉELLES calculées depuis les données fournies.
+
+RÈGLES IMPORTANTES pour le format des sections :
+- type "bar" : config doit avoir { xKey, yKeys: [...], colors: [...] }
+- type "composed" : config doit avoir { xKey, bars: [{key, color, name}], line: {key, color, name} }
+- type "grouped_bar" : config doit avoir { xKey, yKeys: [...], colors: [...], names: [...] }
+- type "area_multi" : config doit avoir { xKey, yKeys: [...], colors: [...], names: [...] }
+- type "pie_multi" : doit avoir data_sets: [{label, data: [{name, value}]}]
+- type "table" : doit avoir columns: [{key, label, align?, fmt?, hl?}]
+- Les couleurs disponibles : "#C8FF3C" (lite), "#4A90B8" (signal), "#C45A32" (warm), "#D4A03A" (warning), "#3A8A4A" (success)
+
+Réponds UNIQUEMENT avec un JSON valide, sans markdown :
+{
+  "id": "report_<uuid>",
+  "title": "...",
+  "subtitle": "...",
+  "objective": "...",
+  "color": "#4A90B8",
+  "kpis": [
+    { "label": "...", "value": "...", "trend": "+X%", "bad": false }
+  ],
+  "sections": [
+    {
+      "title": "...",
+      "type": "bar|composed|grouped_bar|area_multi|pie_multi|table",
+      "insight": "Observation analytique clé",
+      "data": [...],
+      "config": { ... }
+    }
+  ]
+}`;
+
+    const message = await anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 4000,
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    const rawText = message.content[0].text.trim();
+    const jsonText = rawText.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
+    const report = JSON.parse(jsonText);
+
+    // Assign a guaranteed unique ID
+    report.id = report.id || `report_${uuidv4()}`;
+
+    db.prepare(`
+      INSERT INTO reports (id, title, subtitle, objective, color, icon, kpis, sections, shared, starred, source)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 0, 'ai')
+    `).run(
+      report.id,
+      report.title,
+      report.subtitle || null,
+      report.objective || null,
+      report.color || "#4A90B8",
+      report.icon || "BarChart3",
+      JSON.stringify(report.kpis || []),
+      JSON.stringify(report.sections || [])
+    );
+
+    db.prepare("INSERT INTO usage_logs (action, query, themes, user_id) VALUES (?, ?, ?, ?)")
+      .run("report_generate", `Generated: ${report.title}`, JSON.stringify(extractThemes(report.title)), "default");
+
+    res.json({ report });
+  } catch (err) {
+    console.error("[POST /api/ai/generate-report]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── POST /api/ai/chat ─────────────────────────────────────────────────────────
+
+app.post("/api/ai/chat", async (req, res) => {
+  try {
+    const { message, history = [] } = req.body;
+    if (!message) {
+      return res.status(400).json({ error: "Paramètre 'message' manquant." });
+    }
+
+    const context = db.prepare("SELECT * FROM project_context WHERE id = 1").get();
+    const dataSummary = buildDataSummary(10);
+    const colStats = buildColumnStats();
+
+    const contextText = context
+      ? `Projet : ${context.project_name || "—"}\nSecteur : ${context.industry || "—"}\nObjectifs : ${context.objectives || "—"}`
+      : "Aucun contexte renseigné.";
+
+    const schemaText = dataSummary.map(t => {
+      const cols = t.columns.map(c => `${c.name}(${c.type})`).join(", ");
+      return `Table "${t.name}" — ${t.rowCount} lignes — colonnes : ${cols}`;
+    }).join("\n");
+
+    const sampleText = dataSummary.map(t =>
+      `Table "${t.name}" — 3 exemples :\n${t.sample.slice(0, 3).map(r => JSON.stringify(r)).join("\n")}`
+    ).join("\n\n");
+
+    const statsText = Object.entries(colStats).map(([table, cols]) => {
+      const entries = Object.entries(cols).map(([col, s]) =>
+        s.type === "number"
+          ? `  ${col}: min=${s.min}, max=${s.max}, avg=${s.avg}`
+          : `  ${col}: ${s.uniqueCount} valeurs uniques`
+      ).join("\n");
+      return `Table "${table}" :\n${entries}`;
+    }).join("\n\n");
+
+    const systemPrompt = `Tu es Minipilot, un assistant analytique expert en mutuelles santé collectives françaises (mutuelle santé collective, sinistralité, prestations, cotisations, bénéficiaires).
+
+CONTEXTE PROJET :
+${contextText}
+
+SCHÉMA DES DONNÉES :
+${schemaText}
+
+STATISTIQUES :
+${statsText}
+
+EXEMPLES DE DONNÉES :
+${sampleText}
+
+INSTRUCTIONS :
+- Réponds en français, de manière professionnelle et concise.
+- Si l'utilisateur demande une analyse, un rapport, un graphique ou une visualisation, génère un rapport complet.
+- Si tu génères un rapport, inclus TOUJOURS un bloc JSON valide entre les balises <REPORT_DATA> et </REPORT_DATA>.
+- Le format du rapport doit respecter exactement ce schéma (pour le composant RenderSection) :
+{
+  "id": "report_xxx",
+  "title": "...",
+  "subtitle": "...",
+  "objective": "...",
+  "color": "#4A90B8",
+  "kpis": [{ "label": "...", "value": "...", "trend": "+X%", "bad": false }],
+  "sections": [{
+    "title": "...",
+    "type": "bar|composed|grouped_bar|area_multi|pie_multi|table",
+    "insight": "...",
+    "data": [...],
+    "config": {
+      "xKey": "...",
+      "yKeys": [...],
+      "colors": [...],
+      "names": [...],
+      "bars": [{"key":"...","color":"...","name":"..."}],
+      "line": {"key":"...","color":"...","name":"..."}
+    }
+  }]
+}
+- Si tu ne génères pas de rapport, réponds simplement avec du texte.
+- Utilise les données réelles disponibles dans les statistiques et exemples.`;
+
+    // Build messages array for Anthropic
+    const messages = [
+      ...history.map(h => ({ role: h.role, content: h.content })),
+      { role: "user", content: message },
+    ];
+
+    const aiResponse = await anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 4000,
+      system: systemPrompt,
+      messages,
+    });
+
+    const rawResponse = aiResponse.content[0].text;
+
+    // Extract report data if present
+    let reportData = null;
+    const reportMatch = rawResponse.match(/<REPORT_DATA>([\s\S]*?)<\/REPORT_DATA>/);
+    if (reportMatch) {
+      try {
+        reportData = JSON.parse(reportMatch[1].trim());
+        reportData.id = reportData.id || `report_${uuidv4()}`;
+
+        // Persist the report
+        db.prepare(`
+          INSERT OR REPLACE INTO reports (id, title, subtitle, objective, color, icon, kpis, sections, shared, starred, source)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 'chat')
+        `).run(
+          reportData.id,
+          reportData.title,
+          reportData.subtitle || null,
+          reportData.objective || null,
+          reportData.color || "#4A90B8",
+          reportData.icon || "BarChart3",
+          JSON.stringify(reportData.kpis || []),
+          JSON.stringify(reportData.sections || [])
+        );
+      } catch (parseErr) {
+        console.error("[chat] Impossible de parser le rapport JSON :", parseErr.message);
+      }
+    }
+
+    // Clean the response text (remove the JSON block for cleaner display)
+    const cleanResponse = rawResponse.replace(/<REPORT_DATA>[\s\S]*?<\/REPORT_DATA>/g, "").trim();
+
+    // Extract themes for logging
+    const themes = extractThemes(message);
+    db.prepare("INSERT INTO usage_logs (action, query, themes, user_id) VALUES (?, ?, ?, ?)")
+      .run("chat_query", message, JSON.stringify(themes), "default");
+
+    res.json({
+      response: cleanResponse,
+      ...(reportData ? { reportData } : {}),
+    });
+  } catch (err) {
+    console.error("[POST /api/ai/chat]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /api/reports ──────────────────────────────────────────────────────────
+
+app.get("/api/reports", (req, res) => {
+  try {
+    const rows = db.prepare("SELECT * FROM reports ORDER BY created_at DESC").all();
+    const reports = rows.map(deserializeReport);
+    const shared = reports.filter(r => r.shared);
+    const privateReports = reports.filter(r => !r.shared);
+    res.json({ shared, private: privateReports });
+  } catch (err) {
+    console.error("[GET /api/reports]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── POST /api/reports ─────────────────────────────────────────────────────────
+
+app.post("/api/reports", (req, res) => {
+  try {
+    const { title, subtitle, objective, color, icon, kpis, sections, shared, source } = req.body;
+    if (!title) return res.status(400).json({ error: "Champ 'title' requis." });
+
+    const id = `report_${uuidv4()}`;
+    db.prepare(`
+      INSERT INTO reports (id, title, subtitle, objective, color, icon, kpis, sections, shared, starred, source)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)
+    `).run(
+      id,
+      title,
+      subtitle || null,
+      objective || null,
+      color || "#4A90B8",
+      icon || "BarChart3",
+      JSON.stringify(kpis || []),
+      JSON.stringify(sections || []),
+      shared ? 1 : 0,
+      source || "chat"
+    );
+
+    const created = db.prepare("SELECT * FROM reports WHERE id = ?").get(id);
+    db.prepare("INSERT INTO usage_logs (action, query, themes, user_id) VALUES (?, ?, ?, ?)")
+      .run("report_create", `Created: ${title}`, JSON.stringify(extractThemes(title)), "default");
+
+    res.status(201).json({ report: deserializeReport(created) });
+  } catch (err) {
+    console.error("[POST /api/reports]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── PATCH /api/reports/:id ────────────────────────────────────────────────────
+
+app.patch("/api/reports/:id", (req, res) => {
+  try {
+    const { id } = req.params;
+    const existing = db.prepare("SELECT * FROM reports WHERE id = ?").get(id);
+    if (!existing) return res.status(404).json({ error: "Rapport introuvable." });
+
+    const { starred, shared, title, subtitle, objective, color } = req.body;
+
+    const newStarred = starred !== undefined ? (starred ? 1 : 0) : existing.starred;
+    const newShared = shared !== undefined ? (shared ? 1 : 0) : existing.shared;
+    const newTitle = title !== undefined ? title : existing.title;
+    const newSubtitle = subtitle !== undefined ? subtitle : existing.subtitle;
+    const newObjective = objective !== undefined ? objective : existing.objective;
+    const newColor = color !== undefined ? color : existing.color;
+
+    db.prepare(`
+      UPDATE reports SET
+        starred = ?,
+        shared = ?,
+        title = ?,
+        subtitle = ?,
+        objective = ?,
+        color = ?
+      WHERE id = ?
+    `).run(newStarred, newShared, newTitle, newSubtitle, newObjective, newColor, id);
+
+    const updated = db.prepare("SELECT * FROM reports WHERE id = ?").get(id);
+    res.json({ report: deserializeReport(updated) });
+  } catch (err) {
+    console.error("[PATCH /api/reports/:id]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── DELETE /api/reports/:id ───────────────────────────────────────────────────
+
+app.delete("/api/reports/:id", (req, res) => {
+  try {
+    const { id } = req.params;
+    const existing = db.prepare("SELECT * FROM reports WHERE id = ?").get(id);
+    if (!existing) return res.status(404).json({ error: "Rapport introuvable." });
+    db.prepare("DELETE FROM reports WHERE id = ?").run(id);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("[DELETE /api/reports/:id]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+function deserializeReport(row) {
+  return {
+    id: row.id,
+    title: row.title,
+    subtitle: row.subtitle,
+    objective: row.objective,
+    color: row.color,
+    icon: row.icon,
+    kpis: row.kpis ? JSON.parse(row.kpis) : [],
+    sections: row.sections ? JSON.parse(row.sections) : [],
+    shared: row.shared === 1,
+    starred: row.starred === 1,
+    source: row.source,
+    createdAt: row.created_at,
+  };
+}
+
+// ── GET /api/logs ─────────────────────────────────────────────────────────────
+
+app.get("/api/logs", (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = Math.min(parseInt(req.query.limit) || 50, 200);
+    const offset = (page - 1) * limit;
+
+    const logs = db
+      .prepare("SELECT * FROM usage_logs ORDER BY created_at DESC LIMIT ? OFFSET ?")
+      .all(limit, offset);
+    const total = db.prepare("SELECT COUNT(*) AS cnt FROM usage_logs").get().cnt;
+
+    res.json({
+      logs: logs.map(l => ({
+        id: l.id,
+        timestamp: l.created_at,
+        action: l.action,
+        query: l.query,
+        themes: l.themes ? JSON.parse(l.themes) : [],
+        userId: l.user_id,
+      })),
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    });
+  } catch (err) {
+    console.error("[GET /api/logs]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /api/stats/themes ─────────────────────────────────────────────────────
+
+app.get("/api/stats/themes", (req, res) => {
+  try {
+    const chatLogs = db
+      .prepare("SELECT themes FROM usage_logs WHERE action = 'chat_query' AND themes IS NOT NULL")
+      .all();
+
+    const themeCounts = {};
+    for (const log of chatLogs) {
+      try {
+        const themes = JSON.parse(log.themes);
+        for (const theme of themes) {
+          if (theme) themeCounts[theme] = (themeCounts[theme] || 0) + 1;
+        }
+      } catch {
+        // Skip malformed themes
+      }
+    }
+
+    const sorted = Object.entries(themeCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 20)
+      .map(([topic, count]) => ({ topic, count }));
+
+    res.json({ themes: sorted });
+  } catch (err) {
+    console.error("[GET /api/stats/themes]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /api/stats/usage ──────────────────────────────────────────────────────
+
+app.get("/api/stats/usage", (req, res) => {
+  try {
+    // Queries per day (last 30 days)
+    const perDay = db.prepare(`
+      SELECT date(created_at) AS day, COUNT(*) AS count
+      FROM usage_logs
+      WHERE created_at >= date('now', '-30 days')
+      GROUP BY date(created_at)
+      ORDER BY day ASC
+    `).all();
+
+    const reportsGenerated = db
+      .prepare("SELECT COUNT(*) AS cnt FROM usage_logs WHERE action IN ('report_generate', 'report_create')")
+      .get().cnt;
+
+    const chatQueries = db
+      .prepare("SELECT COUNT(*) AS cnt FROM usage_logs WHERE action = 'chat_query'")
+      .get().cnt;
+
+    const activeUsers = db
+      .prepare("SELECT COUNT(DISTINCT user_id) AS cnt FROM usage_logs WHERE created_at >= date('now', '-7 days')")
+      .get().cnt;
+
+    const totalReports = db.prepare("SELECT COUNT(*) AS cnt FROM reports").get().cnt;
+
+    res.json({
+      queriesPerDay: perDay,
+      reportsGenerated,
+      chatQueries,
+      activeUsers,
+      totalReports,
+    });
+  } catch (err) {
+    console.error("[GET /api/stats/usage]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /api/onboarding/status ────────────────────────────────────────────────
+
+app.get("/api/onboarding/status", (req, res) => {
+  try {
+    const filesCount = db.prepare("SELECT COUNT(*) AS cnt FROM uploaded_files").get().cnt;
+    const contextSet = !!db.prepare("SELECT id FROM project_context WHERE id = 1").get();
+    const dataTransformed = db.prepare("SELECT COUNT(*) AS cnt FROM clean_data").get().cnt > 0;
+    const reportsCount = db.prepare("SELECT COUNT(*) AS cnt FROM reports").get().cnt;
+
+    // Determine current step and completed steps
+    const completedSteps = [];
+    let currentStep;
+
+    if (filesCount === 0) {
+      currentStep = "upload";
+    } else if (!contextSet) {
+      completedSteps.push("upload");
+      currentStep = "context";
+    } else if (!dataTransformed) {
+      completedSteps.push("upload", "context");
+      currentStep = "transform";
+    } else if (reportsCount === 0) {
+      completedSteps.push("upload", "context", "transform");
+      currentStep = "verify";
+    } else {
+      completedSteps.push("upload", "context", "transform", "verify", "suggest");
+      currentStep = "complete";
+    }
+
+    res.json({
+      step: currentStep,
+      currentStep,
+      completedSteps,
+      filesUploaded: filesCount,
+      contextSet,
+      dataTransformed,
+      reportsCount,
+    });
+  } catch (err) {
+    console.error("[GET /api/onboarding/status]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── POST /api/onboarding/reset ────────────────────────────────────────────────
+
+app.post("/api/onboarding/reset", (req, res) => {
+  try {
+    db.prepare("DELETE FROM usage_logs").run();
+    db.prepare("DELETE FROM reports").run();
+    db.prepare("DELETE FROM clean_data").run();
+    db.prepare("DELETE FROM data_rows").run();
+    db.prepare("DELETE FROM uploaded_files").run();
+    db.prepare("DELETE FROM project_context").run();
+
+    // Clean uploads directory
+    const files = fs.readdirSync(UPLOADS_DIR);
+    for (const f of files) {
+      try {
+        fs.unlinkSync(path.join(UPLOADS_DIR, f));
+      } catch {
+        // Best-effort
+      }
+    }
+
+    res.json({ success: true, message: "Onboarding réinitialisé." });
+  } catch (err) {
+    console.error("[POST /api/onboarding/reset]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── 404 handler ──────────────────────────────────────────────────────────────
+
+app.use((req, res) => {
+  res.status(404).json({ error: `Route introuvable : ${req.method} ${req.path}` });
+});
+
+// ─── Global error handler ─────────────────────────────────────────────────────
+
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  console.error("[Unhandled error]", err);
+  if (err.code === "LIMIT_FILE_SIZE") {
+    return res.status(413).json({ error: "Fichier trop volumineux (max 50 Mo)." });
+  }
+  res.status(500).json({ error: err.message || "Erreur serveur interne." });
+});
+
+// ─── Start ────────────────────────────────────────────────────────────────────
+
+// Export for Vercel serverless
+export default app;
+
+// Only listen in dev mode (not on Vercel)
+if (!IS_VERCEL) {
+  const PORT = process.env.PORT || 3001;
+  app.listen(PORT, () => {
+    console.log(`Minipilot server — http://localhost:${PORT}`);
+    console.log(`Database : ${DB_PATH}`);
+    console.log(`Uploads  : ${UPLOADS_DIR}`);
+  });
+}
