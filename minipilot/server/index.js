@@ -481,12 +481,19 @@ app.post("/api/upload", upload.array("files", 10), async (req, res) => {
 
       // Parse file first to get columns and rows
       if (ext === ".xlsx" || ext === ".xls") {
-        const workbook = XLSX.readFile(file.path);
+        const fileBuffer = fs.readFileSync(file.path);
+        const workbook = XLSX.read(fileBuffer, { type: "buffer" });
+        // Parse all sheets and pick the one with the most columns as "primary"
+        let bestColCount = 0;
         for (const sheetName of workbook.SheetNames) {
           const sheet = workbook.Sheets[sheetName];
           const sheetRows = XLSX.utils.sheet_to_json(sheet, { defval: null });
           if (sheetRows.length === 0) continue;
-          if (columns.length === 0) columns = Object.keys(sheetRows[0]);
+          const sheetCols = Object.keys(sheetRows[0]).filter(k => !k.startsWith("__EMPTY"));
+          if (sheetCols.length > bestColCount) {
+            bestColCount = sheetCols.length;
+            columns = sheetCols;
+          }
           rows = rows.concat(sheetRows.map(r => ({ _sheet: sheetName, ...r })));
         }
       } else if (ext === ".csv") {
