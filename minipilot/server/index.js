@@ -13,6 +13,7 @@ import * as XLSX from "xlsx";
 import { parse as csvParse } from "csv-parse/sync";
 import Database from "better-sqlite3";
 import Anthropic from "@anthropic-ai/sdk";
+import { Mistral } from "@mistralai/mistralai";
 import { v4 as uuidv4 } from "uuid";
 
 // ─── Paths ───────────────────────────────────────────────────────────────────
@@ -92,9 +93,156 @@ db.exec(`
   );
 `);
 
-// ─── Anthropic client ─────────────────────────────────────────────────────────
+// ─── AI clients ──────────────────────────────────────────────────────────────
+//
+// Two modes, togglable at runtime via GET/POST /api/ai/mode:
+//   "local"   → Ollama on localhost (Mistral, 100% offline, zero data leakage)
+//   "premium" → Anthropic Claude → Mistral cloud fallback → Ollama last resort
+//
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const anthropic = process.env.ANTHROPIC_API_KEY
+  ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+  : null;
+
+const mistralCloud = process.env.MISTRAL_API_KEY
+  ? new Mistral({ apiKey: process.env.MISTRAL_API_KEY })
+  : null;
+
+const OLLAMA_BASE = process.env.OLLAMA_BASE_URL || "http://localhost:11434";
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "ministral-3:3b";
+const MISTRAL_CLOUD_MODEL = process.env.MISTRAL_CLOUD_MODEL || "ministral-3b-latest";
+
+// Runtime AI mode — togglable via API
+let aiMode = process.env.AI_MODE || "premium"; // "local" | "premium"
+
+async function checkOllama() {
+  try {
+    const res = await fetch(`${OLLAMA_BASE}/api/tags`, { signal: AbortSignal.timeout(2000) });
+    if (!res.ok) return { running: false, models: [] };
+    const data = await res.json();
+    const models = (data.models || []).map(m => m.name.replace(":latest", ""));
+    return { running: true, models };
+  } catch { return { running: false, models: [] }; }
+}
+
+// Log available providers on startup
+(async () => {
+  const ollama = await checkOllama();
+  const providers = [];
+  if (anthropic) providers.push("Anthropic (cloud)");
+  if (mistralCloud) providers.push("Mistral (cloud)");
+  if (ollama.running) providers.push(`Ollama [${ollama.models.join(", ") || "no models"}]`);
+  console.log(`AI providers: ${providers.length ? providers.join(" · ") : "NONE"}`);
+  console.log(`AI mode: ${aiMode}`);
+  if (!anthropic && !ollama.running) {
+    console.log("⚠  Pour l'IA : ANTHROPIC_API_KEY dans .env ou Ollama sur localhost:11434");
+  }
+})();
+
+/**
+ * Call Ollama chat API (100% local, zero internet)
+ */
+async function ollamaChat(messages, { maxTokens = 4096 } = {}) {
+  const res = await fetch(`${OLLAMA_BASE}/api/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: OLLAMA_MODEL,
+      messages,
+      stream: false,
+      options: { num_predict: maxTokens, temperature: 0.3 },
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Ollama (${OLLAMA_MODEL}): ${err}`);
+  }
+  const data = await res.json();
+  return { text: data.message?.content || "", provider: "ollama", model: OLLAMA_MODEL };
+}
+
+/**
+ * Call Mistral cloud API (fallback for premium mode)
+ */
+async function mistralCloudChat(messages, { maxTokens = 4096 } = {}) {
+  if (!mistralCloud) throw new Error("MISTRAL_API_KEY non configurée");
+  const result = await mistralCloud.chat.complete({
+    model: MISTRAL_CLOUD_MODEL,
+    messages,
+    maxTokens,
+  });
+  return { text: result.choices[0].message.content, provider: "mistral", model: MISTRAL_CLOUD_MODEL };
+}
+
+/**
+ * Unified AI completion — route based on aiMode
+ */
+async function aiComplete(systemPrompt, userPrompt, { maxTokens = 4096 } = {}) {
+  const msgs = [];
+  if (systemPrompt) msgs.push({ role: "system", content: systemPrompt });
+  msgs.push({ role: "user", content: userPrompt });
+
+  if (aiMode === "local") {
+    return ollamaChat(msgs, { maxTokens });
+  }
+
+  // Premium: Anthropic → Mistral cloud → Ollama
+  if (anthropic) {
+    try {
+      const message = await anthropic.messages.create({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: maxTokens,
+        system: systemPrompt || undefined,
+        messages: [{ role: "user", content: userPrompt }],
+      });
+      return { text: message.content[0].text, provider: "anthropic", model: "claude-sonnet-4" };
+    } catch (err) {
+      console.warn("[aiComplete] Anthropic failed:", err.message);
+    }
+  }
+
+  if (mistralCloud) {
+    try { return await mistralCloudChat(msgs, { maxTokens }); }
+    catch (err) { console.warn("[aiComplete] Mistral cloud failed:", err.message); }
+  }
+
+  return ollamaChat(msgs, { maxTokens });
+}
+
+/**
+ * Unified AI chat (multi-turn)
+ */
+async function aiChat(systemPrompt, chatMessages, { maxTokens = 4096 } = {}) {
+  const ollamaMsgs = [];
+  if (systemPrompt) ollamaMsgs.push({ role: "system", content: systemPrompt });
+  ollamaMsgs.push(...chatMessages);
+
+  if (aiMode === "local") {
+    return ollamaChat(ollamaMsgs, { maxTokens });
+  }
+
+  // Premium: Anthropic → Mistral cloud → Ollama
+  if (anthropic) {
+    try {
+      const response = await anthropic.messages.create({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: maxTokens,
+        system: systemPrompt || undefined,
+        messages: chatMessages,
+      });
+      return { text: response.content[0].text, provider: "anthropic", model: "claude-sonnet-4" };
+    } catch (err) {
+      console.warn("[aiChat] Anthropic failed:", err.message);
+    }
+  }
+
+  if (mistralCloud) {
+    try { return await mistralCloudChat(ollamaMsgs, { maxTokens }); }
+    catch (err) { console.warn("[aiChat] Mistral cloud failed:", err.message); }
+  }
+
+  return ollamaChat(ollamaMsgs, { maxTokens });
+}
 
 // ─── Express app ─────────────────────────────────────────────────────────────
 
@@ -798,13 +946,9 @@ Réponds UNIQUEMENT avec un JSON valide, sans markdown, sans explication, dans c
   ]
 }`;
 
-    const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 2000,
-      messages: [{ role: "user", content: prompt }],
-    });
+    const aiResult = await aiComplete("", prompt, { maxTokens: 2000 });
 
-    const rawText = message.content[0].text.trim();
+    const rawText = aiResult.text.trim();
     // Strip possible markdown code fences
     const jsonText = rawText.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
     const parsed = JSON.parse(jsonText);
@@ -899,13 +1043,9 @@ Réponds UNIQUEMENT avec un JSON valide, sans markdown :
   ]
 }`;
 
-    const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 4000,
-      messages: [{ role: "user", content: prompt }],
-    });
+    const aiResult = await aiComplete("", prompt, { maxTokens: 4000 });
 
-    const rawText = message.content[0].text.trim();
+    const rawText = aiResult.text.trim();
     const jsonText = rawText.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
     const report = JSON.parse(jsonText);
 
@@ -1021,14 +1161,9 @@ INSTRUCTIONS :
       { role: "user", content: message },
     ];
 
-    const aiResponse = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 4000,
-      system: systemPrompt,
-      messages,
-    });
+    const aiResponse = await aiChat(systemPrompt, messages, { maxTokens: 4000 });
 
-    const rawResponse = aiResponse.content[0].text;
+    const rawResponse = aiResponse.text;
 
     // Extract report data if present
     let reportData = null;
@@ -1067,6 +1202,8 @@ INSTRUCTIONS :
 
     res.json({
       response: cleanResponse,
+      provider: aiResponse.provider || aiMode,
+      model: aiResponse.model || null,
       ...(reportData ? { reportData } : {}),
     });
   } catch (err) {
@@ -1293,6 +1430,69 @@ app.get("/api/stats/usage", (req, res) => {
     console.error("[GET /api/stats/usage]", err);
     res.status(500).json({ error: err.message });
   }
+});
+
+// ── GET /api/ai/mode — current AI mode & available providers ─────────────────
+
+app.get("/api/ai/mode", async (req, res) => {
+  const ollama = await checkOllama();
+  res.json({
+    mode: aiMode,
+    providers: {
+      anthropic: !!anthropic,
+      mistral: !!mistralCloud,
+      ollama: ollama.running,
+      ollamaModels: ollama.models,
+      ollamaModel: OLLAMA_MODEL,
+    },
+  });
+});
+
+// ── POST /api/ai/mode — toggle between local and premium ────────────────────
+
+app.post("/api/ai/mode", async (req, res) => {
+  const { mode } = req.body;
+  if (mode !== "local" && mode !== "premium") {
+    return res.status(400).json({ error: "Mode invalide. Valeurs acceptées : 'local' ou 'premium'" });
+  }
+
+  if (mode === "local") {
+    const ollama = await checkOllama();
+    if (!ollama.running) {
+      return res.status(503).json({
+        error: "Ollama n'est pas accessible sur " + OLLAMA_BASE,
+        hint: "Lancez: brew services start ollama && ollama pull mistral",
+      });
+    }
+    if (!ollama.models.some(m => m.includes(OLLAMA_MODEL))) {
+      return res.status(503).json({
+        error: `Modèle '${OLLAMA_MODEL}' non trouvé dans Ollama`,
+        available: ollama.models,
+        hint: `Lancez: ollama pull ${OLLAMA_MODEL}`,
+      });
+    }
+  }
+
+  if (mode === "premium" && !anthropic && !mistralCloud) {
+    return res.status(503).json({
+      error: "Aucune clé API cloud configurée",
+      hint: "Ajoutez ANTHROPIC_API_KEY ou MISTRAL_API_KEY dans .env",
+    });
+  }
+
+  aiMode = mode;
+  console.log(`AI mode switched to: ${mode}`);
+  const ollama = await checkOllama();
+  res.json({
+    mode: aiMode,
+    providers: {
+      anthropic: !!anthropic,
+      mistral: !!mistralCloud,
+      ollama: ollama.running,
+      ollamaModels: ollama.models,
+      ollamaModel: OLLAMA_MODEL,
+    },
+  });
 });
 
 // ── GET /api/onboarding/status ────────────────────────────────────────────────

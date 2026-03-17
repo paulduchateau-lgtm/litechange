@@ -148,3 +148,17 @@ export async function getUsageStats() {
   const res = await fetch(`${API_BASE}/stats/usage`);
   return res.json();
 }
+
+export async function getAiMode() {
+  const res = await fetch(`${API_BASE}/ai/mode`);
+  return res.json();
+}
+
+export async function setAiMode(mode) {
+  const res = await fetch(`${API_BASE}/ai/mode`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ mode }),
+  });
+  return res.json();
+}

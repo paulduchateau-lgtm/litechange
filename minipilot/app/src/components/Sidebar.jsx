@@ -1,5 +1,7 @@
-import { X, LayoutDashboard, MessageSquare, FileText, Settings, Menu, Sun, Moon, RotateCcw } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, LayoutDashboard, MessageSquare, FileText, Settings, Menu, Sun, Moon, RotateCcw, Wifi, WifiOff, Loader2 } from "lucide-react";
 import { useTheme } from "../data/theme";
+import { getAiMode, setAiMode } from "../lib/api";
 
 const NAV_ITEMS = [
   { id: "dashboard", Icon: LayoutDashboard, label: "Dashboard" },
@@ -7,6 +9,96 @@ const NAV_ITEMS = [
   { id: "reports", Icon: FileText, label: "Rapports" },
   { id: "admin", Icon: Settings, label: "Admin" },
 ];
+
+function AiModeToggle() {
+  const [mode, setMode] = useState(null); // null = loading
+  const [providers, setProviders] = useState({});
+  const [switching, setSwitching] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    getAiMode()
+      .then(data => { setMode(data.mode); setProviders(data.providers || {}); })
+      .catch(() => setMode("premium"));
+  }, []);
+
+  const handleToggle = async () => {
+    const newMode = mode === "local" ? "premium" : "local";
+    setSwitching(true);
+    setError(null);
+    try {
+      const result = await setAiMode(newMode);
+      if (result.error) {
+        setError(result.hint || result.error);
+      } else {
+        setMode(result.mode);
+        setProviders(result.providers || {});
+      }
+    } catch {
+      setError("Erreur de connexion au serveur");
+    }
+    setSwitching(false);
+  };
+
+  if (mode === null) return null;
+
+  const isLocal = mode === "local";
+
+  return (
+    <div style={{ padding: "0 8px" }}>
+      <button
+        onClick={handleToggle}
+        disabled={switching}
+        onMouseEnter={e => e.currentTarget.style.background = "var(--mp-nav-hover)"}
+        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+        style={{
+          width: "100%", display: "flex", alignItems: "center",
+          gap: 10, padding: "9px 12px",
+          background: "transparent",
+          border: "none", borderRadius: "var(--radius-sm)",
+          cursor: switching ? "wait" : "pointer",
+          color: "var(--mp-text-muted)",
+          fontSize: 12, fontFamily: "var(--font-body)",
+          transition: "background 200ms ease",
+          opacity: switching ? 0.6 : 1,
+        }}
+      >
+        {switching ? (
+          <Loader2 size={14} style={{ animation: "spin 1s linear infinite", flexShrink: 0 }} />
+        ) : isLocal ? (
+          <WifiOff size={14} color="var(--mp-success)" style={{ flexShrink: 0 }} />
+        ) : (
+          <Wifi size={14} color="var(--mp-signal)" style={{ flexShrink: 0 }} />
+        )}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 1 }}>
+          <span style={{
+            fontFamily: "var(--font-data)", fontSize: 9,
+            textTransform: "uppercase", letterSpacing: "0.1em",
+            color: isLocal ? "var(--mp-success)" : "var(--mp-signal)",
+          }}>
+            {isLocal ? "Local" : "Premium"}
+          </span>
+          <span style={{ fontSize: 11, color: "var(--mp-text-muted)" }}>
+            {isLocal
+              ? `Ollama · ${providers.ollamaModel || "ministral-3:3b"}`
+              : providers.anthropic ? "Claude · Anthropic" : "Mistral Cloud"
+            }
+          </span>
+        </div>
+      </button>
+      {error && (
+        <p style={{
+          fontSize: 10, color: "var(--mp-warm)",
+          fontFamily: "var(--font-body)",
+          padding: "4px 12px 0", margin: 0,
+          lineHeight: 1.4,
+        }}>
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
 
 export default function Sidebar({ page, setPage, sidebarOpen, setSidebarOpen, onStartOnboarding }) {
   const { theme, toggle } = useTheme();
@@ -54,7 +146,7 @@ export default function Sidebar({ page, setPage, sidebarOpen, setSidebarOpen, on
             fontWeight: 300, fontStyle: "italic",
             color: "var(--mp-accent-text)",
           }}>pilot</span>
-          <span className="data-label" style={{ marginLeft: 8, fontSize: 9 }}>v0.2</span>
+          <span className="data-label" style={{ marginLeft: 8, fontSize: 9 }}>v0.3</span>
         </div>
       </div>
 
@@ -112,8 +204,11 @@ export default function Sidebar({ page, setPage, sidebarOpen, setSidebarOpen, on
         </div>
       )}
 
+      {/* AI Mode Toggle */}
+      <AiModeToggle />
+
       {/* Theme Toggle */}
-      <div style={{ padding: "8px 8px 0" }}>
+      <div style={{ padding: "4px 8px 0" }}>
         <button
           onClick={toggle}
           style={{
