@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Users, Database, Settings, Shield, FileText, BarChart3, Clock, Hash, Save, Check, Loader2, RefreshCw } from "lucide-react";
-import { getContext, updateContext, getLogs, getThemeStats, getUsageStats } from "../lib/api";
+import { useWorkspaceApi } from "../lib/WorkspaceContext";
 
 const SLM_CONFIG = [
   { n: "Analyse & Rapports", m: "Claude (Anthropic)", s: "API", status: "success" },
@@ -9,6 +9,7 @@ const SLM_CONFIG = [
 ];
 
 export default function AdminPage() {
+  const api = useWorkspaceApi();
   const [tab, setTab] = useState("context");
   const [context, setContext] = useState(null);
   const [contextLoading, setContextLoading] = useState(true);
@@ -31,7 +32,7 @@ export default function AdminPage() {
   const loadContext = async () => {
     setContextLoading(true);
     try {
-      const data = await getContext();
+      const data = await api.getContext();
       setContext(data);
     } catch {
       setContext({ project_name: "", industry: "", objectives: "", free_text: "" });
@@ -42,7 +43,7 @@ export default function AdminPage() {
   const saveContextHandler = async () => {
     setContextSaving(true);
     try {
-      await updateContext(context);
+      await api.updateContext(context);
       setContextSaved(true);
       setTimeout(() => setContextSaved(false), 2000);
     } catch (e) { console.error(e); }
@@ -52,7 +53,7 @@ export default function AdminPage() {
   const loadLogs = async () => {
     setLogsLoading(true);
     try {
-      const data = await getLogs(1);
+      const data = await api.getLogs(1);
       setLogs(data.logs || []);
     } catch { setLogs([]); }
     setLogsLoading(false);
@@ -61,7 +62,7 @@ export default function AdminPage() {
   const loadStats = async () => {
     setStatsLoading(true);
     try {
-      const [themes, usage] = await Promise.all([getThemeStats(), getUsageStats()]);
+      const [themes, usage] = await Promise.all([api.getThemeStats(), api.getUsageStats()]);
       setThemeStats(themes.themes || []);
       setUsageStats(usage);
     } catch { setThemeStats([]); setUsageStats(null); }

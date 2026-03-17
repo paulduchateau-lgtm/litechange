@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ChevronUp, ChevronDown, CheckCircle, Loader2, AlertTriangle } from "lucide-react";
-import { getDataPreview, getDataStats } from "../../lib/api";
+import { useWorkspaceApi } from "../../lib/WorkspaceContext";
 
 const TYPE_COLORS = {
   number: "var(--mp-signal)",
@@ -36,6 +36,7 @@ function TypeBadge({ type }) {
 }
 
 export default function OnboardingVerify({ onNext, data }) {
+  const api = useWorkspaceApi();
   const [preview, setPreview] = useState(null);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -48,8 +49,8 @@ export default function OnboardingVerify({ onNext, data }) {
     const load = async () => {
       try {
         const [previewData, statsData] = await Promise.all([
-          getDataPreview(),
-          getDataStats(),
+          api.getDataPreview(),
+          api.getDataStats(),
         ]);
         // Normalize preview format — guard against legacy API responses
         const normalized = {
@@ -138,35 +139,82 @@ export default function OnboardingVerify({ onNext, data }) {
       {/* Summary bar */}
       {preview && (
         <div style={{
-          display: "flex", alignItems: "center", gap: 24,
           background: "var(--mp-bg-card)",
           border: "1px solid var(--mp-border)",
           borderRadius: "var(--radius-md)",
-          padding: "12px 20px",
+          padding: "20px 24px",
         }}>
-          {[
-            { label: "Tables", value: typeof preview.tables === "number" ? preview.tables : 1 },
-            { label: "Colonnes", value: columns.length },
-            { label: "Lignes", value: typeof preview.totalRows === "number" ? preview.totalRows.toLocaleString("fr-FR") : rows.length },
-          ].map(({ label, value }) => (
-            <div key={label} style={{ display: "flex", align: "center", gap: 10 }}>
-              <span style={{
-                fontFamily: "var(--font-data)", fontSize: 10,
-                textTransform: "uppercase", letterSpacing: "0.1em",
-                color: "var(--mp-text-muted)",
+          <p style={{
+            fontFamily: "var(--font-data)", fontSize: 10,
+            textTransform: "uppercase", letterSpacing: "0.1em",
+            color: "var(--mp-accent-text)", marginBottom: 16,
+          }}>
+            Base de donnees unifiee
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 16 }}>
+            {[
+              { label: "Tables", value: typeof preview.tables === "number" ? preview.tables : 1 },
+              { label: "Colonnes", value: columns.length },
+              { label: "Lignes totales", value: typeof preview.totalRows === "number" ? preview.totalRows.toLocaleString("fr-FR") : rows.length },
+              { label: "Num.", value: numericCols.length, color: "var(--mp-signal)" },
+              { label: "Texte", value: columns.filter(c => c.type === "string" || c.type === "text").length },
+              { label: "Dates", value: columns.filter(c => c.type === "date").length, color: "var(--mp-warning)" },
+            ].map(({ label, value, color }) => (
+              <div key={label}>
+                <span style={{
+                  fontFamily: "var(--font-data)", fontSize: 9,
+                  textTransform: "uppercase", letterSpacing: "0.1em",
+                  color: "var(--mp-text-muted)", display: "block", marginBottom: 4,
+                }}>
+                  {label}
+                </span>
+                <span style={{
+                  fontFamily: "var(--font-data)", fontSize: 20,
+                  fontWeight: 600, color: color || "var(--mp-text)",
+                  fontVariantNumeric: "tabular-nums",
+                }}>
+                  {value}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Column schema */}
+      {columns.length > 0 && (
+        <div style={{
+          background: "var(--mp-bg-card)",
+          border: "1px solid var(--mp-border)",
+          borderRadius: "var(--radius-md)",
+          padding: "16px 20px",
+        }}>
+          <p style={{
+            fontFamily: "var(--font-data)", fontSize: 10,
+            textTransform: "uppercase", letterSpacing: "0.1em",
+            color: "var(--mp-text-muted)", marginBottom: 12,
+          }}>
+            Schema des colonnes detectees
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {columns.map(col => (
+              <div key={col.key} style={{
+                display: "inline-flex", alignItems: "center", gap: 6,
+                background: "var(--mp-bg)",
+                border: "1px solid var(--mp-border)",
+                borderRadius: "var(--radius-sm)",
+                padding: "5px 10px",
               }}>
-                {label}
-              </span>
-              <span style={{
-                fontFamily: "var(--font-data)", fontSize: 14,
-                fontWeight: 600, color: "var(--mp-text)",
-                fontVariantNumeric: "tabular-nums",
-                marginLeft: 6,
-              }}>
-                {value}
-              </span>
-            </div>
-          ))}
+                <span style={{
+                  fontFamily: "var(--font-data)", fontSize: 12,
+                  color: "var(--mp-text)",
+                }}>
+                  {col.label || col.key}
+                </span>
+                <TypeBadge type={col.type} />
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -177,6 +225,19 @@ export default function OnboardingVerify({ onNext, data }) {
           borderRadius: "var(--radius-md)",
           overflow: "hidden",
         }}>
+          <div style={{
+            padding: "12px 16px",
+            borderBottom: "1px solid var(--mp-border)",
+            background: "var(--mp-bg-card)",
+          }}>
+            <span style={{
+              fontFamily: "var(--font-data)", fontSize: 10,
+              textTransform: "uppercase", letterSpacing: "0.1em",
+              color: "var(--mp-text-muted)",
+            }}>
+              Apercu des donnees nettoyees — {displayRows.length} sur {(typeof preview?.totalRows === "number" ? preview.totalRows : rows.length).toLocaleString("fr-FR")} lignes
+            </span>
+          </div>
           <div style={{ overflow: "auto", maxHeight: 380 }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead style={{ position: "sticky", top: 0, zIndex: 1 }}>

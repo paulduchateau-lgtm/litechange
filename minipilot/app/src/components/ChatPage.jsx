@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Send, MessageSquare, Database, FileText, Star, StarOff, Loader2, Sparkles, Save } from "lucide-react";
-import { chatMessage, saveReport } from "../lib/api";
+import { useWorkspaceApi } from "../lib/WorkspaceContext";
 import RenderSection from "./RenderSection";
 
 const SUGGESTIONS = [
@@ -12,6 +12,7 @@ const SUGGESTIONS = [
 ];
 
 export default function ChatPage({ reports, toggleStar, openReport, onReportGenerated }) {
+  const api = useWorkspaceApi();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -29,7 +30,7 @@ export default function ChatPage({ reports, toggleStar, openReport, onReportGene
     setIsTyping(true);
 
     try {
-      const result = await chatMessage(userMsg, messages.map(m => ({ role: m.role, content: m.content })));
+      const result = await api.chatMessage(userMsg, messages.map(m => ({ role: m.role, content: m.content })));
 
       setMessages(prev => [...prev, {
         role: "assistant",
@@ -52,7 +53,7 @@ export default function ChatPage({ reports, toggleStar, openReport, onReportGene
     if (!msg?.reportData) return;
 
     try {
-      await saveReport({
+      await api.saveReport({
         ...msg.reportData,
         source: "chat",
         shared: 0,

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AlignLeft, List, Save } from "lucide-react";
-import { saveContext } from "../../lib/api";
+import { useWorkspaceApi } from "../../lib/WorkspaceContext";
 
 const SECTEURS = [
   "Assurance",
@@ -68,6 +68,7 @@ function FormField({ label, children }) {
 }
 
 export default function OnboardingContext({ onNext, data }) {
+  const api = useWorkspaceApi();
   const [mode, setMode] = useState("form");
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
@@ -102,7 +103,7 @@ export default function OnboardingContext({ onNext, data }) {
       const payload = mode === "form"
         ? { mode: "form", ...formData }
         : { mode: "free", freeText };
-      await saveContext(payload);
+      await api.saveContext(payload);
       onNext(payload);
     } catch {
       // Proceed even if save fails — data is available locally

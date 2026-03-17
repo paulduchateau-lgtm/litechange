@@ -3,7 +3,7 @@ import {
   Sparkles, BarChart2, PieChart, Table2, TrendingUp,
   Check, Loader2, AlertTriangle, ChevronRight,
 } from "lucide-react";
-import { suggestReports, generateReport } from "../../lib/api";
+import { useWorkspaceApi } from "../../lib/WorkspaceContext";
 
 const CHART_TYPE_ICONS = {
   bar: BarChart2,
@@ -57,6 +57,7 @@ function TypingDots() {
 }
 
 export default function OnboardingSuggest({ onNext, data }) {
+  const api = useWorkspaceApi();
   const [suggestions, setSuggestions] = useState([]);
   const [selected, setSelected] = useState(new Set());
   const [loading, setLoading] = useState(true);
@@ -71,7 +72,7 @@ export default function OnboardingSuggest({ onNext, data }) {
 
     const load = async () => {
       try {
-        const result = await suggestReports();
+        const result = await api.suggestReports();
         const list = result.suggestions || [];
         setSuggestions(list);
         // Pre-select top 3
@@ -110,7 +111,7 @@ export default function OnboardingSuggest({ onNext, data }) {
     for (let i = 0; i < selectedList.length; i++) {
       setGenerationProgress(prev => ({ ...prev, [i]: "active" }));
       try {
-        const report = await generateReport(selectedList[i]);
+        const report = await api.generateReport(selectedList[i]);
         generated.push(report);
         setGenerationProgress(prev => ({ ...prev, [i]: "done" }));
       } catch {

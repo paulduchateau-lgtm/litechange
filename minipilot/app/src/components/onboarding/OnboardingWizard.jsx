@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Check, Upload, FileText, Wand2, CheckCircle, Sparkles, Loader2 } from "lucide-react";
-import { getOnboardingStatus } from "../../lib/api";
+import { useWorkspaceApi } from "../../lib/WorkspaceContext";
 import OnboardingUpload from "./OnboardingUpload";
 import OnboardingContext from "./OnboardingContext";
 import OnboardingTransform from "./OnboardingTransform";
@@ -95,6 +95,7 @@ function StepIndicator({ steps, currentStep, completedSteps }) {
 }
 
 export default function OnboardingWizard({ onComplete }) {
+  const api = useWorkspaceApi();
   const [currentStep, setCurrentStep] = useState(null);
   const [completedSteps, setCompletedSteps] = useState(new Set());
   const [stepData, setStepData] = useState({});
@@ -104,7 +105,7 @@ export default function OnboardingWizard({ onComplete }) {
   useEffect(() => {
     const resume = async () => {
       try {
-        const status = await getOnboardingStatus();
+        const status = await api.getOnboardingStatus();
         const lastStep = status?.currentStep || "upload";
         const completed = new Set(status?.completedSteps || []);
         const savedData = status?.data || {};

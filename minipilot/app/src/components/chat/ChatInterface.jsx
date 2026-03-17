@@ -3,7 +3,7 @@ import {
   Send, MessageSquare, Star, StarOff, FileText,
   Loader2, BarChart2, PieChart, Table2,
 } from "lucide-react";
-import { chatMessage, saveReport } from "../../lib/api";
+import { useWorkspaceApi } from "../../lib/WorkspaceContext";
 
 const INITIAL_SUGGESTIONS = [
   "Sinistralite globale et ratio P/C",
@@ -150,6 +150,7 @@ function InlineReport({ data, onSave, onOpen, isSaved }) {
 }
 
 export default function ChatInterface({ onOpenReport }) {
+  const api = useWorkspaceApi();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -176,7 +177,7 @@ export default function ChatInterface({ onOpenReport }) {
 
     try {
       const history = messages.map(m => ({ role: m.role, content: m.content }));
-      const result = await chatMessage(messageText, history);
+      const result = await api.chatMessage(messageText, history);
 
       setMessages(prev => [...prev, {
         role: "assistant",
@@ -197,7 +198,7 @@ export default function ChatInterface({ onOpenReport }) {
 
   const handleSaveReport = useCallback(async (reportData, msgId) => {
     try {
-      await saveReport(reportData);
+      await api.saveReport(reportData);
       setSavedReports(prev => new Set([...prev, msgId]));
     } catch {
       setSavedReports(prev => new Set([...prev, msgId]));

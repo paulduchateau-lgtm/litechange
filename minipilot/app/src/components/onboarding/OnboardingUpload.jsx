@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import { Upload, FileSpreadsheet, X, Database, FileText, Check, AlertCircle } from "lucide-react";
+import { useWorkspaceApi } from "../../lib/WorkspaceContext";
 
 const ACCEPTED_TYPES = [".xlsx", ".xls", ".csv", ".json"];
 const ACCEPTED_MIME = [
@@ -28,6 +29,7 @@ function FileIcon({ name }) {
 }
 
 export default function OnboardingUpload({ onNext, data }) {
+  const api = useWorkspaceApi();
   const [files, setFiles] = useState(data?.files || []);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -51,13 +53,9 @@ export default function OnboardingUpload({ onNext, data }) {
     setFiles(prev => [...prev, ...pending]);
 
     try {
-      const formData = new FormData();
-      fileList.forEach(f => formData.append("files", f));
-      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const result = await api.uploadFiles(fileList);
 
-      if (!res.ok) throw new Error("Echec du transfert");
-
-      const result = await res.json();
+      if (!result || result.error) throw new Error(result?.error || "Echec du transfert");
 
       setFiles(prev =>
         prev.map(f => {
@@ -79,7 +77,7 @@ export default function OnboardingUpload({ onNext, data }) {
     } finally {
       setUploading(false);
     }
-  }, []);
+  }, [api]);
 
   const handleDrop = useCallback(async (e) => {
     e.preventDefault();

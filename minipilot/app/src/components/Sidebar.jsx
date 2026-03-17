@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { X, LayoutDashboard, MessageSquare, FileText, Settings, Menu, Sun, Moon, RotateCcw, Wifi, WifiOff, Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { X, LayoutDashboard, MessageSquare, FileText, Settings, Menu, Sun, Moon, RotateCcw, Wifi, WifiOff, Loader2, ArrowLeft } from "lucide-react";
 import { useTheme } from "../data/theme";
 import { getAiMode, setAiMode } from "../lib/api";
 
@@ -100,8 +101,9 @@ function AiModeToggle() {
   );
 }
 
-export default function Sidebar({ page, setPage, sidebarOpen, setSidebarOpen, onStartOnboarding }) {
+export default function Sidebar({ page, setPage, sidebarOpen, setSidebarOpen, onStartOnboarding, slug }) {
   const { theme, toggle } = useTheme();
+  const navigate = useNavigate();
   if (!sidebarOpen) {
     return (
       <button
@@ -154,7 +156,7 @@ export default function Sidebar({ page, setPage, sidebarOpen, setSidebarOpen, on
       <div style={{ padding: "12px 8px", flex: 1 }}>
         {NAV_ITEMS.map(it => {
           const NavIcon = it.Icon;
-          const isActive = page === it.id || (page === "view_report" && it.id === "reports");
+          const isActive = page === it.id || (page === "report" && it.id === "reports");
           return (
             <button
               key={it.id}
@@ -199,10 +201,31 @@ export default function Sidebar({ page, setPage, sidebarOpen, setSidebarOpen, on
             }}
           >
             <RotateCcw size={13} />
-            <span>Nouvel onboarding</span>
+            <span>Reinitialiser l'espace</span>
           </button>
         </div>
       )}
+
+      {/* Back to home */}
+      <div style={{ padding: "0 8px" }}>
+        <button
+          onClick={() => navigate("/")}
+          onMouseEnter={e => e.currentTarget.style.background = "var(--mp-nav-hover)"}
+          onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+          style={{
+            width: "100%", display: "flex", alignItems: "center",
+            gap: 10, padding: "9px 12px",
+            background: "transparent",
+            border: "none", borderRadius: "var(--radius-sm)",
+            cursor: "pointer", color: "var(--mp-text-muted)",
+            fontSize: 12, fontFamily: "var(--font-body)",
+            transition: "background 200ms ease",
+          }}
+        >
+          <ArrowLeft size={13} />
+          <span>Retour a l'accueil</span>
+        </button>
+      </div>
 
       {/* AI Mode Toggle */}
       <AiModeToggle />

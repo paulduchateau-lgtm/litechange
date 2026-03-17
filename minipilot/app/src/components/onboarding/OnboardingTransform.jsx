@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Loader2, Check, Merge, Hash, Calendar, Type, AlertTriangle } from "lucide-react";
-import { transformData } from "../../lib/api";
+import { useWorkspaceApi } from "../../lib/WorkspaceContext";
 
 const MIN_STEP_DURATION = 1200;
 
@@ -55,6 +55,7 @@ function StepIcon({ iconKey, status }) {
 }
 
 export default function OnboardingTransform({ onNext, data }) {
+  const api = useWorkspaceApi();
   const hasMultipleFiles = (data?.files?.length || 0) > 1;
   const steps = getTransformSteps(hasMultipleFiles);
 
@@ -74,7 +75,7 @@ export default function OnboardingTransform({ onNext, data }) {
     const run = async () => {
       try {
         // Kick off real transform in background
-        const transformPromise = transformData().then(res => {
+        const transformPromise = api.transformData().then(res => {
           if (res?.error) throw new Error(res.error);
           return res;
         });
