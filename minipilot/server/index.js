@@ -20,8 +20,9 @@ import { v4 as uuidv4 } from "uuid";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const IS_VERCEL = !!process.env.VERCEL;
-const UPLOADS_DIR = IS_VERCEL ? path.join("/tmp", "uploads") : path.join(__dirname, "uploads");
-const DB_PATH = IS_VERCEL ? path.join("/tmp", "minipilot.db") : path.join(__dirname, "minipilot.db");
+const IS_DOCKER = !!process.env.DOCKER;
+const UPLOADS_DIR = process.env.UPLOADS_DIR || (IS_VERCEL ? path.join("/tmp", "uploads") : path.join(__dirname, "uploads"));
+const DB_PATH = process.env.DB_PATH || (IS_VERCEL ? path.join("/tmp", "minipilot.db") : path.join(__dirname, "minipilot.db"));
 
 if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
@@ -2558,17 +2559,42 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: err.message || "Erreur serveur interne." });
 });
 
+// ─── Health check ─────────────────────────────────────────────────────────────
+
+app.get("/api/health", (req, res) => {
+  try {
+    db.prepare("SELECT 1").get();
+    res.json({ status: "ok", db: "connected" });
+  } catch (e) {
+    res.status(500).json({ status: "error", db: e.message });
+  }
+});
+
+// ─── Static file serving (Docker / production) ───────────────────────────────
+
+const STATIC_DIR = path.join(__dirname, "..", "app", "dist");
+if (!IS_VERCEL && fs.existsSync(STATIC_DIR)) {
+  app.use(express.static(STATIC_DIR));
+  // SPA fallback — serve index.html for any non-API route
+  app.get("*", (req, res) => {
+    if (!req.path.startsWith("/api")) {
+      res.sendFile(path.join(STATIC_DIR, "index.html"));
+    }
+  });
+}
+
 // ─── Start ────────────────────────────────────────────────────────────────────
 
 // Export for Vercel serverless
 export default app;
 
-// Only listen in dev mode (not on Vercel)
+// Only listen in dev mode or Docker (not on Vercel)
 if (!IS_VERCEL) {
   const PORT = process.env.PORT || 3001;
   app.listen(PORT, () => {
     console.log(`Minipilot server — http://localhost:${PORT}`);
     console.log(`Database : ${DB_PATH}`);
     console.log(`Uploads  : ${UPLOADS_DIR}`);
+    if (fs.existsSync(STATIC_DIR)) console.log(`Frontend : ${STATIC_DIR}`);
   });
 }
