@@ -4,7 +4,6 @@ import { WorkspaceProvider, useWorkspaceApi } from "../lib/WorkspaceContext";
 import Sidebar from "./Sidebar";
 import DashboardPage from "./DashboardPage";
 import ChatPage from "./ChatPage";
-import ReportsPage from "./ReportsPage";
 import AdminPage from "./AdminPage";
 import FullReport from "./FullReport";
 import TrashPage from "./TrashPage";
@@ -121,7 +120,7 @@ function WorkspaceContent() {
     if (p !== "report") setViewingReport(null);
     if (p === "dashboard") navigate(`/${slug}`);
     else navigate(`/${slug}/${p}`);
-    if (p === "dashboard" || p === "reports") loadReports();
+    if (p === "dashboard") loadReports();
   };
 
   if (showOnboarding) {
@@ -192,6 +191,7 @@ function WorkspaceContent() {
             reports={reports}
             reportsLoading={reportsLoading}
             toggleStar={toggleStar}
+            trashReport={trashReport}
             openReport={openReport}
             goToChat={goToChat}
           />
@@ -200,7 +200,7 @@ function WorkspaceContent() {
         {currentPage === "report" && (
           <div style={{ padding: 32, overflow: "auto" }}>
             <button
-              onClick={() => handleSetPage("reports")}
+              onClick={() => handleSetPage("dashboard")}
               style={{
                 background: "none", border: "none", cursor: "pointer",
                 color: "var(--mp-text-muted)", fontSize: 13,
@@ -208,7 +208,7 @@ function WorkspaceContent() {
                 marginBottom: 16, fontFamily: "var(--font-body)", padding: 0,
               }}
             >
-              ← Retour aux rapports
+              ← Retour au tableau de bord
             </button>
             {viewingReport ? (
               <FullReport
@@ -230,17 +230,6 @@ function WorkspaceContent() {
             toggleStar={toggleStar}
             openReport={openReport}
             onReportGenerated={loadReports}
-          />
-        )}
-
-        {currentPage === "reports" && (
-          <ReportsPage
-            reports={reports}
-            reportsLoading={reportsLoading}
-            toggleStar={toggleStar}
-            trashReport={trashReport}
-            openReport={openReport}
-            goToChat={goToChat}
           />
         )}
 

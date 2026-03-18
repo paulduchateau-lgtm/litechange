@@ -1,9 +1,12 @@
-import { Star, BookOpen, MessageSquare, Activity, Loader2 } from "lucide-react";
+import { Star, BookOpen, FileText, MessageSquare, Activity, Loader2 } from "lucide-react";
 import ReportCard from "./ReportCard";
 
-export default function DashboardPage({ reports, reportsLoading, toggleStar, openReport, goToChat }) {
+export default function DashboardPage({ reports, reportsLoading, toggleStar, trashReport, openReport, goToChat }) {
   const sharedReports = reports.shared || [];
-  const privateReports = (reports.private || []).filter(r => r.starred);
+  const allPrivate = reports.private || [];
+  const favoriteReports = allPrivate.filter(r => r.starred);
+  const otherReports = allPrivate.filter(r => !r.starred);
+  const total = sharedReports.length + allPrivate.length;
 
   // Compute overview KPIs from shared reports (take first 4)
   const overviewKpis = [];
@@ -17,13 +20,27 @@ export default function DashboardPage({ reports, reportsLoading, toggleStar, ope
 
   return (
     <div style={{ padding: 32, maxWidth: 1140, width: "100%", margin: "0 auto" }}>
-      <h1 style={{
-        fontSize: 28, fontWeight: 300, marginBottom: 4,
-        fontFamily: "var(--font-display)",
-      }}>Dashboard</h1>
-      <p style={{ color: "var(--mp-text-muted)", fontSize: 14, marginBottom: 24 }}>
-        Vue d'ensemble de vos données et rapports
-      </p>
+      <div style={{
+        display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24,
+      }}>
+        <div>
+          <h1 style={{
+            fontSize: 28, fontWeight: 300, marginBottom: 4,
+            fontFamily: "var(--font-display)",
+          }}>Tableau de bord</h1>
+          <p style={{ color: "var(--mp-text-muted)", fontSize: 14 }}>
+            {total} rapport{total !== 1 ? "s" : ""} disponible{total !== 1 ? "s" : ""}
+          </p>
+        </div>
+        <button onClick={goToChat} style={{
+          background: "var(--mp-accent)", border: "none", borderRadius: "var(--radius-md)",
+          padding: "10px 20px", color: "var(--mp-accent-on)", cursor: "pointer",
+          fontSize: 14, fontWeight: 500, display: "flex", alignItems: "center", gap: 8,
+          fontFamily: "var(--font-body)",
+        }}>
+          <MessageSquare size={16} /> Nouvelle exploration
+        </button>
+      </div>
 
       {/* Overview KPIs */}
       {overviewKpis.length > 0 && (
@@ -59,38 +76,10 @@ export default function DashboardPage({ reports, reportsLoading, toggleStar, ope
         </div>
       )}
 
-      {/* Starred Private Reports */}
-      {privateReports.length > 0 && (
-        <div style={{ marginBottom: 28 }}>
-          <h2 style={{
-            fontSize: 15, fontWeight: 500, marginBottom: 14,
-            display: "flex", alignItems: "center", gap: 8,
-          }}>
-            <Star size={15} color="#D4A03A" fill="#D4A03A" /> Mes rapports
-          </h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 14 }}>
-            {privateReports.map(r => (
-              <ReportCard
-                key={r.id}
-                report={normalizeReport(r)}
-                isFav
-                onToggleFav={() => toggleStar(r.id)}
-                onClick={() => openReport(r.id)}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Shared Reports */}
+      {/* Section 1: Rapports communs (partagés) */}
       {sharedReports.length > 0 && (
         <div style={{ marginBottom: 28 }}>
-          <h2 style={{
-            fontSize: 15, fontWeight: 500, marginBottom: 14,
-            display: "flex", alignItems: "center", gap: 8,
-          }}>
-            <BookOpen size={15} color="var(--mp-accent)" /> Rapports partagés
-          </h2>
+          <SectionHeader icon={<BookOpen size={15} color="var(--mp-accent)" />} label="Rapports communs" count={sharedReports.length} />
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 14 }}>
             {sharedReports.map(r => (
               <ReportCard
@@ -98,6 +87,7 @@ export default function DashboardPage({ reports, reportsLoading, toggleStar, ope
                 report={normalizeReport(r)}
                 isFav={!!r.starred}
                 onToggleFav={() => toggleStar(r.id)}
+                onDelete={trashReport ? () => trashReport(r.id) : undefined}
                 onClick={() => openReport(r.id)}
                 isShared
               />
@@ -106,8 +96,46 @@ export default function DashboardPage({ reports, reportsLoading, toggleStar, ope
         </div>
       )}
 
+      {/* Section 2: Mes rapports favoris */}
+      {favoriteReports.length > 0 && (
+        <div style={{ marginBottom: 28 }}>
+          <SectionHeader icon={<Star size={15} color="#D4A03A" fill="#D4A03A" />} label="Mes rapports favoris" count={favoriteReports.length} />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 14 }}>
+            {favoriteReports.map(r => (
+              <ReportCard
+                key={r.id}
+                report={normalizeReport(r)}
+                isFav
+                onToggleFav={() => toggleStar(r.id)}
+                onDelete={trashReport ? () => trashReport(r.id) : undefined}
+                onClick={() => openReport(r.id)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Section 3: Tous mes rapports (non-favoris) */}
+      {otherReports.length > 0 && (
+        <div style={{ marginBottom: 28 }}>
+          <SectionHeader icon={<FileText size={15} color="var(--mp-text-muted)" />} label="Tous mes rapports" count={otherReports.length} />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 14 }}>
+            {otherReports.map(r => (
+              <ReportCard
+                key={r.id}
+                report={normalizeReport(r)}
+                isFav={false}
+                onToggleFav={() => toggleStar(r.id)}
+                onDelete={trashReport ? () => trashReport(r.id) : undefined}
+                onClick={() => openReport(r.id)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Empty state */}
-      {!reportsLoading && sharedReports.length === 0 && privateReports.length === 0 && (
+      {!reportsLoading && total === 0 && (
         <div style={{
           background: "var(--mp-bg-card)", border: "1px solid var(--mp-border)",
           borderRadius: "var(--radius-md)", padding: "48px 32px",
@@ -115,37 +143,37 @@ export default function DashboardPage({ reports, reportsLoading, toggleStar, ope
         }}>
           <BookOpen size={32} color="var(--mp-text-muted)" style={{ marginBottom: 12 }} />
           <p style={{ fontSize: 15, fontWeight: 500, marginBottom: 4 }}>Aucun rapport disponible</p>
-          <p style={{ fontSize: 13, color: "var(--mp-text-muted)" }}>
-            Lancez l'explorateur pour générer votre premier rapport.
+          <p style={{ fontSize: 13, color: "var(--mp-text-muted)", marginBottom: 16 }}>
+            Lancez l'explorateur pour generer votre premier rapport.
           </p>
+          <button onClick={goToChat} style={{
+            background: "var(--mp-accent)", border: "none", borderRadius: "var(--radius-md)",
+            padding: "10px 20px", color: "var(--mp-accent-on)", cursor: "pointer",
+            fontSize: 14, fontWeight: 500, fontFamily: "var(--font-body)",
+          }}>
+            Lancer l'explorateur
+          </button>
         </div>
       )}
-
-      {/* CTA */}
-      <div style={{
-        background: "linear-gradient(135deg, var(--mp-accent-dim), transparent)",
-        border: "1px solid var(--mp-border)",
-        borderRadius: "var(--radius-md)", padding: "22px 26px",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-      }}>
-        <div>
-          <h3 style={{ fontSize: 15, fontWeight: 500, marginBottom: 4, fontFamily: "var(--font-display)" }}>
-            Explorer vos données
-          </h3>
-          <p style={{ fontSize: 13, color: "var(--mp-text-muted)", margin: 0 }}>
-            Posez une question en langage naturel pour générer un rapport métier complet
-          </p>
-        </div>
-        <button onClick={goToChat} style={{
-          background: "var(--mp-accent)", border: "none", borderRadius: "var(--radius-md)",
-          padding: "10px 20px", color: "var(--mp-accent-on)", cursor: "pointer",
-          fontSize: 14, fontWeight: 500, display: "flex", alignItems: "center", gap: 8,
-          fontFamily: "var(--font-body)",
-        }}>
-          <MessageSquare size={16} /> Nouvelle exploration
-        </button>
-      </div>
     </div>
+  );
+}
+
+function SectionHeader({ icon, label, count }) {
+  return (
+    <h2 style={{
+      fontSize: 15, fontWeight: 500, marginBottom: 14,
+      display: "flex", alignItems: "center", gap: 8,
+    }}>
+      {icon}
+      {label}
+      <span style={{
+        fontFamily: "var(--font-data)", fontSize: 10,
+        color: "var(--mp-text-muted)", fontWeight: 400,
+      }}>
+        ({count})
+      </span>
+    </h2>
   );
 }
 
