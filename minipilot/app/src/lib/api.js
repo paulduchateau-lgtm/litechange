@@ -145,6 +145,12 @@ export function createWorkspaceApi(slug) {
       return res.json();
     },
 
+    getReport: async (id) => {
+      const res = await fetch(`${BASE}/reports/${id}`);
+      if (!res.ok) return null;
+      return res.json();
+    },
+
     saveReport: async (report) => {
       const res = await fetch(`${BASE}/reports`, {
         method: "POST",

@@ -88,19 +88,27 @@ function WorkspaceContent() {
   const subPath = location.pathname.replace(`/${slug}`, "").replace(/^\//, "");
   const currentPage = subPath.split("/")[0] || "dashboard";
 
-  // If viewing a report URL but viewingReport is null, find it from loaded reports
+  // Load report directly by ID when navigating to a report URL
   useEffect(() => {
-    if (currentPage === "report" && !viewingReport && reports) {
-      const allReports = [...(reports.shared || []), ...(reports.private || [])];
+    if (currentPage === "report" && !viewingReport) {
       const reportId = subPath.split("/")[1];
-      if (reportId) {
-        const found = allReports.find(r => r.id === reportId);
-        if (found) setViewingReport(found);
+      if (!reportId) return;
+      // First try from already-loaded reports
+      const allReports = [...(reports.shared || []), ...(reports.private || [])];
+      const found = allReports.find(r => r.id === reportId);
+      if (found) {
+        setViewingReport(found);
+      } else {
+        // Fetch directly from API
+        api.getReport(reportId)
+          .then(report => { if (report) setViewingReport(report); })
+          .catch(() => {});
       }
     }
   }, [currentPage, viewingReport, reports, subPath]);
 
   const handleSetPage = (p) => {
+    if (p !== "report") setViewingReport(null);
     if (p === "dashboard") navigate(`/${slug}`);
     else navigate(`/${slug}/${p}`);
     if (p === "dashboard" || p === "reports") loadReports();

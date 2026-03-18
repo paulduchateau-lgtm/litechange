@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AlignLeft, List, Save } from "lucide-react";
-import { useWorkspaceApi } from "../../lib/WorkspaceContext";
+import { useWorkspaceApi, useWorkspace } from "../../lib/WorkspaceContext";
 
 const SECTEURS = [
   "Assurance",
@@ -8,30 +8,21 @@ const SECTEURS = [
   "Mutuelle",
   "Prevoyance",
   "Institution publique",
-];
-
-const OBJECTIFS = [
-  "Pilotage sinistralite",
-  "Suivi portefeuille",
-  "Analyse consommation",
-  "Conformite reglementaire",
+  "Energie",
+  "Telecom",
+  "Transport",
+  "Sante",
+  "Industrie",
   "Autre",
 ];
 
-const PERIODES = [
-  "Dernier trimestre",
-  "6 derniers mois",
-  "Annee en cours",
-  "3 dernieres annees",
-];
-
 const INDICATEURS = [
-  "Ratio P/C",
-  "Cotisations",
-  "Prestations",
-  "Absenteisme",
-  "Optique/Dentaire",
-  "Demographie",
+  "Pilotage COMEX",
+  "Analyses financieres",
+  "Analyse des risques",
+  "Gestion de projet",
+  "Optimisation des ressources",
+  "Suivi RH",
 ];
 
 const inputStyle = {
@@ -69,14 +60,14 @@ function FormField({ label, children }) {
 
 export default function OnboardingContext({ onNext, data }) {
   const api = useWorkspaceApi();
+  const { workspace } = useWorkspace();
   const [mode, setMode] = useState("form");
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
-    projectName: data?.projectName || "",
-    secteur: data?.secteur || "",
+    projectName: data?.projectName || workspace?.name || "",
+    secteur: data?.secteur || workspace?.industry || "",
     objectif: data?.objectif || "",
     perimetre: data?.perimetre || "",
-    periode: data?.periode || "",
     indicateurs: data?.indicateurs || [],
   });
   const [freeText, setFreeText] = useState(data?.freeText || "");
@@ -93,7 +84,7 @@ export default function OnboardingContext({ onNext, data }) {
   };
 
   const isFormValid = mode === "form"
-    ? formData.projectName.trim() && formData.secteur && formData.objectif && formData.periode
+    ? formData.projectName.trim() && formData.secteur
     : freeText.trim().length > 20;
 
   const handleNext = async () => {
@@ -106,7 +97,6 @@ export default function OnboardingContext({ onNext, data }) {
       await api.saveContext(payload);
       onNext(payload);
     } catch {
-      // Proceed even if save fails — data is available locally
       const payload = mode === "form"
         ? { mode: "form", ...formData }
         : { mode: "free", freeText };
@@ -169,60 +159,54 @@ export default function OnboardingContext({ onNext, data }) {
             />
           </FormField>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-            <FormField label="Secteur d'activite">
-              <select
-                value={formData.secteur}
-                onChange={e => update("secteur", e.target.value)}
-                style={{ ...inputStyle, cursor: "pointer" }}
-                onFocus={e => e.target.style.borderColor = "var(--mp-accent)"}
-                onBlur={e => e.target.style.borderColor = "var(--mp-border)"}
-              >
-                <option value="">Selectionner...</option>
-                {SECTEURS.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
-            </FormField>
-
-            <FormField label="Objectif principal">
-              <select
-                value={formData.objectif}
-                onChange={e => update("objectif", e.target.value)}
-                style={{ ...inputStyle, cursor: "pointer" }}
-                onFocus={e => e.target.style.borderColor = "var(--mp-accent)"}
-                onBlur={e => e.target.style.borderColor = "var(--mp-border)"}
-              >
-                <option value="">Selectionner...</option>
-                {OBJECTIFS.map(o => <option key={o} value={o}>{o}</option>)}
-              </select>
-            </FormField>
-          </div>
-
-          <FormField label="Perimetre">
-            <input
-              type="text"
-              value={formData.perimetre}
-              onChange={e => update("perimetre", e.target.value)}
-              placeholder="Ex : 371 entreprises, 6 720 beneficiaires"
-              style={inputStyle}
-              onFocus={e => e.target.style.borderColor = "var(--mp-accent)"}
-              onBlur={e => e.target.style.borderColor = "var(--mp-border)"}
-            />
-          </FormField>
-
-          <FormField label="Periode d'analyse">
+          <FormField label="Secteur d'activite">
             <select
-              value={formData.periode}
-              onChange={e => update("periode", e.target.value)}
+              value={formData.secteur}
+              onChange={e => update("secteur", e.target.value)}
               style={{ ...inputStyle, cursor: "pointer" }}
               onFocus={e => e.target.style.borderColor = "var(--mp-accent)"}
               onBlur={e => e.target.style.borderColor = "var(--mp-border)"}
             >
               <option value="">Selectionner...</option>
-              {PERIODES.map(p => <option key={p} value={p}>{p}</option>)}
+              {SECTEURS.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </FormField>
 
-          <FormField label="Indicateurs cles attendus">
+          <FormField label="Objectif principal">
+            <textarea
+              value={formData.objectif}
+              onChange={e => update("objectif", e.target.value)}
+              placeholder="Decrivez en quelques lignes l'objectif principal de cette analyse. Que cherchez-vous a comprendre, mesurer ou ameliorer ?"
+              rows={3}
+              style={{
+                ...inputStyle,
+                resize: "vertical",
+                lineHeight: 1.6,
+                minHeight: 80,
+              }}
+              onFocus={e => e.target.style.borderColor = "var(--mp-accent)"}
+              onBlur={e => e.target.style.borderColor = "var(--mp-border)"}
+            />
+          </FormField>
+
+          <FormField label="Description du perimetre">
+            <textarea
+              value={formData.perimetre}
+              onChange={e => update("perimetre", e.target.value)}
+              placeholder="Decrivez le perimetre de l'analyse : population concernee, entites, geographie, produits, processus, periode... Tout element de cadrage utile."
+              rows={3}
+              style={{
+                ...inputStyle,
+                resize: "vertical",
+                lineHeight: 1.6,
+                minHeight: 80,
+              }}
+              onFocus={e => e.target.style.borderColor = "var(--mp-accent)"}
+              onBlur={e => e.target.style.borderColor = "var(--mp-border)"}
+            />
+          </FormField>
+
+          <FormField label="Axes d'analyse attendus">
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {INDICATEURS.map(ind => {
                 const selected = formData.indicateurs.includes(ind);
@@ -265,7 +249,7 @@ export default function OnboardingContext({ onNext, data }) {
           <textarea
             value={freeText}
             onChange={e => setFreeText(e.target.value)}
-            placeholder="Decrivez votre projet et vos besoins d'analyse en langage libre. Mentionnez le secteur, les objectifs, les indicateurs importants, la periode concernee et tout element contextuel utile a l'analyse..."
+            placeholder="Decrivez votre projet et vos besoins d'analyse en langage libre. Mentionnez le secteur, les objectifs, le perimetre, les axes d'analyse importants et tout element contextuel utile..."
             rows={10}
             style={{
               ...inputStyle,

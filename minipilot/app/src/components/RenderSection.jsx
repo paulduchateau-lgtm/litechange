@@ -45,12 +45,22 @@ function RiskBadge({ value }) {
 }
 
 function DataTable({ section }) {
+  // Derive columns from data keys if columns not provided by AI
+  const columns = section.columns || (
+    section.data?.length > 0
+      ? Object.keys(section.data[0]).map(key => ({ key, label: key, align: typeof section.data[0][key] === "number" ? "right" : "left" }))
+      : []
+  );
+  const data = section.data || [];
+
+  if (columns.length === 0) return <p style={{ fontSize: 13, color: "var(--mp-text-muted)" }}>Aucune donnée à afficher.</p>;
+
   return (
     <div style={{ overflow: "auto", borderRadius: "var(--radius-sm)", border: "1px solid var(--mp-border)" }}>
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
         <thead>
           <tr style={{ background: "var(--mp-bg)" }}>
-            {section.columns.map(col => (
+            {columns.map(col => (
               <th key={col.key} style={{
                 padding: "10px 14px",
                 textAlign: col.align || "left",
@@ -67,7 +77,7 @@ function DataTable({ section }) {
           </tr>
         </thead>
         <tbody>
-          {section.data.map((row, ri) => (
+          {data.map((row, ri) => (
             <tr key={ri} style={{
               background: ri % 2 === 0 ? "transparent" : "var(--mp-bg)",
               borderBottom: "1px solid var(--mp-border-subtle)",
@@ -76,7 +86,7 @@ function DataTable({ section }) {
             onMouseEnter={e => e.currentTarget.style.background = "var(--mp-accent-dim)"}
             onMouseLeave={e => e.currentTarget.style.background = ri % 2 === 0 ? "transparent" : "var(--mp-bg)"}
             >
-              {section.columns.map(col => {
+              {columns.map(col => {
                 let val = row[col.key];
                 let color = "var(--mp-text)";
 
@@ -119,100 +129,123 @@ export default function RenderSection({ section }) {
     return map[color] || color;
   };
 
+  const noData = <p style={{ fontSize: 13, color: "var(--mp-text-muted)" }}>Aucune donnée à afficher.</p>;
+
   const renderChart = () => {
-    switch (section.type) {
-      case "composed":
-        return (
-          <ResponsiveContainer width="100%" height={h}>
-            <ComposedChart data={section.data}>
-              <CartesianGrid strokeDasharray="3 3" stroke={ct.grid} />
-              <XAxis dataKey={c.xKey} tick={ct.axis} axisLine={{ stroke: ct.grid }} />
-              <YAxis yAxisId="left" tick={ct.axis} axisLine={{ stroke: ct.grid }} />
-              <YAxis yAxisId="right" orientation="right" tick={ct.axis} axisLine={{ stroke: ct.grid }} />
-              <Tooltip contentStyle={ct.tooltip} />
-              <Legend wrapperStyle={{ fontSize: 11, fontFamily: "'DM Sans'" }} />
-              {c.bars?.map(b => <Bar key={b.key} yAxisId="left" dataKey={b.key} fill={remapColor(b.color)} name={b.name} radius={[3,3,0,0]} />)}
-              {c.line && <Line yAxisId="right" type="monotone" dataKey={c.line.key} stroke={remapColor(c.line.color)} name={c.line.name} strokeWidth={2.5} dot={{ r:3, fill:remapColor(c.line.color) }} />}
-            </ComposedChart>
-          </ResponsiveContainer>
-        );
+    try {
+      if (!section.type) return null;
 
-      case "bar":
-        return (
-          <ResponsiveContainer width="100%" height={h}>
-            <BarChart data={section.data}>
-              <CartesianGrid strokeDasharray="3 3" stroke={ct.grid} />
-              <XAxis dataKey={c.xKey} tick={ct.axis} axisLine={{ stroke: ct.grid }} />
-              <YAxis tick={ct.axis} axisLine={{ stroke: ct.grid }} />
-              <Tooltip contentStyle={ct.tooltip} />
-              {c.yKeys.map((k,i) => <Bar key={k} dataKey={k} fill={remapColor(c.colors?.[i]) || ct.colors[i]} radius={[3,3,0,0]} />)}
-            </BarChart>
-          </ResponsiveContainer>
-        );
+      switch (section.type) {
+        case "composed":
+          if (!section.data?.length) return noData;
+          return (
+            <ResponsiveContainer width="100%" height={h}>
+              <ComposedChart data={section.data}>
+                <CartesianGrid strokeDasharray="3 3" stroke={ct.grid} />
+                <XAxis dataKey={c.xKey} tick={ct.axis} axisLine={{ stroke: ct.grid }} />
+                <YAxis yAxisId="left" tick={ct.axis} axisLine={{ stroke: ct.grid }} />
+                <YAxis yAxisId="right" orientation="right" tick={ct.axis} axisLine={{ stroke: ct.grid }} />
+                <Tooltip contentStyle={ct.tooltip} />
+                <Legend wrapperStyle={{ fontSize: 11, fontFamily: "'DM Sans'" }} />
+                {c.bars?.map(b => <Bar key={b.key} yAxisId="left" dataKey={b.key} fill={remapColor(b.color)} name={b.name} radius={[3,3,0,0]} />)}
+                {c.line && <Line yAxisId="right" type="monotone" dataKey={c.line.key} stroke={remapColor(c.line.color)} name={c.line.name} strokeWidth={2.5} dot={{ r:3, fill:remapColor(c.line.color) }} />}
+              </ComposedChart>
+            </ResponsiveContainer>
+          );
 
-      case "grouped_bar":
-        return (
-          <ResponsiveContainer width="100%" height={h}>
-            <BarChart data={section.data}>
-              <CartesianGrid strokeDasharray="3 3" stroke={ct.grid} />
-              <XAxis dataKey={c.xKey} tick={ct.axis} axisLine={{ stroke: ct.grid }} />
-              <YAxis tick={ct.axis} axisLine={{ stroke: ct.grid }} />
-              <Tooltip contentStyle={ct.tooltip} />
-              <Legend wrapperStyle={{ fontSize: 11, fontFamily: "'DM Sans'" }} />
-              {c.yKeys.map((k,i) => <Bar key={k} dataKey={k} fill={remapColor(c.colors[i])} name={c.names?.[i] || k} radius={[3,3,0,0]} />)}
-            </BarChart>
-          </ResponsiveContainer>
-        );
+        case "bar":
+          if (!section.data?.length || !c.yKeys?.length) return noData;
+          return (
+            <ResponsiveContainer width="100%" height={h}>
+              <BarChart data={section.data}>
+                <CartesianGrid strokeDasharray="3 3" stroke={ct.grid} />
+                <XAxis dataKey={c.xKey} tick={ct.axis} axisLine={{ stroke: ct.grid }} />
+                <YAxis tick={ct.axis} axisLine={{ stroke: ct.grid }} />
+                <Tooltip contentStyle={ct.tooltip} />
+                {c.yKeys.map((k,i) => <Bar key={k} dataKey={k} fill={remapColor(c.colors?.[i]) || ct.colors[i]} radius={[3,3,0,0]} />)}
+              </BarChart>
+            </ResponsiveContainer>
+          );
 
-      case "area_multi":
-        return (
-          <ResponsiveContainer width="100%" height={h}>
-            <AreaChart data={section.data}>
-              <defs>
-                {c.yKeys.map((k,i) => (
-                  <linearGradient key={k} id={`ag_${k}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={remapColor(c.colors[i])} stopOpacity={0.25} />
-                    <stop offset="95%" stopColor={remapColor(c.colors[i])} stopOpacity={0} />
-                  </linearGradient>
-                ))}
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke={ct.grid} />
-              <XAxis dataKey={c.xKey} tick={ct.axis} axisLine={{ stroke: ct.grid }} />
-              <YAxis tick={ct.axis} axisLine={{ stroke: ct.grid }} />
-              <Tooltip contentStyle={ct.tooltip} />
-              <Legend wrapperStyle={{ fontSize: 11, fontFamily: "'DM Sans'" }} />
-              {c.yKeys.map((k,i) => <Area key={k} type="monotone" dataKey={k} stroke={remapColor(c.colors[i])} fill={`url(#ag_${k})`} name={c.names[i]} strokeWidth={2} />)}
-            </AreaChart>
-          </ResponsiveContainer>
-        );
+        case "grouped_bar":
+          if (!section.data?.length || !c.yKeys?.length) return noData;
+          return (
+            <ResponsiveContainer width="100%" height={h}>
+              <BarChart data={section.data}>
+                <CartesianGrid strokeDasharray="3 3" stroke={ct.grid} />
+                <XAxis dataKey={c.xKey} tick={ct.axis} axisLine={{ stroke: ct.grid }} />
+                <YAxis tick={ct.axis} axisLine={{ stroke: ct.grid }} />
+                <Tooltip contentStyle={ct.tooltip} />
+                <Legend wrapperStyle={{ fontSize: 11, fontFamily: "'DM Sans'" }} />
+                {c.yKeys.map((k,i) => <Bar key={k} dataKey={k} fill={remapColor(c.colors?.[i]) || ct.colors[i]} name={c.names?.[i] || k} radius={[3,3,0,0]} />)}
+              </BarChart>
+            </ResponsiveContainer>
+          );
 
-      case "pie_multi":
-        return (
-          <div style={{ display: "flex", gap: 32, justifyContent: "center", flexWrap: "wrap" }}>
-            {section.data_sets.map((ds, di) => (
-              <div key={di} style={{ textAlign: "center" }}>
-                <span className="data-label" style={{ display: "block", marginBottom: 8 }}>{ds.label}</span>
-                <ResponsiveContainer width={260} height={220}>
-                  <PieChart>
-                    <Pie data={ds.data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80}
-                      label={({name, value}) => `${name}: ${value}`}
-                      labelLine={{ stroke: ct.axis.fill }}
-                      strokeWidth={2} stroke="var(--mp-bg)">
-                      {ds.data.map((_, i) => <Cell key={i} fill={ct.colors[i]} />)}
-                    </Pie>
-                    <Tooltip contentStyle={ct.tooltip} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            ))}
-          </div>
-        );
+        case "area_multi":
+          if (!section.data?.length || !c.yKeys?.length) return noData;
+          return (
+            <ResponsiveContainer width="100%" height={h}>
+              <AreaChart data={section.data}>
+                <defs>
+                  {c.yKeys.map((k,i) => (
+                    <linearGradient key={k} id={`ag_${k}`} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={remapColor(c.colors?.[i]) || ct.colors[i]} stopOpacity={0.25} />
+                      <stop offset="95%" stopColor={remapColor(c.colors?.[i]) || ct.colors[i]} stopOpacity={0} />
+                    </linearGradient>
+                  ))}
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke={ct.grid} />
+                <XAxis dataKey={c.xKey} tick={ct.axis} axisLine={{ stroke: ct.grid }} />
+                <YAxis tick={ct.axis} axisLine={{ stroke: ct.grid }} />
+                <Tooltip contentStyle={ct.tooltip} />
+                <Legend wrapperStyle={{ fontSize: 11, fontFamily: "'DM Sans'" }} />
+                {c.yKeys.map((k,i) => <Area key={k} type="monotone" dataKey={k} stroke={remapColor(c.colors?.[i]) || ct.colors[i]} fill={`url(#ag_${k})`} name={c.names?.[i] || k} strokeWidth={2} />)}
+              </AreaChart>
+            </ResponsiveContainer>
+          );
 
-      case "table":
-        return <DataTable section={section} />;
+        case "pie_multi":
+          if (!section.data_sets?.length) return noData;
+          return (
+            <div style={{ display: "flex", gap: 32, justifyContent: "center", flexWrap: "wrap" }}>
+              {section.data_sets.map((ds, di) => (
+                <div key={di} style={{ textAlign: "center" }}>
+                  <span className="data-label" style={{ display: "block", marginBottom: 8 }}>{ds.label}</span>
+                  <ResponsiveContainer width={260} height={220}>
+                    <PieChart>
+                      <Pie data={ds.data || []} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80}
+                        label={({name, value}) => `${name}: ${value}`}
+                        labelLine={{ stroke: ct.axis.fill }}
+                        strokeWidth={2} stroke="var(--mp-bg)">
+                        {(ds.data || []).map((_, i) => <Cell key={i} fill={ct.colors[i % ct.colors.length]} />)}
+                      </Pie>
+                      <Tooltip contentStyle={ct.tooltip} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              ))}
+            </div>
+          );
 
-      default:
-        return null;
+        case "table":
+          return <DataTable section={section} />;
+
+        default:
+          return null;
+      }
+    } catch (err) {
+      console.error("[RenderSection] render error:", err, section);
+      return (
+        <div style={{
+          padding: "12px 16px", background: "var(--mp-bg-elevated)",
+          borderRadius: "var(--radius-sm)", border: "1px solid var(--mp-border)",
+        }}>
+          <p style={{ fontSize: 12, color: "var(--mp-text-muted)", margin: 0 }}>
+            Impossible d'afficher cette section ({section.type})
+          </p>
+        </div>
+      );
     }
   };
 

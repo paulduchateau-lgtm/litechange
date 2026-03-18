@@ -1,6 +1,6 @@
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useContext, useMemo, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { createWorkspaceApi } from "./api";
+import { createWorkspaceApi, getWorkspace } from "./api";
 
 const WorkspaceContext = createContext(null);
 
@@ -9,7 +9,16 @@ export function WorkspaceProvider({ children, slug: propSlug }) {
   const slug = propSlug || params.slug;
 
   const api = useMemo(() => createWorkspaceApi(slug), [slug]);
-  const value = useMemo(() => ({ slug, api }), [slug, api]);
+
+  // Load workspace metadata (name, industry, etc.)
+  const [workspace, setWorkspace] = useState(null);
+  useEffect(() => {
+    getWorkspace(slug)
+      .then(setWorkspace)
+      .catch(() => setWorkspace(null));
+  }, [slug]);
+
+  const value = useMemo(() => ({ slug, api, workspace }), [slug, api, workspace]);
 
   return (
     <WorkspaceContext.Provider value={value}>

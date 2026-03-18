@@ -5,12 +5,12 @@ import {
 } from "lucide-react";
 import { useWorkspaceApi } from "../../lib/WorkspaceContext";
 
-const INITIAL_SUGGESTIONS = [
-  "Sinistralite globale et ratio P/C",
-  "Consommation par profil sociodemographique",
-  "Tableau de bord portefeuille contrats",
-  "Analyse des arrets de travail",
-  "Focus optique et dentaire",
+const DEFAULT_SUGGESTIONS = [
+  "Quels sont les risques avec la criticite la plus elevee ?",
+  "Quelle est la repartition des risques par niveau de criticite ?",
+  "Quelle direction concentre le plus de risques critiques ?",
+  "Quels risques critiques n'ont pas de plan d'action ?",
+  "Construis un dashboard COMEX synthetisant les risques majeurs",
 ];
 
 function TypingIndicator() {
@@ -181,7 +181,7 @@ export default function ChatInterface({ onOpenReport }) {
 
       setMessages(prev => [...prev, {
         role: "assistant",
-        content: result.message || result.content || "Analyse en cours...",
+        content: result.response || result.message || result.content || "Analyse en cours...",
         reportData: result.reportData || null,
         id: Date.now() + 1,
       }]);
@@ -252,7 +252,7 @@ export default function ChatInterface({ onOpenReport }) {
               display: "flex", flexWrap: "wrap", gap: 8,
               justifyContent: "center", maxWidth: 640,
             }}>
-              {INITIAL_SUGGESTIONS.map(q => (
+              {DEFAULT_SUGGESTIONS.map(q => (
                 <button
                   key={q}
                   onClick={() => handleSend(q)}

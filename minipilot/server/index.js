@@ -542,6 +542,112 @@ function buildColumnStats(workspaceId = null) {
   return result;
 }
 
+/**
+ * Build a comprehensive data context for AI chat — includes full distributions,
+ * cross-tabulations, and all data rows (up to a reasonable limit).
+ */
+function buildFullDataContext(workspaceId) {
+  const wsFilter = workspaceId ? " WHERE workspace_id = ?" : "";
+  const wsParams = workspaceId ? [workspaceId] : [];
+
+  const tables = db
+    .prepare(`SELECT DISTINCT table_name FROM clean_data${wsFilter}`)
+    .all(...wsParams)
+    .map(r => r.table_name);
+
+  const result = { tables: [], totalRows: 0 };
+
+  for (const tableName of tables) {
+    const colsRow = workspaceId
+      ? db.prepare("SELECT columns FROM clean_data WHERE table_name = ? AND workspace_id = ? LIMIT 1").get(tableName, workspaceId)
+      : db.prepare("SELECT columns FROM clean_data WHERE table_name = ? LIMIT 1").get(tableName);
+    const cols = colsRow ? JSON.parse(colsRow.columns) : [];
+    const rows = workspaceId
+      ? db.prepare("SELECT row_data FROM clean_data WHERE table_name = ? AND workspace_id = ?").all(tableName, workspaceId).map(r => JSON.parse(r.row_data))
+      : db.prepare("SELECT row_data FROM clean_data WHERE table_name = ?").all(tableName).map(r => JSON.parse(r.row_data));
+
+    result.totalRows += rows.length;
+
+    // Build distributions for categorical columns
+    const distributions = {};
+    const numericStats = {};
+
+    for (const col of cols) {
+      const key = col.name;
+      const values = rows.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== "");
+
+      if (col.type === "number") {
+        const nums = values.map(Number).filter(n => !isNaN(n));
+        if (nums.length > 0) {
+          const sorted = [...nums].sort((a, b) => a - b);
+          numericStats[key] = {
+            count: nums.length,
+            min: Math.min(...nums),
+            max: Math.max(...nums),
+            sum: Math.round(nums.reduce((a, b) => a + b, 0) * 100) / 100,
+            avg: Math.round((nums.reduce((a, b) => a + b, 0) / nums.length) * 100) / 100,
+            median: sorted[Math.floor(sorted.length / 2)],
+          };
+        }
+      } else {
+        // Full distribution for categorical columns
+        const freq = {};
+        values.forEach(v => { freq[v] = (freq[v] || 0) + 1; });
+        // Keep all values (not just top 5)
+        const entries = Object.entries(freq).sort((a, b) => b[1] - a[1]);
+        distributions[key] = {
+          uniqueCount: entries.length,
+          values: Object.fromEntries(entries),
+        };
+      }
+    }
+
+    // Cross-tabulations for key dimensions
+    const crossTabs = {};
+    const catCols = cols.filter(c => c.type !== "number").map(c => c.name);
+    const numCols = cols.filter(c => c.type === "number").map(c => c.name);
+
+    // For each categorical col, compute aggregates of numeric cols
+    for (const catCol of catCols.slice(0, 8)) { // Limit to 8 most useful dimensions
+      const groups = {};
+      rows.forEach(row => {
+        const key = row[catCol] || "(vide)";
+        if (!groups[key]) groups[key] = { count: 0 };
+        groups[key].count++;
+        for (const numCol of numCols.slice(0, 6)) {
+          const v = Number(row[numCol]);
+          if (!isNaN(v)) {
+            if (!groups[key][numCol]) groups[key][numCol] = { sum: 0, count: 0 };
+            groups[key][numCol].sum += v;
+            groups[key][numCol].count++;
+          }
+        }
+      });
+      // Compute averages
+      for (const [, g] of Object.entries(groups)) {
+        for (const numCol of numCols.slice(0, 6)) {
+          if (g[numCol]) {
+            g[numCol].avg = Math.round((g[numCol].sum / g[numCol].count) * 100) / 100;
+          }
+        }
+      }
+      crossTabs[catCol] = groups;
+    }
+
+    result.tables.push({
+      name: tableName,
+      rowCount: rows.length,
+      columns: cols.map(c => `${c.name} (${c.type})`),
+      distributions,
+      numericStats,
+      crossTabs,
+      // Include ALL rows if <= 200, otherwise a representative sample
+      allData: rows.length <= 200 ? rows : rows.slice(0, 50),
+    });
+  }
+  return result;
+}
+
 // ─── Routes ───────────────────────────────────────────────────────────────────
 
 // ── GET /api/workspaces ───────────────────────────────────────────────────────
@@ -1902,64 +2008,78 @@ app.post("/api/w/:slug/transform", (req, res) => {
     const tablesByCommonKey = {};
 
     for (const file of files) {
-      const rawRows = db.prepare("SELECT row_data FROM data_rows WHERE file_id = ?").all(file.id).map(r => JSON.parse(r.row_data));
-      if (rawRows.length === 0) continue;
-      const nonEmptyRows = rawRows.filter(row => Object.values(row).some(v => v !== null && v !== undefined && v !== ""));
-      if (nonEmptyRows.length === 0) continue;
+      // Group rows by sheet — each sheet becomes its own clean_data table
+      const sheets = db.prepare("SELECT DISTINCT sheet_name FROM data_rows WHERE file_id = ?").all(file.id);
+      const sheetNames = sheets.map(s => s.sheet_name).filter(Boolean);
+      // If no sheet_name (CSV), treat as single sheet
+      const sheetsToProcess = sheetNames.length > 0 ? sheetNames : [null];
 
-      const originalKeys = Object.keys(nonEmptyRows[0]);
-      const keyMap = {};
-      for (const k of originalKeys) keyMap[k] = normalizeColumnName(k);
+      for (const sheetName of sheetsToProcess) {
+        const rawRows = sheetName
+          ? db.prepare("SELECT row_data FROM data_rows WHERE file_id = ? AND sheet_name = ?").all(file.id, sheetName).map(r => JSON.parse(r.row_data))
+          : db.prepare("SELECT row_data FROM data_rows WHERE file_id = ?").all(file.id).map(r => JSON.parse(r.row_data));
+        if (rawRows.length === 0) continue;
+        const nonEmptyRows = rawRows.filter(row => Object.values(row).some(v => v !== null && v !== undefined && v !== ""));
+        if (nonEmptyRows.length === 0) continue;
 
-      const remapped = nonEmptyRows.map(row => {
-        const newRow = {};
-        for (const [origKey, normKey] of Object.entries(keyMap)) {
-          let val = row[origKey];
-          if (typeof val === "string") val = val.trim();
-          newRow[normKey] = val;
-        }
-        return newRow;
-      });
+        const originalKeys = Object.keys(nonEmptyRows[0]);
+        const keyMap = {};
+        for (const k of originalKeys) keyMap[k] = normalizeColumnName(k);
 
-      const normalizedKeys = Object.values(keyMap);
-      const columns = normalizedKeys.map(key => {
-        const sampleVals = remapped.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== "").slice(0, 50);
-        const type = detectType(sampleVals);
-        return { name: key, type, nullable: remapped.some(r => r[key] === null || r[key] === undefined || r[key] === "") };
-      });
+        const remapped = nonEmptyRows.map(row => {
+          const newRow = {};
+          for (const [origKey, normKey] of Object.entries(keyMap)) {
+            let val = row[origKey];
+            if (typeof val === "string") val = val.trim();
+            newRow[normKey] = val;
+          }
+          return newRow;
+        });
 
-      const converted = remapped.map(row => {
-        const newRow = {};
+        const normalizedKeys = Object.values(keyMap);
+        const columns = normalizedKeys.map(key => {
+          const sampleVals = remapped.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== "").slice(0, 50);
+          const type = detectType(sampleVals);
+          return { name: key, type, nullable: remapped.some(r => r[key] === null || r[key] === undefined || r[key] === "") };
+        });
+
+        const converted = remapped.map(row => {
+          const newRow = {};
+          for (const col of columns) {
+            let val = row[col.name];
+            if (val === null || val === undefined || val === "") newRow[col.name] = null;
+            else if (col.type === "number") newRow[col.name] = parseFrenchNumber(val);
+            else if (col.type === "date") newRow[col.name] = normalizeDate(String(val));
+            else newRow[col.name] = String(val).trim();
+          }
+          return newRow;
+        });
+
+        // Use sheet name as table name if multi-sheet, otherwise file name
+        const baseName = sheetName
+          ? normalizeColumnName(sheetName)
+          : normalizeColumnName(path.basename(file.name, path.extname(file.name)));
+        const tableName = baseName;
+        const colsJson = JSON.stringify(columns);
+
+        const insertClean = db.prepare("INSERT INTO clean_data (table_name, columns, row_data, source_file_id, workspace_id) VALUES (?, ?, ?, ?, ?)");
+        const insertMany = db.transaction(items => {
+          for (const row of items) insertClean.run(tableName, colsJson, JSON.stringify(row), file.id, workspaceId);
+        });
+        insertMany(converted);
+
+        const colStats = columns.map(col => {
+          const vals = converted.map(r => r[col.name]).filter(v => v !== null && v !== undefined && v !== "");
+          const nullCount = converted.length - vals.length;
+          const sampleValues = col.type === "string" ? [...new Set(vals)].slice(0, 5) : vals.slice(0, 5);
+          return { name: col.name, type: col.type, nullCount, sampleValues };
+        });
+        tableSummaries.push({ name: tableName, columns: colStats, rowCount: converted.length });
+
         for (const col of columns) {
-          let val = row[col.name];
-          if (val === null || val === undefined || val === "") newRow[col.name] = null;
-          else if (col.type === "number") newRow[col.name] = parseFrenchNumber(val);
-          else if (col.type === "date") newRow[col.name] = normalizeDate(String(val));
-          else newRow[col.name] = String(val).trim();
+          if (!tablesByCommonKey[col.name]) tablesByCommonKey[col.name] = [];
+          tablesByCommonKey[col.name].push(tableName);
         }
-        return newRow;
-      });
-
-      const tableName = normalizeColumnName(path.basename(file.name, path.extname(file.name)));
-      const colsJson = JSON.stringify(columns);
-
-      const insertClean = db.prepare("INSERT INTO clean_data (table_name, columns, row_data, source_file_id, workspace_id) VALUES (?, ?, ?, ?, ?)");
-      const insertMany = db.transaction(items => {
-        for (const row of items) insertClean.run(tableName, colsJson, JSON.stringify(row), file.id, workspaceId);
-      });
-      insertMany(converted);
-
-      const colStats = columns.map(col => {
-        const vals = converted.map(r => r[col.name]).filter(v => v !== null && v !== undefined && v !== "");
-        const nullCount = converted.length - vals.length;
-        const sampleValues = col.type === "string" ? [...new Set(vals)].slice(0, 5) : vals.slice(0, 5);
-        return { name: col.name, type: col.type, nullCount, sampleValues };
-      });
-      tableSummaries.push({ name: tableName, columns: colStats, rowCount: converted.length });
-
-      for (const col of columns) {
-        if (!tablesByCommonKey[col.name]) tablesByCommonKey[col.name] = [];
-        tablesByCommonKey[col.name].push(tableName);
       }
     }
 
@@ -2233,72 +2353,111 @@ app.post("/api/w/:slug/ai/chat", async (req, res) => {
 
     const workspaceId = req.workspace.id;
     const context = db.prepare("SELECT * FROM project_context WHERE workspace_id = ?").get(workspaceId);
-    const dataSummary = buildDataSummary(10, workspaceId);
-    const colStats = buildColumnStats(workspaceId);
+    const fullData = buildFullDataContext(workspaceId);
 
-    const contextText = context
-      ? `Projet : ${context.project_name || "—"}\nSecteur : ${context.industry || "—"}\nObjectifs : ${context.objectives || "—"}`
-      : "Aucun contexte renseigné.";
+    const projectName = context?.project_name || req.workspace.name || "Analyse";
+    const industry = context?.industry || req.workspace.industry || "";
+    const objectives = context?.objectives || "";
+    const questionnaire = context?.questionnaire ? JSON.parse(context.questionnaire) : {};
+    const scope = questionnaire.perimetre || "";
+    const indicateurs = questionnaire.indicateurs || [];
 
-    const schemaText = dataSummary.map(t => {
-      const cols = t.columns.map(c => `${c.name}(${c.type})`).join(", ");
-      return `Table "${t.name}" — ${t.rowCount} lignes — colonnes : ${cols}`;
-    }).join("\n");
+    // Build rich data context
+    let dataContext = "";
+    for (const table of fullData.tables) {
+      dataContext += `\n## Table "${table.name}" — ${table.rowCount} lignes\n`;
+      dataContext += `Colonnes : ${table.columns.join(", ")}\n`;
 
-    const sampleText = dataSummary.map(t =>
-      `Table "${t.name}" — 3 exemples :\n${t.sample.slice(0, 3).map(r => JSON.stringify(r)).join("\n")}`
-    ).join("\n\n");
+      // Numeric stats
+      if (Object.keys(table.numericStats).length > 0) {
+        dataContext += "\nStatistiques numériques :\n";
+        for (const [col, s] of Object.entries(table.numericStats)) {
+          dataContext += `  ${col}: min=${s.min}, max=${s.max}, moyenne=${s.avg}, médiane=${s.median}, somme=${s.sum}, count=${s.count}\n`;
+        }
+      }
 
-    const statsText = Object.entries(colStats).map(([table, cols]) => {
-      const entries = Object.entries(cols).map(([col, s]) =>
-        s.type === "number" ? `  ${col}: min=${s.min}, max=${s.max}, avg=${s.avg}` : `  ${col}: ${s.uniqueCount} valeurs uniques`
-      ).join("\n");
-      return `Table "${table}" :\n${entries}`;
-    }).join("\n\n");
+      // Full distributions
+      if (Object.keys(table.distributions).length > 0) {
+        dataContext += "\nDistributions catégorielles :\n";
+        for (const [col, d] of Object.entries(table.distributions)) {
+          const valStr = Object.entries(d.values).map(([v, c]) => `${v}: ${c}`).join(", ");
+          dataContext += `  ${col} (${d.uniqueCount} valeurs): ${valStr}\n`;
+        }
+      }
 
-    const systemPrompt = `Tu es Minipilot, un assistant analytique expert en mutuelles santé collectives françaises (mutuelle santé collective, sinistralité, prestations, cotisations, bénéficiaires).
+      // Cross-tabs (key aggregations)
+      if (Object.keys(table.crossTabs).length > 0) {
+        dataContext += "\nAgrégations croisées :\n";
+        for (const [catCol, groups] of Object.entries(table.crossTabs)) {
+          dataContext += `  Par ${catCol}:\n`;
+          for (const [val, agg] of Object.entries(groups)) {
+            const numStr = Object.entries(agg)
+              .filter(([k]) => k !== "count")
+              .map(([k, v]) => `${k}: moy=${v.avg}, somme=${v.sum}`)
+              .join("; ");
+            dataContext += `    ${val} (${agg.count} lignes)${numStr ? " — " + numStr : ""}\n`;
+          }
+        }
+      }
 
-CONTEXTE PROJET :
-${contextText}
-
-SCHÉMA DES DONNÉES :
-${schemaText}
-
-STATISTIQUES :
-${statsText}
-
-EXEMPLES DE DONNÉES :
-${sampleText}
-
-INSTRUCTIONS :
-- Réponds en français, de manière professionnelle et concise.
-- Si l'utilisateur demande une analyse, un rapport, un graphique ou une visualisation, génère un rapport complet.
-- Si tu génères un rapport, inclus TOUJOURS un bloc JSON valide entre les balises <REPORT_DATA> et </REPORT_DATA>.
-- Le format du rapport doit respecter exactement ce schéma (pour le composant RenderSection) :
-{
-  "id": "report_xxx",
-  "title": "...",
-  "subtitle": "...",
-  "objective": "...",
-  "color": "#4A90B8",
-  "kpis": [{ "label": "...", "value": "...", "trend": "+X%", "bad": false }],
-  "sections": [{
-    "title": "...",
-    "type": "bar|composed|grouped_bar|area_multi|pie_multi|table",
-    "insight": "...",
-    "data": [...],
-    "config": {
-      "xKey": "...",
-      "yKeys": [...],
-      "colors": [...],
-      "names": [...],
-      "bars": [{"key":"...","color":"...","name":"..."}],
-      "line": {"key":"...","color":"...","name":"..."}
+      // All data rows
+      if (table.allData && table.allData.length > 0) {
+        dataContext += `\nDonnées complètes (${table.allData.length} lignes) :\n`;
+        dataContext += JSON.stringify(table.allData, null, 0) + "\n";
+      }
     }
-  }]
+
+    const systemPrompt = `Tu es Minipilot, un assistant analytique expert. Tu analyses les données du projet "${projectName}"${industry ? ` dans le secteur ${industry}` : ""}.
+${objectives ? `\nObjectifs du projet : ${objectives}` : ""}
+${scope ? `\nPérimètre : ${scope}` : ""}
+${indicateurs.length ? `\nAxes d'analyse attendus : ${indicateurs.join(", ")}` : ""}
+
+DONNÉES DISPONIBLES :
+${dataContext}
+
+RÈGLES IMPÉRATIVES :
+1. Réponds TOUJOURS en français, de manière professionnelle, institutionnelle et factuelle.
+2. Base tes réponses EXCLUSIVEMENT sur les données fournies ci-dessus. Calcule les vrais chiffres à partir des distributions et agrégations.
+3. Quand on te demande une analyse, un classement, une répartition ou un reporting → génère TOUJOURS un rapport avec des données réelles tirées du dataset.
+4. Ne jamais inventer de données. Utilise uniquement ce qui figure dans les distributions, statistiques et données complètes ci-dessus.
+5. Pour les KPIs, calcule les valeurs réelles (ex : nombre total de risques critiques = compter dans la distribution de Niveau_brut ou Niveau_residuel).
+
+FORMAT DU RAPPORT :
+Si tu génères un rapport, inclus TOUJOURS un bloc JSON valide entre <REPORT_DATA> et </REPORT_DATA>.
+Le JSON doit respecter exactement cette structure :
+{
+  "id": "report_<uuid>",
+  "title": "Titre court et descriptif",
+  "subtitle": "Sous-titre explicatif",
+  "objective": "Ce que ce rapport permet de comprendre",
+  "color": "#4A90B8",
+  "icon": "BarChart3",
+  "kpis": [
+    { "label": "Label KPI", "value": "123", "trend": "+X%", "bad": false }
+  ],
+  "sections": [
+    {
+      "title": "Titre de la section",
+      "type": "bar|grouped_bar|composed|area_multi|pie_multi|table",
+      "insight": "Phrase d'analyse clé de cette section",
+      "data": [...],
+      "config": { ... }
+    }
+  ]
 }
-- Si tu ne génères pas de rapport, réponds simplement avec du texte.
-- Utilise les données réelles disponibles dans les statistiques et exemples.`;
+
+TYPES DE SECTIONS DISPONIBLES :
+- "bar" : graphique en barres — config: { xKey, yKeys: [...], colors: [...] }
+- "grouped_bar" : barres groupées — config: { xKey, yKeys: [...], colors: [...], names: [...] }
+- "composed" : barres + ligne — config: { xKey, bars: [{key, color, name}], line: {key, color, name} }
+- "pie_multi" : camemberts — pas de config, mais "data_sets": [{ label: "...", data: [{name, value}] }]
+- "table" : tableau de données — "columns": [{ key, label, align?, fmt?, hl? }], "data": [{...}]
+  IMPORTANT pour les tables: tu DOIS fournir le champ "columns" (array d'objets avec key et label) ET "data" (array d'objets).
+  Exemple: { "type": "table", "title": "Top 10", "columns": [{"key":"nom","label":"Nom"},{"key":"score","label":"Score","align":"right","fmt":"number"}], "data": [{"nom":"X","score":12}] }
+
+COULEURS : utilise "#4A90B8" (bleu signal), "#C45A32" (rouge alerte), "#D4A03A" (jaune warning), "#3A8A4A" (vert), "#B0D838" (vert accent).
+
+Si tu ne génères PAS de rapport (question simple), réponds avec du texte structuré et concis.`;
 
     const messages = [
       ...history.map(h => ({ role: h.role, content: h.content })),
@@ -2371,6 +2530,20 @@ app.post("/api/w/:slug/reports", (req, res) => {
     res.status(201).json({ report: deserializeReport(created) });
   } catch (err) {
     console.error("[POST /api/w/:slug/reports]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /api/w/:slug/reports/:id ─────────────────────────────────────────────
+
+app.get("/api/w/:slug/reports/:id", (req, res) => {
+  try {
+    const { id } = req.params;
+    const row = db.prepare("SELECT * FROM reports WHERE id = ? AND workspace_id = ?").get(id, req.workspace.id);
+    if (!row) return res.status(404).json({ error: "Rapport introuvable." });
+    res.json(deserializeReport(row));
+  } catch (err) {
+    console.error("[GET /api/w/:slug/reports/:id]", err);
     res.status(500).json({ error: err.message });
   }
 });
