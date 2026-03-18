@@ -201,7 +201,14 @@ async function ollamaChat(messages, { maxTokens = 4096 } = {}) {
       model: OLLAMA_MODEL,
       messages,
       stream: false,
-      options: { num_predict: maxTokens, temperature: 0.3 },
+      options: {
+        num_predict: maxTokens,
+        temperature: 0.2,
+        repeat_penalty: 1.3,
+        repeat_last_n: 128,
+        top_k: 40,
+        top_p: 0.9,
+      },
     }),
   });
   if (!res.ok) {
@@ -209,7 +216,29 @@ async function ollamaChat(messages, { maxTokens = 4096 } = {}) {
     throw new Error(`Ollama (${OLLAMA_MODEL}): ${err}`);
   }
   const data = await res.json();
-  return { text: data.message?.content || "", provider: "ollama", model: OLLAMA_MODEL };
+  let text = data.message?.content || "";
+  // Detect and truncate repetition loops (same 50+ char block repeated 3+ times)
+  text = truncateRepetitions(text);
+  return { text, provider: "ollama", model: OLLAMA_MODEL };
+}
+
+/**
+ * Detect and truncate repetition loops from small LLMs.
+ * If a chunk of 40+ chars is repeated 3+ times, cut at the second occurrence.
+ */
+function truncateRepetitions(text) {
+  // Find repeated blocks of 40+ characters
+  const match = text.match(/(.{40,}?)\1{2,}/s);
+  if (match) {
+    const repeatedBlock = match[1];
+    const firstIdx = text.indexOf(repeatedBlock);
+    const secondIdx = text.indexOf(repeatedBlock, firstIdx + repeatedBlock.length);
+    if (secondIdx > firstIdx) {
+      console.warn(`[ollama] Detected repetition loop (${repeatedBlock.length} chars repeated). Truncating.`);
+      text = text.substring(0, secondIdx).trim();
+    }
+  }
+  return text;
 }
 
 /**
@@ -430,34 +459,57 @@ function extractThemes(query) {
  * 3. Bare JSON object with "title" and "sections" keys
  * Returns { json: parsed object, cleanText: response without the JSON block } or null
  */
+/**
+ * Clean common JSON issues produced by small LLMs:
+ * - // comments
+ * - Trailing commas
+ * - Unquoted values like 34 320 000 € → "34320000"
+ * - NaN, undefined, Infinity
+ */
+function cleanLlmJson(str) {
+  return str
+    .replace(/\/\/[^\n]*/g, "")                     // Remove // comments
+    .replace(/,\s*([\]}])/g, "$1")                   // Remove trailing commas
+    // Fix unquoted numeric values with spaces/symbols: 34 320 000 € → "34320000"
+    .replace(/:\s*(\d[\d\s]+\d)\s*[€%$£]?\s*([,\}\]])/g, (_, num, after) => {
+      return `: "${num.replace(/\s/g, '')}"${after}`;
+    })
+    // Fix bare currency/unit values: 500 000 adhérents → "500000"
+    .replace(/:\s*(\d[\d\s]+)\s*[a-zA-Zéèêàùôîûç]+\s*([,\}\]])/g, (_, num, after) => {
+      return `: "${num.replace(/\s/g, '')}"${after}`;
+    })
+    // Fix NaN, undefined, Infinity
+    .replace(/:\s*(NaN|undefined|Infinity)\s*([,\}\]])/g, ': null$2');
+}
+
 function extractReportFromResponse(rawResponse) {
   // Strategy 1: <REPORT_DATA> tags
   const tagMatch = rawResponse.match(/<REPORT_DATA>([\s\S]*?)<\/REPORT_DATA>/);
   if (tagMatch) {
     try {
-      const json = JSON.parse(tagMatch[1].trim());
+      const cleaned = cleanLlmJson(tagMatch[1].trim());
+      const json = JSON.parse(cleaned);
       if (json.title || json.sections) {
         const cleanText = rawResponse.replace(/<REPORT_DATA>[\s\S]*?<\/REPORT_DATA>/g, "").trim();
         return { json, cleanText };
       }
-    } catch {}
+    } catch (e) {
+      console.warn("[extractReport] REPORT_DATA tag parse failed:", e.message);
+    }
   }
 
   // Strategy 2: ```json ... ``` code blocks
   const codeBlockMatch = rawResponse.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
   if (codeBlockMatch) {
     try {
-      // Clean common issues: comments (// ...) and trailing commas
-      let jsonStr = codeBlockMatch[1]
-        .replace(/\/\/[^\n]*/g, "")           // Remove // comments
-        .replace(/,\s*([\]}])/g, "$1");       // Remove trailing commas
-      const json = JSON.parse(jsonStr);
+      const cleaned = cleanLlmJson(codeBlockMatch[1]);
+      const json = JSON.parse(cleaned);
       if (json.title || json.sections) {
         const cleanText = rawResponse.replace(/```(?:json)?\s*\{[\s\S]*?\}\s*```/g, "").trim();
         return { json, cleanText };
       }
     } catch (e) {
-      console.warn("[extractReportFromResponse] code block JSON parse failed:", e.message);
+      console.warn("[extractReport] code block JSON parse failed:", e.message);
     }
   }
 
@@ -465,15 +517,15 @@ function extractReportFromResponse(rawResponse) {
   const bareMatch = rawResponse.match(/(\{"id"[\s\S]*?"sections"\s*:\s*\[[\s\S]*?\]\s*\})/);
   if (bareMatch) {
     try {
-      let jsonStr = bareMatch[1]
-        .replace(/\/\/[^\n]*/g, "")
-        .replace(/,\s*([\]}])/g, "$1");
-      const json = JSON.parse(jsonStr);
+      const cleaned = cleanLlmJson(bareMatch[1]);
+      const json = JSON.parse(cleaned);
       if (json.title && json.sections) {
         const cleanText = rawResponse.replace(bareMatch[0], "").trim();
         return { json, cleanText };
       }
-    } catch {}
+    } catch (e) {
+      console.warn("[extractReport] bare JSON parse failed:", e.message);
+    }
   }
 
   return null;
@@ -1501,16 +1553,22 @@ INSTRUCTIONS :
       { role: "user", content: message },
     ];
 
-    const aiResponse = await aiChat(systemPrompt, messages, { maxTokens: 4000 });
+    // Adapt maxTokens based on AI mode (small local models need shorter output)
+    const chatMaxTokens = aiMode === "local" ? 2000 : 4000;
+    const aiResponse = await aiChat(systemPrompt, messages, { maxTokens: chatMaxTokens });
 
-    const rawResponse = aiResponse.text;
+    let rawResponse = aiResponse.text;
+    // If from local model, clean up common issues
+    if (aiResponse.provider === "ollama") {
+      rawResponse = truncateRepetitions(rawResponse);
+    }
 
-    // Extract report data if present
+    // Extract report data using unified extractor (supports REPORT_DATA tags, markdown blocks, bare JSON)
     let reportData = null;
-    const reportMatch = rawResponse.match(/<REPORT_DATA>([\s\S]*?)<\/REPORT_DATA>/);
-    if (reportMatch) {
+    const extracted = extractReportFromResponse(rawResponse);
+    if (extracted) {
       try {
-        reportData = JSON.parse(reportMatch[1].trim());
+        reportData = extracted.json;
         reportData.id = reportData.id || `report_${uuidv4()}`;
 
         // Persist the report
@@ -1533,7 +1591,7 @@ INSTRUCTIONS :
     }
 
     // Clean the response text (remove the JSON block for cleaner display)
-    const cleanResponse = rawResponse.replace(/<REPORT_DATA>[\s\S]*?<\/REPORT_DATA>/g, "").trim();
+    const cleanResponse = extracted ? extracted.cleanText : rawResponse;
 
     // Extract themes for logging
     const themes = extractThemes(message);
@@ -2536,10 +2594,12 @@ app.post("/api/w/:slug/ai/chat", async (req, res) => {
         }
       }
 
-      // All data rows
+      // Sample data rows (limit to avoid exceeding token limits)
       if (table.allData && table.allData.length > 0) {
-        dataContext += `\nDonnées complètes (${table.allData.length} lignes) :\n`;
-        dataContext += JSON.stringify(table.allData, null, 0) + "\n";
+        const maxRows = aiMode === "local" ? 15 : 50;
+        const sampleData = table.allData.slice(0, maxRows);
+        dataContext += `\nÉchantillon de données (${sampleData.length} sur ${table.allData.length} lignes) :\n`;
+        dataContext += JSON.stringify(sampleData, null, 0) + "\n";
       }
     }
 
@@ -2609,8 +2669,12 @@ RÈGLE CRITIQUE SUR LE FORMAT DE SORTIE :
       { role: "user", content: message },
     ];
 
-    const aiResponse = await aiChat(systemPrompt, messages, { maxTokens: 8000 });
-    const rawResponse = aiResponse.text;
+    const wsMaxTokens = aiMode === "local" ? 3000 : 8000;
+    const aiResponse = await aiChat(systemPrompt, messages, { maxTokens: wsMaxTokens });
+    let rawResponse = aiResponse.text;
+    if (aiResponse.provider === "ollama") {
+      rawResponse = truncateRepetitions(rawResponse);
+    }
 
     let reportData = null;
     let cleanResponse = rawResponse;
