@@ -84,6 +84,15 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
+  CREATE TABLE IF NOT EXISTS chat_sessions (
+    id TEXT PRIMARY KEY,
+    workspace_id TEXT,
+    title TEXT,
+    messages TEXT DEFAULT '[]',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
   CREATE TABLE IF NOT EXISTS usage_logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     action TEXT,
@@ -2341,6 +2350,76 @@ Réponds UNIQUEMENT avec un JSON valide, sans markdown :
     res.json({ report });
   } catch (err) {
     console.error("[POST /api/w/:slug/ai/generate-report]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /api/w/:slug/chat-sessions ───────────────────────────────────────────
+
+app.get("/api/w/:slug/chat-sessions", (req, res) => {
+  try {
+    const rows = db.prepare(
+      "SELECT id, title, created_at, updated_at FROM chat_sessions WHERE workspace_id = ? ORDER BY updated_at DESC LIMIT 20"
+    ).all(req.workspace.id);
+    res.json({ sessions: rows });
+  } catch (err) {
+    console.error("[GET /api/w/:slug/chat-sessions]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /api/w/:slug/chat-sessions/:id ──────────────────────────────────────
+
+app.get("/api/w/:slug/chat-sessions/:id", (req, res) => {
+  try {
+    const row = db.prepare("SELECT * FROM chat_sessions WHERE id = ? AND workspace_id = ?").get(req.params.id, req.workspace.id);
+    if (!row) return res.status(404).json({ error: "Session introuvable." });
+    res.json({ ...row, messages: JSON.parse(row.messages || "[]") });
+  } catch (err) {
+    console.error("[GET /api/w/:slug/chat-sessions/:id]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── POST /api/w/:slug/chat-sessions ─────────────────────────────────────────
+
+app.post("/api/w/:slug/chat-sessions", (req, res) => {
+  try {
+    const id = `chat_${uuidv4()}`;
+    const title = req.body.title || "Nouvelle conversation";
+    db.prepare("INSERT INTO chat_sessions (id, workspace_id, title, messages) VALUES (?, ?, ?, '[]')")
+      .run(id, req.workspace.id, title);
+    res.json({ id, title, messages: [], created_at: new Date().toISOString() });
+  } catch (err) {
+    console.error("[POST /api/w/:slug/chat-sessions]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── PATCH /api/w/:slug/chat-sessions/:id ────────────────────────────────────
+
+app.patch("/api/w/:slug/chat-sessions/:id", (req, res) => {
+  try {
+    const { title, messages } = req.body;
+    const existing = db.prepare("SELECT * FROM chat_sessions WHERE id = ? AND workspace_id = ?").get(req.params.id, req.workspace.id);
+    if (!existing) return res.status(404).json({ error: "Session introuvable." });
+    db.prepare("UPDATE chat_sessions SET title = ?, messages = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
+      .run(title || existing.title, messages !== undefined ? JSON.stringify(messages) : existing.messages, req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("[PATCH /api/w/:slug/chat-sessions/:id]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── DELETE /api/w/:slug/chat-sessions/:id ───────────────────────────────────
+
+app.delete("/api/w/:slug/chat-sessions/:id", (req, res) => {
+  try {
+    db.prepare("DELETE FROM chat_sessions WHERE id = ? AND workspace_id = ?").run(req.params.id, req.workspace.id);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("[DELETE /api/w/:slug/chat-sessions/:id]", err);
     res.status(500).json({ error: err.message });
   }
 });

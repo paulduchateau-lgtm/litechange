@@ -140,6 +140,36 @@ export function createWorkspaceApi(slug) {
       return res.json();
     },
 
+    // Chat sessions
+    getChatSessions: async () => {
+      const res = await fetch(`${BASE}/chat-sessions`);
+      return res.json();
+    },
+    getChatSession: async (id) => {
+      const res = await fetch(`${BASE}/chat-sessions/${id}`);
+      return res.json();
+    },
+    createChatSession: async (title) => {
+      const res = await fetch(`${BASE}/chat-sessions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title }),
+      });
+      return res.json();
+    },
+    updateChatSession: async (id, data) => {
+      const res = await fetch(`${BASE}/chat-sessions/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      return res.json();
+    },
+    deleteChatSession: async (id) => {
+      const res = await fetch(`${BASE}/chat-sessions/${id}`, { method: "DELETE" });
+      return res.json();
+    },
+
     getReports: async () => {
       const res = await fetch(`${BASE}/reports`);
       return res.json();
