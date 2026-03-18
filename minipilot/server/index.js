@@ -112,6 +112,7 @@ try { db.exec("ALTER TABLE clean_data ADD COLUMN workspace_id TEXT REFERENCES wo
 try { db.exec("ALTER TABLE project_context ADD COLUMN workspace_id TEXT"); } catch {}
 try { db.exec("ALTER TABLE reports ADD COLUMN workspace_id TEXT REFERENCES workspaces(id)"); } catch {}
 try { db.exec("ALTER TABLE usage_logs ADD COLUMN workspace_id TEXT"); } catch {}
+try { db.exec("ALTER TABLE reports ADD COLUMN trashed INTEGER DEFAULT 0"); } catch {}
 
 // Backfill: if data exists but no workspaces, create a default workspace
 {
@@ -2503,7 +2504,7 @@ Si tu ne génères PAS de rapport (question simple), réponds avec du texte stru
 
 app.get("/api/w/:slug/reports", (req, res) => {
   try {
-    const rows = db.prepare("SELECT * FROM reports WHERE workspace_id = ? ORDER BY created_at DESC").all(req.workspace.id);
+    const rows = db.prepare("SELECT * FROM reports WHERE workspace_id = ? AND (trashed IS NULL OR trashed = 0) ORDER BY created_at DESC").all(req.workspace.id);
     const reports = rows.map(deserializeReport);
     res.json({ shared: reports.filter(r => r.shared), private: reports.filter(r => !r.shared) });
   } catch (err) {
@@ -2578,17 +2579,44 @@ app.patch("/api/w/:slug/reports/:id", (req, res) => {
   }
 });
 
-// ── DELETE /api/w/:slug/reports/:id ──────────────────────────────────────────
+// ── DELETE /api/w/:slug/reports/:id (soft-delete → corbeille) ────────────────
 
 app.delete("/api/w/:slug/reports/:id", (req, res) => {
   try {
     const { id } = req.params;
     const existing = db.prepare("SELECT * FROM reports WHERE id = ? AND workspace_id = ?").get(id, req.workspace.id);
     if (!existing) return res.status(404).json({ error: "Rapport introuvable." });
-    db.prepare("DELETE FROM reports WHERE id = ? AND workspace_id = ?").run(id, req.workspace.id);
+    db.prepare("UPDATE reports SET trashed = 1 WHERE id = ? AND workspace_id = ?").run(id, req.workspace.id);
     res.json({ success: true });
   } catch (err) {
     console.error("[DELETE /api/w/:slug/reports/:id]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /api/w/:slug/reports/trash ──────────────────────────────────────────
+
+app.get("/api/w/:slug/reports-trash", (req, res) => {
+  try {
+    const rows = db.prepare("SELECT * FROM reports WHERE workspace_id = ? AND trashed = 1 ORDER BY created_at DESC").all(req.workspace.id);
+    res.json({ reports: rows.map(deserializeReport) });
+  } catch (err) {
+    console.error("[GET /api/w/:slug/reports-trash]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── POST /api/w/:slug/reports/:id/restore ───────────────────────────────────
+
+app.post("/api/w/:slug/reports/:id/restore", (req, res) => {
+  try {
+    const { id } = req.params;
+    const existing = db.prepare("SELECT * FROM reports WHERE id = ? AND workspace_id = ? AND trashed = 1").get(id, req.workspace.id);
+    if (!existing) return res.status(404).json({ error: "Rapport introuvable dans la corbeille." });
+    db.prepare("UPDATE reports SET trashed = 0 WHERE id = ? AND workspace_id = ?").run(id, req.workspace.id);
+    res.json({ success: true, report: deserializeReport(db.prepare("SELECT * FROM reports WHERE id = ?").get(id)) });
+  } catch (err) {
+    console.error("[POST /api/w/:slug/reports/:id/restore]", err);
     res.status(500).json({ error: err.message });
   }
 });

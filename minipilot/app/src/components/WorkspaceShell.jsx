@@ -7,6 +7,7 @@ import ChatPage from "./ChatPage";
 import ReportsPage from "./ReportsPage";
 import AdminPage from "./AdminPage";
 import FullReport from "./FullReport";
+import TrashPage from "./TrashPage";
 import OnboardingWizard from "./onboarding/OnboardingWizard";
 
 function WorkspaceContent() {
@@ -80,6 +81,15 @@ function WorkspaceContent() {
       setViewingReport(report);
     }
     navigate(`/${slug}/report/${reportId}`);
+  };
+
+  const trashReport = async (reportId) => {
+    try {
+      await api.deleteReport(reportId);
+      loadReports();
+    } catch (e) {
+      console.error("Failed to trash report", e);
+    }
   };
 
   const goToChat = () => navigate(`/${slug}/chat`);
@@ -228,9 +238,14 @@ function WorkspaceContent() {
             reports={reports}
             reportsLoading={reportsLoading}
             toggleStar={toggleStar}
+            trashReport={trashReport}
             openReport={openReport}
             goToChat={goToChat}
           />
+        )}
+
+        {currentPage === "trash" && (
+          <TrashPage onReportRestored={loadReports} />
         )}
 
         {currentPage === "admin" && <AdminPage />}

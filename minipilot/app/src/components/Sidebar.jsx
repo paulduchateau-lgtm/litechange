@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { X, LayoutDashboard, MessageSquare, FileText, Settings, Menu, Sun, Moon, RotateCcw, Wifi, WifiOff, Loader2, ArrowLeft } from "lucide-react";
+import { X, LayoutDashboard, MessageSquare, FileText, Settings, Trash2, Menu, Sun, Moon, RotateCcw, Wifi, WifiOff, Loader2, ArrowLeft } from "lucide-react";
 import { useTheme } from "../data/theme";
 import { getAiMode, setAiMode } from "../lib/api";
 
@@ -153,14 +153,46 @@ export default function Sidebar({ page, setPage, sidebarOpen, setSidebarOpen, on
       </div>
 
       {/* Nav */}
-      <div style={{ padding: "12px 8px", flex: 1 }}>
-        {NAV_ITEMS.map(it => {
-          const NavIcon = it.Icon;
-          const isActive = page === it.id || (page === "report" && it.id === "reports");
+      <div style={{ padding: "12px 8px", flex: 1, display: "flex", flexDirection: "column" }}>
+        <div>
+          {NAV_ITEMS.map(it => {
+            const NavIcon = it.Icon;
+            const isActive = page === it.id || (page === "report" && it.id === "reports");
+            return (
+              <button
+                key={it.id}
+                onClick={() => setPage(it.id)}
+                onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = "var(--mp-nav-hover)"; }}
+                onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
+                style={{
+                  width: "100%", display: "flex", alignItems: "center",
+                  gap: 12, padding: "10px 12px", marginBottom: 2,
+                  background: isActive ? "var(--mp-accent-dim)" : "transparent",
+                  border: "none", borderRadius: "var(--radius-sm)",
+                  cursor: "pointer",
+                  color: isActive ? "var(--mp-accent-text)" : "var(--mp-text-secondary)",
+                  fontSize: 13, fontWeight: isActive ? 500 : 400,
+                  fontFamily: "var(--font-body)",
+                  whiteSpace: "nowrap",
+                  transition: "background-color 120ms ease, color 120ms ease",
+                }}
+              >
+                <NavIcon size={15} />
+                <span>{it.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Spacer */}
+        <div style={{ flex: 1 }} />
+
+        {/* Corbeille */}
+        {(() => {
+          const isActive = page === "trash";
           return (
             <button
-              key={it.id}
-              onClick={() => setPage(it.id)}
+              onClick={() => setPage("trash")}
               onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = "var(--mp-nav-hover)"; }}
               onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
               style={{
@@ -169,18 +201,18 @@ export default function Sidebar({ page, setPage, sidebarOpen, setSidebarOpen, on
                 background: isActive ? "var(--mp-accent-dim)" : "transparent",
                 border: "none", borderRadius: "var(--radius-sm)",
                 cursor: "pointer",
-                color: isActive ? "var(--mp-accent-text)" : "var(--mp-text-secondary)",
-                fontSize: 13, fontWeight: isActive ? 500 : 400,
+                color: isActive ? "var(--mp-accent-text)" : "var(--mp-text-muted)",
+                fontSize: 12, fontWeight: isActive ? 500 : 400,
                 fontFamily: "var(--font-body)",
                 whiteSpace: "nowrap",
                 transition: "background-color 120ms ease, color 120ms ease",
               }}
             >
-              <NavIcon size={15} />
-              <span>{it.label}</span>
+              <Trash2 size={14} />
+              <span>Corbeille</span>
             </button>
           );
-        })}
+        })()}
       </div>
 
       {/* Reset onboarding */}

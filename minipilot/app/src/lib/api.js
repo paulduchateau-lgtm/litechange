@@ -174,6 +174,16 @@ export function createWorkspaceApi(slug) {
       return res.json();
     },
 
+    getTrashedReports: async () => {
+      const res = await fetch(`${BASE}/reports-trash`);
+      return res.json();
+    },
+
+    restoreReport: async (id) => {
+      const res = await fetch(`${BASE}/reports/${id}/restore`, { method: "POST" });
+      return res.json();
+    },
+
     getOnboardingStatus: async () => {
       const res = await fetch(`${BASE}/onboarding/status`);
       return res.json();

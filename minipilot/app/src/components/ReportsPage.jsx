@@ -1,7 +1,7 @@
 import { Plus, BookOpen, Lock, Loader2 } from "lucide-react";
 import ReportCard from "./ReportCard";
 
-export default function ReportsPage({ reports, reportsLoading, toggleStar, openReport, goToChat }) {
+export default function ReportsPage({ reports, reportsLoading, toggleStar, trashReport, openReport, goToChat }) {
   const sharedReports = reports.shared || [];
   const privateReports = reports.private || [];
   const total = sharedReports.length + privateReports.length;
@@ -56,6 +56,7 @@ export default function ReportsPage({ reports, reportsLoading, toggleStar, openR
                 report={normalizeReport(r)}
                 isFav={!!r.starred}
                 onToggleFav={() => toggleStar(r.id)}
+                onDelete={trashReport ? () => trashReport(r.id) : undefined}
                 onClick={() => openReport(r.id)}
                 isShared
               />
@@ -81,6 +82,7 @@ export default function ReportsPage({ reports, reportsLoading, toggleStar, openR
                 report={normalizeReport(r)}
                 isFav={!!r.starred}
                 onToggleFav={() => toggleStar(r.id)}
+                onDelete={trashReport ? () => trashReport(r.id) : undefined}
                 onClick={() => openReport(r.id)}
               />
             ))}
