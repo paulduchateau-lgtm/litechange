@@ -424,6 +424,62 @@ function extractThemes(query) {
 }
 
 /**
+ * Extract report JSON from AI response. Tries multiple patterns:
+ * 1. <REPORT_DATA>{ ... }</REPORT_DATA> tags
+ * 2. ```json { ... } ``` markdown code blocks
+ * 3. Bare JSON object with "title" and "sections" keys
+ * Returns { json: parsed object, cleanText: response without the JSON block } or null
+ */
+function extractReportFromResponse(rawResponse) {
+  // Strategy 1: <REPORT_DATA> tags
+  const tagMatch = rawResponse.match(/<REPORT_DATA>([\s\S]*?)<\/REPORT_DATA>/);
+  if (tagMatch) {
+    try {
+      const json = JSON.parse(tagMatch[1].trim());
+      if (json.title || json.sections) {
+        const cleanText = rawResponse.replace(/<REPORT_DATA>[\s\S]*?<\/REPORT_DATA>/g, "").trim();
+        return { json, cleanText };
+      }
+    } catch {}
+  }
+
+  // Strategy 2: ```json ... ``` code blocks
+  const codeBlockMatch = rawResponse.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+  if (codeBlockMatch) {
+    try {
+      // Clean common issues: comments (// ...) and trailing commas
+      let jsonStr = codeBlockMatch[1]
+        .replace(/\/\/[^\n]*/g, "")           // Remove // comments
+        .replace(/,\s*([\]}])/g, "$1");       // Remove trailing commas
+      const json = JSON.parse(jsonStr);
+      if (json.title || json.sections) {
+        const cleanText = rawResponse.replace(/```(?:json)?\s*\{[\s\S]*?\}\s*```/g, "").trim();
+        return { json, cleanText };
+      }
+    } catch (e) {
+      console.warn("[extractReportFromResponse] code block JSON parse failed:", e.message);
+    }
+  }
+
+  // Strategy 3: Find a bare JSON object containing "title" and "sections"
+  const bareMatch = rawResponse.match(/(\{"id"[\s\S]*?"sections"\s*:\s*\[[\s\S]*?\]\s*\})/);
+  if (bareMatch) {
+    try {
+      let jsonStr = bareMatch[1]
+        .replace(/\/\/[^\n]*/g, "")
+        .replace(/,\s*([\]}])/g, "$1");
+      const json = JSON.parse(jsonStr);
+      if (json.title && json.sections) {
+        const cleanText = rawResponse.replace(bareMatch[0], "").trim();
+        return { json, cleanText };
+      }
+    } catch {}
+  }
+
+  return null;
+}
+
+/**
  * Generate a URL-safe slug from a workspace name, ensuring uniqueness.
  */
 function generateSlug(name) {
@@ -2537,32 +2593,45 @@ TYPES DE SECTIONS DISPONIBLES :
 
 COULEURS : utilise "#4A90B8" (bleu signal), "#C45A32" (rouge alerte), "#D4A03A" (jaune warning), "#3A8A4A" (vert), "#B0D838" (vert accent).
 
-Si tu ne génères PAS de rapport (question simple), réponds avec du texte structuré et concis.`;
+RÈGLE CRITIQUE SUR LE FORMAT DE SORTIE :
+- Tu DOIS TOUJOURS envelopper le JSON du rapport entre les balises <REPORT_DATA> et </REPORT_DATA>.
+- NE PAS utiliser de bloc markdown \`\`\`json. Utilise UNIQUEMENT les balises <REPORT_DATA>.
+- Le JSON doit être valide : pas de commentaires (//), pas de virgules en fin de tableau/objet.
+- Exemple correct :
+<REPORT_DATA>
+{"id":"report_xxx","title":"Mon rapport","kpis":[],"sections":[]}
+</REPORT_DATA>
+- Si tu ne génères PAS de rapport (question purement factuelle), réponds avec du texte structuré.
+- En cas de doute, génère TOUJOURS un rapport avec les données réelles.`;
 
     const messages = [
       ...history.map(h => ({ role: h.role, content: h.content })),
       { role: "user", content: message },
     ];
 
-    const aiResponse = await aiChat(systemPrompt, messages, { maxTokens: 4000 });
+    const aiResponse = await aiChat(systemPrompt, messages, { maxTokens: 8000 });
     const rawResponse = aiResponse.text;
 
     let reportData = null;
-    const reportMatch = rawResponse.match(/<REPORT_DATA>([\s\S]*?)<\/REPORT_DATA>/);
-    if (reportMatch) {
+    let cleanResponse = rawResponse;
+
+    const extracted = extractReportFromResponse(rawResponse);
+    if (extracted) {
       try {
-        reportData = JSON.parse(reportMatch[1].trim());
+        reportData = extracted.json;
         reportData.id = reportData.id || `report_${uuidv4()}`;
+        cleanResponse = extracted.cleanText;
         db.prepare(`
           INSERT OR REPLACE INTO reports (id, title, subtitle, objective, color, icon, kpis, sections, shared, starred, source, workspace_id)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 'chat', ?)
         `).run(reportData.id, reportData.title, reportData.subtitle || null, reportData.objective || null, reportData.color || "#4A90B8", reportData.icon || "BarChart3", JSON.stringify(reportData.kpis || []), JSON.stringify(reportData.sections || []), workspaceId);
       } catch (parseErr) {
         console.error("[chat ws] Impossible de parser le rapport JSON :", parseErr.message);
+        reportData = null;
+        cleanResponse = rawResponse;
       }
     }
 
-    const cleanResponse = rawResponse.replace(/<REPORT_DATA>[\s\S]*?<\/REPORT_DATA>/g, "").trim();
     const themes = extractThemes(message);
     db.prepare("INSERT INTO usage_logs (action, query, themes, user_id, workspace_id) VALUES (?, ?, ?, ?, ?)")
       .run("chat_query", message, JSON.stringify(themes), "default", workspaceId);

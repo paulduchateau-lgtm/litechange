@@ -208,23 +208,48 @@ export default function RenderSection({ section }) {
         case "pie_multi":
           if (!section.data_sets?.length) return noData;
           return (
-            <div style={{ display: "flex", gap: 32, justifyContent: "center", flexWrap: "wrap" }}>
-              {section.data_sets.map((ds, di) => (
-                <div key={di} style={{ textAlign: "center" }}>
-                  <span className="data-label" style={{ display: "block", marginBottom: 8 }}>{ds.label}</span>
-                  <ResponsiveContainer width={260} height={220}>
-                    <PieChart>
-                      <Pie data={ds.data || []} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80}
-                        label={({name, value}) => `${name}: ${value}`}
-                        labelLine={{ stroke: ct.axis.fill }}
-                        strokeWidth={2} stroke="var(--mp-bg)">
-                        {(ds.data || []).map((_, i) => <Cell key={i} fill={ct.colors[i % ct.colors.length]} />)}
-                      </Pie>
-                      <Tooltip contentStyle={ct.tooltip} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              ))}
+            <div style={{ display: "flex", gap: 40, justifyContent: "center", flexWrap: "wrap" }}>
+              {section.data_sets.map((ds, di) => {
+                const items = ds.data || [];
+                return (
+                  <div key={di} style={{ textAlign: "center", minWidth: 280 }}>
+                    <span className="data-label" style={{ display: "block", marginBottom: 8 }}>{ds.label}</span>
+                    <ResponsiveContainer width="100%" height={220}>
+                      <PieChart>
+                        <Pie data={items} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80}
+                          label={false}
+                          strokeWidth={2} stroke="var(--mp-bg)">
+                          {items.map((_, i) => <Cell key={i} fill={ct.colors[i % ct.colors.length]} />)}
+                        </Pie>
+                        <Tooltip
+                          contentStyle={ct.tooltip}
+                          formatter={(value, name) => [value, name]}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    {/* Legend below */}
+                    <div style={{
+                      display: "flex", flexWrap: "wrap", gap: "6px 14px",
+                      justifyContent: "center", marginTop: 4, padding: "0 8px",
+                    }}>
+                      {items.map((item, i) => (
+                        <div key={i} style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                          <span style={{
+                            width: 8, height: 8, borderRadius: 2, flexShrink: 0,
+                            background: ct.colors[i % ct.colors.length],
+                          }} />
+                          <span style={{
+                            fontFamily: "var(--font-data)", fontSize: 10,
+                            color: "var(--mp-text-muted)", whiteSpace: "nowrap",
+                          }}>
+                            {item.name}: <strong style={{ color: "var(--mp-text)" }}>{item.value}</strong>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           );
 
