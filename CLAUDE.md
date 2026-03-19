@@ -171,6 +171,25 @@ Each role sees only relevant nav items:
 - All interactive elements must have `focus-visible` styles
 - Tables: `scope="col"` on `<th>`, `overflow-x-auto` wrapper
 
+## Architecture Documentation
+
+**All architecture plans and technical documentation MUST be generated as standalone HTML pages** following the LiteChange light-theme visual format. See existing examples:
+- `minipilot/docs/data-pipeline.html` — Data pipeline reference
+- `minipilot/docs/secure-architecture.html` — Secure pipeline architecture
+
+### Rules for architecture docs:
+- **Format**: Single-file HTML with inline CSS (no external dependencies except Google Fonts)
+- **Fonts**: Source Serif 4 (headings), DM Sans (body), IBM Plex Mono (code/data/labels)
+- **Colors**: Light-theme only — Paper 100 bg (#F5F4F0), Olive 900 text (#1C1D1A), Lite 700 accent (#6B8A1A)
+- **Pipeline diagrams**: Vertical layout with numbered steps, phase separators, and flow boxes
+- **Code blocks**: Dark background (Olive 900) with syntax coloring (green keywords, blue types, grey comments)
+- **Security zones**: Green (trusted/local) and red (network boundary) bordered zones
+- **Comparison grids**: Side-by-side columns for before/after or mode comparisons
+- **Place files in**: `{project}/docs/` and copy to `{project}/app/public/` for preview
+- **Never**: horizontal scrollbars, markdown files for architecture, external CSS frameworks
+
+Use the `architecture-doc` skill (`.claude/skills/architecture-doc.md`) when generating these documents.
+
 ## Files
 
 See `/design-system/` for:

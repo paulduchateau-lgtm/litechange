@@ -1,4 +1,5 @@
-import { Star, StarOff, Download, ArrowUpRight, ArrowDownRight, BarChart3, Activity, TrendingUp, Heart, AlertTriangle, Users, FileText, Calendar, Clock, Eye, Stethoscope, Building2 } from "lucide-react";
+import { useState } from "react";
+import { Star, StarOff, Download, Loader2, ArrowUpRight, ArrowDownRight, BarChart3, Activity, TrendingUp, Heart, AlertTriangle, Users, FileText, Calendar, Clock, Eye, Stethoscope, Building2 } from "lucide-react";
 import RenderSection from "./RenderSection";
 
 // Map icon names to components for dynamic reports
@@ -13,6 +14,7 @@ function getIcon(iconName) {
 }
 
 export default function FullReport({ report, isFav, onToggleFav }) {
+  const [pdfLoading, setPdfLoading] = useState(false);
   const Icon = getIcon(report.icon);
   const kpis = typeof report.kpis === "string" ? JSON.parse(report.kpis) : (report.kpis || []);
   const sections = typeof report.sections === "string" ? JSON.parse(report.sections) : (report.sections || []);
@@ -49,13 +51,30 @@ export default function FullReport({ report, isFav, onToggleFav }) {
             {isFav ? <Star size={14} fill="#D4A03A" /> : <StarOff size={14} />}
             {isFav ? "Favori" : "Ajouter"}
           </button>
-          <button style={{
-            background: "var(--mp-bg-card)", border: "1px solid var(--mp-border)",
-            borderRadius: "var(--radius-sm)", padding: "8px 14px", cursor: "pointer",
-            display: "flex", alignItems: "center", gap: 6,
-            color: "var(--mp-text-muted)", fontSize: 12, fontFamily: "var(--font-body)",
-          }}>
-            <Download size={14} /> PDF
+          <button
+            onClick={async () => {
+              if (pdfLoading) return;
+              setPdfLoading(true);
+              try {
+                const { generatePdf } = await import("../lib/generatePdf.js");
+                await generatePdf(report);
+              } catch (err) {
+                console.error("[PDF] generation failed:", err);
+              } finally {
+                setPdfLoading(false);
+              }
+            }}
+            style={{
+              background: "var(--mp-bg-card)", border: "1px solid var(--mp-border)",
+              borderRadius: "var(--radius-sm)", padding: "8px 14px", cursor: pdfLoading ? "wait" : "pointer",
+              display: "flex", alignItems: "center", gap: 6,
+              color: "var(--mp-text-muted)", fontSize: 12, fontFamily: "var(--font-body)",
+              opacity: pdfLoading ? 0.6 : 1, transition: "opacity 0.2s",
+            }}
+            disabled={pdfLoading}
+          >
+            {pdfLoading ? <Loader2 size={14} style={{ animation: "spin 1s linear infinite" }} /> : <Download size={14} />}
+            {pdfLoading ? "Génération…" : "PDF"}
           </button>
         </div>
       </div>
