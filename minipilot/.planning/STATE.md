@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Report Studio
-status: unknown
-stopped_at: Completed 03-02-PLAN.md — frontend import wizard + field mapper + routing
-last_updated: "2026-03-22T22:11:00Z"
+status: in-progress
+stopped_at: Completed 04-01-PLAN.md — scheduling backend (node-cron, scheduler module, DB tables, API endpoints)
+last_updated: "2026-03-22T22:32:36Z"
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 9
+  completed_plans: 8
 ---
 
 # State — Minipilot
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** Transform raw organizational data into actionable change management reports — automatically, iteratively, and on schedule.
-**Current focus:** Phase 03 — import-de-rapports
+**Current focus:** Phase 04 — scheduling
 
 ## Current Position
 
-Phase: 03 (import-de-rapports) — COMPLETE
-Plan: 2 of 2 (complete)
+Phase: 04 (scheduling) — IN PROGRESS
+Plan: 1 of 2 (04-01 complete)
 
 ## Performance Metrics
 
@@ -46,6 +46,7 @@ Plan: 2 of 2 (complete)
 | Phase 02-editeur-wysiwyg P02 | 133 | 3 tasks | 4 files |
 | Phase 03-import-de-rapports P01 | 90s | 2 tasks | 4 files |
 | Phase 03-import-de-rapports P02 | 2min | 2 tasks | 4 files |
+| Phase 04-scheduling P01 | 3min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,10 @@ From Plan 01-02 execution:
 - [Phase 03-import-de-rapports]: Truncate docx HTML to 8000/3000 chars depending on aiMode — prevents AI token overflow
 - [Phase 03-import-de-rapports]: Importer button on DashboardPage (not ReportsPage) — WorkspaceShell renders DashboardPage, ReportsPage has no active route
 - [Phase 03-import-de-rapports]: Multi-step wizard via integer state (1/2/3) in single component — no per-step component split needed
+- [Phase 04-scheduling]: Extracted scheduler to separate scheduler.js module — keeps index.js manageable
+- [Phase 04-scheduling]: Rehydration skips 'once' frequency (already executed) — only re-registers recurring schedules
+- [Phase 04-scheduling]: generateReportForSchedule replicates AI prompt in scheduler.js — avoids circular import from index.js
+- [Phase 04-scheduling]: node-cron v4 with noOverlap:true on all tasks — prevents concurrent execution overlap
 
 ### Pending Todos
 
@@ -89,11 +94,11 @@ None yet.
 
 ### Blockers/Concerns
 
-- Server is a single 3000+ line index.js — may need modularization before or during Phase 2/3 work
-- Scheduling (Phase 4) has no background worker — implementation approach TBD at planning time
+- Server is a single 3000+ line index.js — scheduler.js extracted as first module, further extraction possible
+- Scheduling uses node-cron in-process — resolved via Plan 04-01
 
 ## Session Continuity
 
-Last session: 2026-03-22T22:11:00Z
-Stopped at: Completed 03-02-PLAN.md — frontend import wizard + field mapper + routing
+Last session: 2026-03-22T22:32:36Z
+Stopped at: Completed 04-01-PLAN.md — scheduling backend (node-cron, scheduler module, DB tables, API endpoints)
 Resume file: None

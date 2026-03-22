@@ -33,11 +33,11 @@ Requirements for milestone v1.1 — Report Studio. Each maps to roadmap phases.
 
 ### Scheduling
 
-- [ ] **SCHED-01**: User can schedule report generation with frequency (once, daily, weekly, monthly)
-- [ ] **SCHED-02**: User can configure schedule details (time, day of week, day of month, end date)
-- [ ] **SCHED-03**: User can select a data source folder/file for automatic data refresh
-- [ ] **SCHED-04**: Each scheduled execution creates a numbered edition of the report
-- [ ] **SCHED-05**: User can choose an existing report or describe a new one for scheduled generation
+- [x] **SCHED-01**: User can schedule report generation with frequency (once, daily, weekly, monthly)
+- [x] **SCHED-02**: User can configure schedule details (time, day of week, day of month, end date)
+- [x] **SCHED-03**: User can select a data source folder/file for automatic data refresh
+- [x] **SCHED-04**: Each scheduled execution creates a numbered edition of the report
+- [x] **SCHED-05**: User can choose an existing report or describe a new one for scheduled generation
 
 ## v2 Requirements
 
@@ -86,11 +86,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | IMP-03 | Phase 3 — Import de Rapports | Complete |
 | IMP-04 | Phase 3 — Import de Rapports | Complete |
 | IMP-05 | Phase 3 — Import de Rapports | Complete |
-| SCHED-01 | Phase 4 — Scheduling | Pending |
-| SCHED-02 | Phase 4 — Scheduling | Pending |
-| SCHED-03 | Phase 4 — Scheduling | Pending |
-| SCHED-04 | Phase 4 — Scheduling | Pending |
-| SCHED-05 | Phase 4 — Scheduling | Pending |
+| SCHED-01 | Phase 4 — Scheduling | Complete |
+| SCHED-02 | Phase 4 — Scheduling | Complete |
+| SCHED-03 | Phase 4 — Scheduling | Complete |
+| SCHED-04 | Phase 4 — Scheduling | Complete |
+| SCHED-05 | Phase 4 — Scheduling | Complete |
 
 **Coverage:**
 - v1.1 requirements: 20 total
