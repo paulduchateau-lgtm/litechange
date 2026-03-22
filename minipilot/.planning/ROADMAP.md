@@ -77,7 +77,10 @@ Plans:
   3. User can designate a data source file or folder so each run uses fresh data
   4. Each scheduled execution creates a numbered edition traceable to its run date
   5. User can select an existing report template or describe a new one as the basis for scheduled generation
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 04-01-PLAN.md — Backend: install node-cron, create scheduler.js module, DB migration (schedules + schedule_runs), API endpoints, startup rehydration
+- [ ] 04-02-PLAN.md — Frontend: API client methods, 4-step scheduling wizard, schedule list page, sidebar nav, routing
 
 ## Progress
 
@@ -88,7 +91,7 @@ Plans:
 | 1. Feedback Itératif | 3/3 | Complete   | 2026-03-22 | - |
 | 2. Editeur WYSIWYG | 2/2 | Complete   | 2026-03-22 | - |
 | 3. Import de Rapports | 2/2 | Complete   | 2026-03-22 | - |
-| 4. Scheduling | v1.1 | 0/TBD | Not started | - |
+| 4. Scheduling | v1.1 | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-03-22*
