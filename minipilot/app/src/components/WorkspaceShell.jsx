@@ -10,6 +10,8 @@ import TrashPage from "./TrashPage";
 import OnboardingWizard from "./onboarding/OnboardingWizard";
 import ReportEditorPage from "./ReportEditorPage";
 import ImportReportPage from "./ImportReportPage";
+import SchedulePage from "./SchedulePage";
+import ScheduleListPage from "./ScheduleListPage";
 
 function WorkspaceContent() {
   const { slug } = useParams();
@@ -255,6 +257,14 @@ function WorkspaceContent() {
 
         {currentPage === "import" && (
           <ImportReportPage api={api} slug={slug} />
+        )}
+
+        {currentPage === "schedule" && (
+          <SchedulePage api={api} slug={slug} />
+        )}
+
+        {currentPage === "schedules" && (
+          <ScheduleListPage api={api} slug={slug} />
         )}
 
         {currentPage === "chat" && (

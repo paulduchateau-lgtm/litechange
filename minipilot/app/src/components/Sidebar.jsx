@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { X, LayoutDashboard, MessageSquare, Settings, Trash2, Menu, Sun, Moon, RotateCcw, Wifi, WifiOff, Loader2, ArrowLeft, FilePenLine } from "lucide-react";
+import { X, LayoutDashboard, MessageSquare, Settings, Trash2, Menu, Sun, Moon, RotateCcw, Wifi, WifiOff, Loader2, ArrowLeft, FilePenLine, Clock } from "lucide-react";
 import { useTheme } from "../data/theme";
 import { getAiMode, setAiMode } from "../lib/api";
 
@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { id: "dashboard", Icon: LayoutDashboard, label: "Tableau de bord" },
   { id: "editor/new", Icon: FilePenLine, label: "Editeur" },
   { id: "chat", Icon: MessageSquare, label: "Explorer" },
+  { id: "schedules", Icon: Clock, label: "Programmations" },
   { id: "admin", Icon: Settings, label: "Admin" },
 ];
 
