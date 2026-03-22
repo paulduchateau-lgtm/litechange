@@ -15,6 +15,7 @@ import Database from "better-sqlite3";
 import Anthropic from "@anthropic-ai/sdk";
 import { Mistral } from "@mistralai/mistralai";
 import { v4 as uuidv4 } from "uuid";
+import mammoth from "mammoth";
 
 // ─── Paths ───────────────────────────────────────────────────────────────────
 
@@ -375,6 +376,25 @@ const upload = multer({
   },
 });
 
+const uploadTemplate = multer({
+  storage,
+  limits: { fileSize: 20 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const allowedMimes = [
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/msword",
+      "application/vnd.ms-excel",
+    ];
+    if (allowedMimes.includes(file.mimetype) || [".xlsx", ".xls", ".docx", ".doc"].includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Seuls les fichiers .xlsx et .docx sont acceptés comme modèles."));
+    }
+  },
+});
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
@@ -400,6 +420,63 @@ function parseFrenchNumber(val) {
   const cleaned = val.replace(/\s/g, "").replace(",", ".");
   const n = Number(cleaned);
   return isNaN(n) ? val : n;
+}
+
+/**
+ * Parse a .docx file and return its HTML content (truncated for AI token limits).
+ */
+async function parseDocxTemplate(filePath) {
+  const buffer = fs.readFileSync(filePath);
+  const { value: html, messages } = await mammoth.convertToHtml({ buffer });
+  if (messages && messages.some(m => m.type === "error")) {
+    console.warn("[parseDocxTemplate] warnings:", messages);
+  }
+  // Truncate: 8000 chars normally, 3000 in local AI mode to avoid Ministral 3B token cap
+  const limit = aiMode === "local" ? 3000 : 8000;
+  return html.slice(0, limit);
+}
+
+/**
+ * Parse an .xlsx file and return an array of sheet descriptors for AI analysis.
+ */
+function parseXlsxTemplate(filePath) {
+  const buffer = fs.readFileSync(filePath);
+  const workbook = XLSX.read(buffer, { type: "buffer" });
+  return workbook.SheetNames.map(name => {
+    const sheet = workbook.Sheets[name];
+    const rows = XLSX.utils.sheet_to_json(sheet, { defval: "", header: 1 });
+    const headers = (rows[0] || []).filter(Boolean);
+    const sampleRows = rows.slice(1, 4);
+    return { name, headers, sampleRows };
+  }).filter(s => s.headers.length > 0);
+}
+
+/**
+ * Build the AI prompt for fingerprint extraction from template content.
+ * Instructs the AI to preserve original field label names (do not translate).
+ */
+function buildFingerprintPrompt(templateContent) {
+  return `Tu analyses un document utilisé comme modèle de rapport (Excel ou Word).
+Identifie sa structure pour permettre de recréer un rapport équivalent.
+Conserve les noms de champs originaux tels quels (ne traduis pas les labels de colonnes/variables).
+
+Réponds UNIQUEMENT en JSON valide sans markdown :
+{
+  "title": "Titre probable du rapport",
+  "objective": "Objectif ou description du rapport",
+  "kpis": [{ "label": "Nom du KPI", "unit": "% ou nombre ou..." }],
+  "sections": [
+    {
+      "title": "Titre de la section",
+      "type": "bar|line|pie|table|text",
+      "fields": ["colonne1", "colonne2"]
+    }
+  ],
+  "detectedFields": ["liste de toutes les variables/colonnes détectées"]
+}
+
+CONTENU DU MODELE :
+${templateContent}`;
 }
 
 /**
@@ -2477,6 +2554,42 @@ Réponds UNIQUEMENT avec un JSON valide, sans markdown :
     res.json({ report });
   } catch (err) {
     console.error("[POST /api/w/:slug/ai/generate-report]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── TEMPLATE IMPORT ──────────────────────────────────────────────────────────
+
+app.post("/api/w/:slug/reports/import-template", uploadTemplate.single("file"), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: "Aucun fichier reçu." });
+
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    let templateContent;
+
+    if (ext === ".docx" || ext === ".doc") {
+      templateContent = await parseDocxTemplate(req.file.path);
+    } else if (ext === ".xlsx" || ext === ".xls") {
+      const sheets = parseXlsxTemplate(req.file.path);
+      templateContent = JSON.stringify(sheets, null, 2);
+    } else {
+      return res.status(400).json({ error: "Format non supporté. Utilisez .xlsx ou .docx." });
+    }
+
+    // AI fingerprint extraction
+    const aiResult = await aiComplete("", buildFingerprintPrompt(templateContent), { maxTokens: 2000 });
+    const rawText = aiResult.text.trim();
+    const jsonText = rawText.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
+    const fingerprint = JSON.parse(jsonText);
+
+    // Get workspace available columns for the field mapping step
+    const workspaceId = req.workspace.id;
+    const files = db.prepare("SELECT columns FROM uploaded_files WHERE workspace_id = ?").all(workspaceId);
+    const allColumns = [...new Set(files.flatMap(f => JSON.parse(f.columns || "[]")))];
+
+    res.json({ fingerprint, availableColumns: allColumns });
+  } catch (err) {
+    console.error("[POST import-template]", err);
     res.status(500).json({ error: err.message });
   }
 });
