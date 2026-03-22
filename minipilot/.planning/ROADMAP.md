@@ -34,7 +34,7 @@ Milestone v1.1 transforms Minipilot from an AI-only report generator into a full
 **Plans**: 3 plans
 Plans:
 - [x] 01-01-PLAN.md — Backend: DB migration (report_versions table), iterate/versions API endpoints, frontend API client
-- [ ] 01-02-PLAN.md — Frontend: Feedback panel (global + section annotations), FullReport integration, AI iteration flow
+- [x] 01-02-PLAN.md — Frontend: Feedback panel (global + section annotations), FullReport integration, AI iteration flow
 - [ ] 01-03-PLAN.md — Frontend: Version history panel, side-by-side comparison view with diff badges
 
 ### Phase 2: Editeur WYSIWYG
@@ -79,7 +79,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 1. Feedback Itératif | v1.1 | 1/3 | In progress | - |
+| 1. Feedback Itératif | v1.1 | 2/3 | In progress | - |
 | 2. Editeur WYSIWYG | v1.1 | 0/TBD | Not started | - |
 | 3. Import de Rapports | v1.1 | 0/TBD | Not started | - |
 | 4. Scheduling | v1.1 | 0/TBD | Not started | - |

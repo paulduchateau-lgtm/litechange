@@ -26,7 +26,7 @@ Requirements for milestone v1.1 — Report Studio. Each maps to roadmap phases.
 ### Feedback itératif
 
 - [x] **FEED-01**: User can provide global feedback on a report explaining what works and what doesn't
-- [ ] **FEED-02**: User can annotate individual sections with feedback
+- [x] **FEED-02**: User can annotate individual sections with feedback
 - [x] **FEED-03**: AI regenerates improved report content based on user feedback
 - [x] **FEED-04**: System keeps a history of report iterations (versions)
 - [ ] **FEED-05**: User can compare previous and current versions side by side
@@ -71,10 +71,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FEED-01 | Phase 1 — Feedback Itératif | Pending |
-| FEED-02 | Phase 1 — Feedback Itératif | Pending |
-| FEED-03 | Phase 1 — Feedback Itératif | Pending |
-| FEED-04 | Phase 1 — Feedback Itératif | Pending |
+| FEED-01 | Phase 1 — Feedback Itératif | Complete |
+| FEED-02 | Phase 1 — Feedback Itératif | Complete |
+| FEED-03 | Phase 1 — Feedback Itératif | Complete |
+| FEED-04 | Phase 1 — Feedback Itératif | Complete |
 | FEED-05 | Phase 1 — Feedback Itératif | Pending |
 | WYSI-01 | Phase 2 — Editeur WYSIWYG | Pending |
 | WYSI-02 | Phase 2 — Editeur WYSIWYG | Pending |

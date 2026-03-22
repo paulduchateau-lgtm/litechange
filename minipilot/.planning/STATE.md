@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Report Studio
 status: executing
-stopped_at: "Completed 01-01-PLAN.md — backend versioning foundation"
-last_updated: "2026-03-22T20:24:08Z"
+stopped_at: "Completed 01-02-PLAN.md — frontend feedback panel UI"
+last_updated: "2026-03-22T20:31:15Z"
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # State — Minipilot
@@ -24,23 +24,23 @@ See: .planning/PROJECT.md (updated 2026-03-22)
 ## Current Position
 
 Phase: 01 (feedback-iteratif) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 1
-- Average duration: ~8 min
-- Total execution time: ~8 min
+- Total plans completed: 2
+- Average duration: ~5 min
+- Total execution time: ~11 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-feedback-iteratif | 1/3 | ~8 min | ~8 min |
+| 01-feedback-iteratif | 2/3 | ~11 min | ~5 min |
 
-**Recent Trend:** 1 plan completed, 2 files modified
+**Recent Trend:** 2 plans completed, 6 files created/modified
 
 ## Accumulated Context
 
@@ -59,6 +59,12 @@ From Plan 01-01 execution:
 - Lazy v1 baseline on first iterate call — no backfill migration needed for existing reports
 - aiMode guard: maxTokens 2000 for local Ollama vs 4000 for premium — prevents Ministral 3B truncation
 
+From Plan 01-02 execution:
+
+- sectionFeedbacks state lives in FullReport (not ReportFeedbackPanel) — single source of truth for RenderSection inline textareas and panel section list
+- feedbackOpen drives both ReportFeedbackPanel drawer AND feedbackMode on RenderSection — one toggle activates all
+- api passed as prop to FullReport (not useWorkspace hook) — keeps component decoupled and testable
+
 ### Pending Todos
 
 None yet.
@@ -71,5 +77,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-22
-Stopped at: Completed 01-01-PLAN.md — backend versioning foundation. Ready for Plan 02 (feedback panel UI).
+Stopped at: Completed 01-02-PLAN.md — frontend feedback panel UI. Ready for Plan 03 (version history panel and comparison view).
 Resume file: None
