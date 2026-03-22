@@ -62,7 +62,10 @@ Plans:
   3. AI identifies KPIs and key metrics present in the uploaded template
   4. AI reconstructs a report matching the structure (sheets, charts, tables, sections) of the original
   5. User can map columns from their workspace data to the fields detected in the imported template
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 03-01-PLAN.md — Backend: install mammoth, parsing helpers (docx/xlsx), AI fingerprint extraction endpoint, API client method
+- [ ] 03-02-PLAN.md — Frontend: 3-step import wizard (upload, AI analysis, field mapping), routing, ReportsPage button
 
 ### Phase 4: Scheduling
 **Goal**: Users can configure recurring report generation that automatically refreshes data and produces new editions
@@ -84,7 +87,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 1. Feedback Itératif | 3/3 | Complete   | 2026-03-22 | - |
 | 2. Editeur WYSIWYG | 2/2 | Complete   | 2026-03-22 | - |
-| 3. Import de Rapports | v1.1 | 0/TBD | Not started | - |
+| 3. Import de Rapports | v1.1 | 0/2 | Planning complete | - |
 | 4. Scheduling | v1.1 | 0/TBD | Not started | - |
 
 ---
