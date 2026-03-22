@@ -214,6 +214,25 @@ export function createWorkspaceApi(slug) {
       return res.json();
     },
 
+    iterateReport: async (id, globalFeedback, sectionFeedback) => {
+      const res = await fetch(`${BASE}/reports/${id}/iterate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ globalFeedback, sectionFeedback }),
+      });
+      return res.json();
+    },
+
+    getReportVersions: async (id) => {
+      const res = await fetch(`${BASE}/reports/${id}/versions`);
+      return res.json();
+    },
+
+    getReportVersion: async (id, vnum) => {
+      const res = await fetch(`${BASE}/reports/${id}/versions/${vnum}`);
+      return res.json();
+    },
+
     getOnboardingStatus: async () => {
       const res = await fetch(`${BASE}/onboarding/status`);
       return res.json();
