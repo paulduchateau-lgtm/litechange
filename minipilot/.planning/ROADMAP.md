@@ -83,7 +83,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1. Feedback Itératif | 3/3 | Complete   | 2026-03-22 | - |
-| 2. Editeur WYSIWYG | v1.1 | 0/2 | Planned | - |
+| 2. Editeur WYSIWYG | 1/2 | In Progress|  | - |
 | 3. Import de Rapports | v1.1 | 0/TBD | Not started | - |
 | 4. Scheduling | v1.1 | 0/TBD | Not started | - |
 

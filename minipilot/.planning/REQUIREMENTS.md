@@ -17,8 +17,8 @@ Requirements for milestone v1.1 — Report Studio. Each maps to roadmap phases.
 
 ### Editeur WYSIWYG
 
-- [ ] **WYSI-01**: User can add chart sections (bar, pie, line, table) from a visual palette
-- [ ] **WYSI-02**: User can add rich text sections with basic formatting (bold, italic, lists)
+- [x] **WYSI-01**: User can add chart sections (bar, pie, line, table) from a visual palette
+- [x] **WYSI-02**: User can add rich text sections with basic formatting (bold, italic, lists)
 - [ ] **WYSI-03**: User can reorder report sections via drag & drop
 - [ ] **WYSI-04**: User sees a live preview of the final report while editing
 - [ ] **WYSI-05**: User can create a new report entirely from the WYSIWYG editor
@@ -29,7 +29,7 @@ Requirements for milestone v1.1 — Report Studio. Each maps to roadmap phases.
 - [x] **FEED-02**: User can annotate individual sections with feedback
 - [x] **FEED-03**: AI regenerates improved report content based on user feedback
 - [x] **FEED-04**: System keeps a history of report iterations (versions)
-- [ ] **FEED-05**: User can compare previous and current versions side by side
+- [x] **FEED-05**: User can compare previous and current versions side by side
 
 ### Scheduling
 
@@ -75,9 +75,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FEED-02 | Phase 1 — Feedback Itératif | Complete |
 | FEED-03 | Phase 1 — Feedback Itératif | Complete |
 | FEED-04 | Phase 1 — Feedback Itératif | Complete |
-| FEED-05 | Phase 1 — Feedback Itératif | Pending |
-| WYSI-01 | Phase 2 — Editeur WYSIWYG | Pending |
-| WYSI-02 | Phase 2 — Editeur WYSIWYG | Pending |
+| FEED-05 | Phase 1 — Feedback Itératif | Complete |
+| WYSI-01 | Phase 2 — Editeur WYSIWYG | Complete |
+| WYSI-02 | Phase 2 — Editeur WYSIWYG | Complete |
 | WYSI-03 | Phase 2 — Editeur WYSIWYG | Pending |
 | WYSI-04 | Phase 2 — Editeur WYSIWYG | Pending |
 | WYSI-05 | Phase 2 — Editeur WYSIWYG | Pending |
