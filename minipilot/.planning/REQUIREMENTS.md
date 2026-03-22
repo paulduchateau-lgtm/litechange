@@ -25,10 +25,10 @@ Requirements for milestone v1.1 — Report Studio. Each maps to roadmap phases.
 
 ### Feedback itératif
 
-- [ ] **FEED-01**: User can provide global feedback on a report explaining what works and what doesn't
+- [x] **FEED-01**: User can provide global feedback on a report explaining what works and what doesn't
 - [ ] **FEED-02**: User can annotate individual sections with feedback
-- [ ] **FEED-03**: AI regenerates improved report content based on user feedback
-- [ ] **FEED-04**: System keeps a history of report iterations (versions)
+- [x] **FEED-03**: AI regenerates improved report content based on user feedback
+- [x] **FEED-04**: System keeps a history of report iterations (versions)
 - [ ] **FEED-05**: User can compare previous and current versions side by side
 
 ### Scheduling
