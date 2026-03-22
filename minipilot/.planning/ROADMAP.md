@@ -87,7 +87,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 1. Feedback Itératif | 3/3 | Complete   | 2026-03-22 | - |
 | 2. Editeur WYSIWYG | 2/2 | Complete   | 2026-03-22 | - |
-| 3. Import de Rapports | v1.1 | 0/2 | Planning complete | - |
+| 3. Import de Rapports | 1/2 | In Progress|  | - |
 | 4. Scheduling | v1.1 | 0/TBD | Not started | - |
 
 ---

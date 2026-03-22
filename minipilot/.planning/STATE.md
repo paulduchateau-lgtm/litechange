@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Report Studio
 status: unknown
-stopped_at: Completed 02-02-PLAN.md — editor page wiring (EditorSectionList, ReportEditorPage, routing, sidebar nav)
-last_updated: "2026-03-22T21:51:16.477Z"
+stopped_at: Completed 03-01-PLAN.md — import-template endpoint + API client method
+last_updated: "2026-03-22T22:08:16.950Z"
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 7
+  completed_plans: 6
 ---
 
 # State — Minipilot
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** Transform raw organizational data into actionable change management reports — automatically, iteratively, and on schedule.
-**Current focus:** Phase 02 — editeur-wysiwyg
+**Current focus:** Phase 03 — import-de-rapports
 
 ## Current Position
 
-Phase: 02 (editeur-wysiwyg) — EXECUTING
-Plan: 2 of 2 (next)
+Phase: 03 (import-de-rapports) — EXECUTING
+Plan: 1 of 2
 
 ## Performance Metrics
 
@@ -44,6 +44,7 @@ Plan: 2 of 2 (next)
 | Phase 01-feedback-iteratif P03 | 15 | 3 tasks | 3 files |
 | Phase 02-editeur-wysiwyg P01 | 137 | 3 tasks | 6 files |
 | Phase 02-editeur-wysiwyg P02 | 133 | 3 tasks | 4 files |
+| Phase 03-import-de-rapports P01 | 90s | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,9 @@ From Plan 01-02 execution:
 - [Phase 02-editeur-wysiwyg]: reportId=null for /editor/new, reportId=string for /editor/:id — derived from subPath in WorkspaceShell
 - [Phase 02-editeur-wysiwyg]: Strip DnD id fields before api.saveReport/updateReport — ids are runtime-only, not persisted
 - [Phase 02-editeur-wysiwyg]: Active state for editor/new item uses OR condition in Sidebar — subpath 'new' is not the page key
+- [Phase 03-import-de-rapports]: mammoth default import (not named) — CJS named exports unreliable in ESM
+- [Phase 03-import-de-rapports]: Separate uploadTemplate multer instance for template imports — clean separation from data uploads
+- [Phase 03-import-de-rapports]: Truncate docx HTML to 8000/3000 chars depending on aiMode — prevents AI token overflow
 
 ### Pending Todos
 
@@ -87,6 +91,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-22T21:51:16.475Z
-Stopped at: Completed 02-02-PLAN.md — editor page wiring (EditorSectionList, ReportEditorPage, routing, sidebar nav)
+Last session: 2026-03-22T22:08:16.948Z
+Stopped at: Completed 03-01-PLAN.md — import-template endpoint + API client method
 Resume file: None

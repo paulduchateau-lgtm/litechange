@@ -9,10 +9,10 @@ Requirements for milestone v1.1 — Report Studio. Each maps to roadmap phases.
 
 ### Import de rapports
 
-- [ ] **IMP-01**: User can upload an Excel file (.xlsx) as a report template
-- [ ] **IMP-02**: User can upload a Word file (.docx) as a report template
-- [ ] **IMP-03**: AI automatically detects KPIs and key metrics from the uploaded template
-- [ ] **IMP-04**: AI analyzes the structure (sheets, charts, tables, sections) to recreate an equivalent report
+- [x] **IMP-01**: User can upload an Excel file (.xlsx) as a report template
+- [x] **IMP-02**: User can upload a Word file (.docx) as a report template
+- [x] **IMP-03**: AI automatically detects KPIs and key metrics from the uploaded template
+- [x] **IMP-04**: AI analyzes the structure (sheets, charts, tables, sections) to recreate an equivalent report
 - [ ] **IMP-05**: User can map workspace data columns to the fields detected in the imported template
 
 ### Editeur WYSIWYG
@@ -81,10 +81,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | WYSI-03 | Phase 2 — Editeur WYSIWYG | Complete |
 | WYSI-04 | Phase 2 — Editeur WYSIWYG | Complete |
 | WYSI-05 | Phase 2 — Editeur WYSIWYG | Complete |
-| IMP-01 | Phase 3 — Import de Rapports | Pending |
-| IMP-02 | Phase 3 — Import de Rapports | Pending |
-| IMP-03 | Phase 3 — Import de Rapports | Pending |
-| IMP-04 | Phase 3 — Import de Rapports | Pending |
+| IMP-01 | Phase 3 — Import de Rapports | Complete |
+| IMP-02 | Phase 3 — Import de Rapports | Complete |
+| IMP-03 | Phase 3 — Import de Rapports | Complete |
+| IMP-04 | Phase 3 — Import de Rapports | Complete |
 | IMP-05 | Phase 3 — Import de Rapports | Pending |
 | SCHED-01 | Phase 4 — Scheduling | Pending |
 | SCHED-02 | Phase 4 — Scheduling | Pending |
