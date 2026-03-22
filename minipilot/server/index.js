@@ -16,6 +16,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { Mistral } from "@mistralai/mistralai";
 import { v4 as uuidv4 } from "uuid";
 import mammoth from "mammoth";
+import { initScheduler, registerSchedule, unregisterSchedule, executeSchedule, buildCronExpression } from './scheduler.js';
+import cron from 'node-cron';
 
 // ─── Paths ───────────────────────────────────────────────────────────────────
 
@@ -124,6 +126,40 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS schedules (
+    id TEXT PRIMARY KEY,
+    workspace_id TEXT NOT NULL REFERENCES workspaces(id),
+    name TEXT NOT NULL,
+    frequency TEXT NOT NULL,
+    cron_expression TEXT NOT NULL,
+    hour INTEGER NOT NULL DEFAULT 8,
+    minute INTEGER NOT NULL DEFAULT 0,
+    day_of_week INTEGER,
+    day_of_month INTEGER,
+    end_date TEXT,
+    source_file_id TEXT REFERENCES uploaded_files(id),
+    template_report_id TEXT,
+    suggestion TEXT,
+    status TEXT NOT NULL DEFAULT 'active',
+    edition_count INTEGER NOT NULL DEFAULT 0,
+    last_run_at TEXT,
+    next_run_at TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS schedule_runs (
+    id TEXT PRIMARY KEY,
+    schedule_id TEXT NOT NULL REFERENCES schedules(id) ON DELETE CASCADE,
+    edition_number INTEGER NOT NULL,
+    report_id TEXT REFERENCES reports(id),
+    status TEXT NOT NULL,
+    error TEXT,
+    ran_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+  CREATE INDEX IF NOT EXISTS idx_runs_schedule_id ON schedule_runs(schedule_id);
 `);
 
 // ─── Migrations: add workspace_id to existing tables ─────────────────────────
@@ -3207,6 +3243,173 @@ app.post("/api/w/:slug/onboarding/reset", (req, res) => {
   }
 });
 
+// ── SCHEDULING ──────────────────────────────────────────────────────────────
+
+// GET /api/w/:slug/schedules — List all schedules for workspace
+app.get("/api/w/:slug/schedules", (req, res) => {
+  try {
+    const workspaceId = req.workspace.id;
+    const schedules = db.prepare("SELECT * FROM schedules WHERE workspace_id = ? ORDER BY created_at DESC").all(workspaceId);
+    res.json({ schedules });
+  } catch (err) {
+    console.error("[GET /api/w/:slug/schedules]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/w/:slug/schedules — Create a new schedule
+app.post("/api/w/:slug/schedules", async (req, res) => {
+  try {
+    const workspaceId = req.workspace.id;
+    const { name, frequency, hour = 8, minute = 0, day_of_week, day_of_month, end_date, source_file_id, template_report_id, suggestion } = req.body;
+
+    if (!name || !frequency) {
+      return res.status(400).json({ error: "Champs 'name' et 'frequency' requis." });
+    }
+    if (!['once', 'daily', 'weekly', 'monthly'].includes(frequency)) {
+      return res.status(400).json({ error: "Frequence invalide. Valeurs acceptees : once, daily, weekly, monthly." });
+    }
+
+    const id = uuidv4();
+    const scheduleData = { frequency, minute, hour, day_of_week, day_of_month };
+    const cronExpr = buildCronExpression(scheduleData);
+
+    // Validate cron expression for recurring schedules
+    if (cronExpr && !cron.validate(cronExpr)) {
+      return res.status(400).json({ error: `Expression cron invalide : ${cronExpr}` });
+    }
+
+    const storedCron = cronExpr || 'once';
+    const suggestionJson = suggestion ? (typeof suggestion === 'string' ? suggestion : JSON.stringify(suggestion)) : null;
+
+    db.prepare(`
+      INSERT INTO schedules (id, workspace_id, name, frequency, cron_expression, hour, minute, day_of_week, day_of_month, end_date, source_file_id, template_report_id, suggestion, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')
+    `).run(id, workspaceId, name, frequency, storedCron, hour, minute, day_of_week || null, day_of_month || null, end_date || null, source_file_id || null, template_report_id || null, suggestionJson);
+
+    const schedule = db.prepare("SELECT * FROM schedules WHERE id = ?").get(id);
+    registerSchedule(schedule);
+
+    res.json({ schedule });
+  } catch (err) {
+    console.error("[POST /api/w/:slug/schedules]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/w/:slug/schedules/:id — Get one schedule with its recent runs
+app.get("/api/w/:slug/schedules/:id", (req, res) => {
+  try {
+    const schedule = db.prepare("SELECT * FROM schedules WHERE id = ? AND workspace_id = ?").get(req.params.id, req.workspace.id);
+    if (!schedule) return res.status(404).json({ error: "Planification introuvable." });
+
+    const runs = db.prepare("SELECT * FROM schedule_runs WHERE schedule_id = ? ORDER BY ran_at DESC LIMIT 20").all(req.params.id);
+    res.json({ schedule, runs });
+  } catch (err) {
+    console.error("[GET /api/w/:slug/schedules/:id]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PATCH /api/w/:slug/schedules/:id — Update schedule (pause/resume/edit)
+app.patch("/api/w/:slug/schedules/:id", (req, res) => {
+  try {
+    const schedule = db.prepare("SELECT * FROM schedules WHERE id = ? AND workspace_id = ?").get(req.params.id, req.workspace.id);
+    if (!schedule) return res.status(404).json({ error: "Planification introuvable." });
+
+    const { name, status, hour, minute, day_of_week, day_of_month, end_date } = req.body;
+
+    // Handle status transitions
+    if (status && status !== schedule.status) {
+      if (status === 'paused') {
+        unregisterSchedule(schedule.id);
+      } else if (status === 'active' && schedule.status === 'paused') {
+        const updated = { ...schedule, ...req.body };
+        registerSchedule(updated);
+      }
+    }
+
+    // Build update fields dynamically
+    const updates = [];
+    const params = [];
+    if (name !== undefined) { updates.push("name = ?"); params.push(name); }
+    if (status !== undefined) { updates.push("status = ?"); params.push(status); }
+    if (hour !== undefined) { updates.push("hour = ?"); params.push(hour); }
+    if (minute !== undefined) { updates.push("minute = ?"); params.push(minute); }
+    if (day_of_week !== undefined) { updates.push("day_of_week = ?"); params.push(day_of_week); }
+    if (day_of_month !== undefined) { updates.push("day_of_month = ?"); params.push(day_of_month); }
+    if (end_date !== undefined) { updates.push("end_date = ?"); params.push(end_date || null); }
+
+    if (updates.length > 0) {
+      params.push(req.params.id);
+      db.prepare(`UPDATE schedules SET ${updates.join(", ")} WHERE id = ?`).run(...params);
+    }
+
+    const updatedSchedule = db.prepare("SELECT * FROM schedules WHERE id = ?").get(req.params.id);
+    res.json({ schedule: updatedSchedule });
+  } catch (err) {
+    console.error("[PATCH /api/w/:slug/schedules/:id]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/w/:slug/schedules/:id — Delete schedule and stop its cron task
+app.delete("/api/w/:slug/schedules/:id", (req, res) => {
+  try {
+    const schedule = db.prepare("SELECT * FROM schedules WHERE id = ? AND workspace_id = ?").get(req.params.id, req.workspace.id);
+    if (!schedule) return res.status(404).json({ error: "Planification introuvable." });
+
+    unregisterSchedule(schedule.id);
+    db.prepare("DELETE FROM schedules WHERE id = ?").run(req.params.id);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error("[DELETE /api/w/:slug/schedules/:id]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/w/:slug/schedules/:id/runs — List run history
+app.get("/api/w/:slug/schedules/:id/runs", (req, res) => {
+  try {
+    const schedule = db.prepare("SELECT * FROM schedules WHERE id = ? AND workspace_id = ?").get(req.params.id, req.workspace.id);
+    if (!schedule) return res.status(404).json({ error: "Planification introuvable." });
+
+    const runs = db.prepare("SELECT * FROM schedule_runs WHERE schedule_id = ? ORDER BY ran_at DESC").all(req.params.id);
+    res.json({ runs });
+  } catch (err) {
+    console.error("[GET /api/w/:slug/schedules/:id/runs]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/w/:slug/schedules/:id/run-now — Manual trigger
+app.post("/api/w/:slug/schedules/:id/run-now", async (req, res) => {
+  try {
+    const schedule = db.prepare("SELECT * FROM schedules WHERE id = ? AND workspace_id = ?").get(req.params.id, req.workspace.id);
+    if (!schedule) return res.status(404).json({ error: "Planification introuvable." });
+
+    await executeSchedule(schedule.id);
+    res.json({ ok: true, message: "Execution lancee" });
+  } catch (err) {
+    console.error("[POST /api/w/:slug/schedules/:id/run-now]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── FILES (for scheduling wizard data source selector) ──────────────────────
+
+// GET /api/w/:slug/files — List uploaded files for workspace
+app.get("/api/w/:slug/files", (req, res) => {
+  try {
+    const workspaceId = req.workspace.id;
+    const files = db.prepare("SELECT id, name, type, size, row_count, created_at FROM uploaded_files WHERE workspace_id = ?").all(workspaceId);
+    res.json({ files });
+  } catch (err) {
+    console.error("[GET /api/w/:slug/files]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ─── 404 handler ──────────────────────────────────────────────────────────────
 
 app.use((req, res) => {
@@ -3252,6 +3455,10 @@ if (!IS_VERCEL && fs.existsSync(STATIC_DIR)) {
 
 // Export for Vercel serverless
 export default app;
+
+// ─── Scheduler initialization ─────────────────────────────────────────────────
+
+initScheduler(db, { aiComplete, buildDataSummary, buildColumnStats, extractThemes, uuidv4 });
 
 // Only listen in dev mode or Docker (not on Vercel)
 if (!IS_VERCEL) {
