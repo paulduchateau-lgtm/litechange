@@ -71,13 +71,32 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (populated by roadmapper) | | |
+| FEED-01 | Phase 1 — Feedback Itératif | Pending |
+| FEED-02 | Phase 1 — Feedback Itératif | Pending |
+| FEED-03 | Phase 1 — Feedback Itératif | Pending |
+| FEED-04 | Phase 1 — Feedback Itératif | Pending |
+| FEED-05 | Phase 1 — Feedback Itératif | Pending |
+| WYSI-01 | Phase 2 — Editeur WYSIWYG | Pending |
+| WYSI-02 | Phase 2 — Editeur WYSIWYG | Pending |
+| WYSI-03 | Phase 2 — Editeur WYSIWYG | Pending |
+| WYSI-04 | Phase 2 — Editeur WYSIWYG | Pending |
+| WYSI-05 | Phase 2 — Editeur WYSIWYG | Pending |
+| IMP-01 | Phase 3 — Import de Rapports | Pending |
+| IMP-02 | Phase 3 — Import de Rapports | Pending |
+| IMP-03 | Phase 3 — Import de Rapports | Pending |
+| IMP-04 | Phase 3 — Import de Rapports | Pending |
+| IMP-05 | Phase 3 — Import de Rapports | Pending |
+| SCHED-01 | Phase 4 — Scheduling | Pending |
+| SCHED-02 | Phase 4 — Scheduling | Pending |
+| SCHED-03 | Phase 4 — Scheduling | Pending |
+| SCHED-04 | Phase 4 — Scheduling | Pending |
+| SCHED-05 | Phase 4 — Scheduling | Pending |
 
 **Coverage:**
 - v1.1 requirements: 20 total
-- Mapped to phases: 0
-- Unmapped: 20 ⚠️
+- Mapped to phases: 20
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-22*
-*Last updated: 2026-03-22 after initial definition*
+*Last updated: 2026-03-22 — traceability populated after roadmap creation*
