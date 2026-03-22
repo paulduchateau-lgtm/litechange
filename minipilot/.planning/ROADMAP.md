@@ -16,7 +16,7 @@ Milestone v1.1 transforms Minipilot from an AI-only report generator into a full
 
 - [x] **Phase 1: Feedback Itératif** — Users can annotate and iterate on AI-generated reports with version history (completed 2026-03-22)
 - [x] **Phase 2: Editeur WYSIWYG** — Users can build and edit reports manually with a visual chart and text palette (completed 2026-03-22)
-- [ ] **Phase 3: Import de Rapports** — Users can upload existing Excel/Word reports and recreate them with their workspace data
+- [x] **Phase 3: Import de Rapports** — Users can upload existing Excel/Word reports and recreate them with their workspace data (completed 2026-03-22)
 - [ ] **Phase 4: Scheduling** — Users can schedule automated report generation with data source refresh
 
 ## Phase Details
@@ -87,7 +87,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 1. Feedback Itératif | 3/3 | Complete   | 2026-03-22 | - |
 | 2. Editeur WYSIWYG | 2/2 | Complete   | 2026-03-22 | - |
-| 3. Import de Rapports | 1/2 | In Progress|  | - |
+| 3. Import de Rapports | 2/2 | Complete   | 2026-03-22 | - |
 | 4. Scheduling | v1.1 | 0/TBD | Not started | - |
 
 ---

@@ -13,7 +13,7 @@ Requirements for milestone v1.1 — Report Studio. Each maps to roadmap phases.
 - [x] **IMP-02**: User can upload a Word file (.docx) as a report template
 - [x] **IMP-03**: AI automatically detects KPIs and key metrics from the uploaded template
 - [x] **IMP-04**: AI analyzes the structure (sheets, charts, tables, sections) to recreate an equivalent report
-- [ ] **IMP-05**: User can map workspace data columns to the fields detected in the imported template
+- [x] **IMP-05**: User can map workspace data columns to the fields detected in the imported template
 
 ### Editeur WYSIWYG
 
@@ -85,7 +85,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | IMP-02 | Phase 3 — Import de Rapports | Complete |
 | IMP-03 | Phase 3 — Import de Rapports | Complete |
 | IMP-04 | Phase 3 — Import de Rapports | Complete |
-| IMP-05 | Phase 3 — Import de Rapports | Pending |
+| IMP-05 | Phase 3 — Import de Rapports | Complete |
 | SCHED-01 | Phase 4 — Scheduling | Pending |
 | SCHED-02 | Phase 4 — Scheduling | Pending |
 | SCHED-03 | Phase 4 — Scheduling | Pending |

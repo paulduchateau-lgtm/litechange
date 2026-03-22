@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Report Studio
 status: unknown
-stopped_at: Completed 03-01-PLAN.md — import-template endpoint + API client method
-last_updated: "2026-03-22T22:08:16.950Z"
+stopped_at: Completed 03-02-PLAN.md — frontend import wizard + field mapper + routing
+last_updated: "2026-03-22T22:11:00Z"
 progress:
   total_phases: 4
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 7
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # State — Minipilot
@@ -23,8 +23,8 @@ See: .planning/PROJECT.md (updated 2026-03-22)
 
 ## Current Position
 
-Phase: 03 (import-de-rapports) — EXECUTING
-Plan: 1 of 2
+Phase: 03 (import-de-rapports) — COMPLETE
+Plan: 2 of 2 (complete)
 
 ## Performance Metrics
 
@@ -45,6 +45,7 @@ Plan: 1 of 2
 | Phase 02-editeur-wysiwyg P01 | 137 | 3 tasks | 6 files |
 | Phase 02-editeur-wysiwyg P02 | 133 | 3 tasks | 4 files |
 | Phase 03-import-de-rapports P01 | 90s | 2 tasks | 4 files |
+| Phase 03-import-de-rapports P02 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,8 @@ From Plan 01-02 execution:
 - [Phase 03-import-de-rapports]: mammoth default import (not named) — CJS named exports unreliable in ESM
 - [Phase 03-import-de-rapports]: Separate uploadTemplate multer instance for template imports — clean separation from data uploads
 - [Phase 03-import-de-rapports]: Truncate docx HTML to 8000/3000 chars depending on aiMode — prevents AI token overflow
+- [Phase 03-import-de-rapports]: Importer button on DashboardPage (not ReportsPage) — WorkspaceShell renders DashboardPage, ReportsPage has no active route
+- [Phase 03-import-de-rapports]: Multi-step wizard via integer state (1/2/3) in single component — no per-step component split needed
 
 ### Pending Todos
 
@@ -91,6 +94,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-22T22:08:16.948Z
-Stopped at: Completed 03-01-PLAN.md — import-template endpoint + API client method
+Last session: 2026-03-22T22:11:00Z
+Stopped at: Completed 03-02-PLAN.md — frontend import wizard + field mapper + routing
 Resume file: None
