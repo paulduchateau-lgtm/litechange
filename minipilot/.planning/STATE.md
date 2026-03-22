@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Report Studio
-status: executing
-stopped_at: "Completed 01-02-PLAN.md — frontend feedback panel UI"
-last_updated: "2026-03-22T20:31:15Z"
+status: unknown
+stopped_at: Completed 01-03-PLAN.md — version history panel and comparison view. Phase 01 complete.
+last_updated: "2026-03-22T20:39:15.549Z"
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # State — Minipilot
@@ -41,6 +41,7 @@ Plan: 3 of 3
 | 01-feedback-iteratif | 2/3 | ~11 min | ~5 min |
 
 **Recent Trend:** 2 plans completed, 6 files created/modified
+| Phase 01-feedback-iteratif P03 | 15 | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -64,6 +65,8 @@ From Plan 01-02 execution:
 - sectionFeedbacks state lives in FullReport (not ReportFeedbackPanel) — single source of truth for RenderSection inline textareas and panel section list
 - feedbackOpen drives both ReportFeedbackPanel drawer AND feedbackMode on RenderSection — one toggle activates all
 - api passed as prop to FullReport (not useWorkspace hook) — keeps component decoupled and testable
+- [Phase 01-feedback-iteratif]: Compare mode replaces full content area (not sidebar overlay) giving full width for split-pane layout
+- [Phase 01-feedback-iteratif]: Version panel refetches on currentVersion change — ensures history updates immediately after each iterate
 
 ### Pending Todos
 
@@ -76,6 +79,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-22
-Stopped at: Completed 01-02-PLAN.md — frontend feedback panel UI. Ready for Plan 03 (version history panel and comparison view).
+Last session: 2026-03-22T20:39:15.547Z
+Stopped at: Completed 01-03-PLAN.md — version history panel and comparison view. Phase 01 complete.
 Resume file: None
