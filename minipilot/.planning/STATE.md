@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Report Studio
 status: unknown
-stopped_at: Completed 02-01-PLAN.md — editor components (palette, text, chart, card) + RenderSection text case
-last_updated: "2026-03-22T21:47:03.903Z"
+stopped_at: Completed 02-02-PLAN.md — editor page wiring (EditorSectionList, ReportEditorPage, routing, sidebar nav)
+last_updated: "2026-03-22T21:51:16.477Z"
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # State — Minipilot
@@ -43,6 +43,7 @@ Plan: 2 of 2 (next)
 **Recent Trend:** 2 plans completed, 6 files created/modified
 | Phase 01-feedback-iteratif P03 | 15 | 3 tasks | 3 files |
 | Phase 02-editeur-wysiwyg P01 | 137 | 3 tasks | 6 files |
+| Phase 02-editeur-wysiwyg P02 | 133 | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,9 @@ From Plan 01-02 execution:
 - [Phase 02-editeur-wysiwyg]: createSection() as named export collocated with palette — Plan 02 imports factory directly
 - [Phase 02-editeur-wysiwyg]: dragHandleProps as prop (not internal useSortable in card) — DnD context wired at list level in Plan 02
 - [Phase 02-editeur-wysiwyg]: Tiptap onBlur (not onUpdate) for onChange — avoids live-preview re-render on every keystroke
+- [Phase 02-editeur-wysiwyg]: reportId=null for /editor/new, reportId=string for /editor/:id — derived from subPath in WorkspaceShell
+- [Phase 02-editeur-wysiwyg]: Strip DnD id fields before api.saveReport/updateReport — ids are runtime-only, not persisted
+- [Phase 02-editeur-wysiwyg]: Active state for editor/new item uses OR condition in Sidebar — subpath 'new' is not the page key
 
 ### Pending Todos
 
@@ -83,6 +87,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-22T21:47:03.901Z
-Stopped at: Completed 02-01-PLAN.md — editor components (palette, text, chart, card) + RenderSection text case
+Last session: 2026-03-22T21:51:16.475Z
+Stopped at: Completed 02-02-PLAN.md — editor page wiring (EditorSectionList, ReportEditorPage, routing, sidebar nav)
 Resume file: None
