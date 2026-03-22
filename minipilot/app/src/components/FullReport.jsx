@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Star, StarOff, Download, Loader2, ArrowUpRight, ArrowDownRight, BarChart3, Activity, TrendingUp, Heart, AlertTriangle, Users, FileText, Calendar, Clock, Eye, Stethoscope, Building2 } from "lucide-react";
+import { Star, StarOff, Download, Loader2, ArrowUpRight, ArrowDownRight, BarChart3, Activity, TrendingUp, Heart, AlertTriangle, Users, FileText, Calendar, Clock, Eye, Stethoscope, Building2, MessageSquare } from "lucide-react";
 import RenderSection from "./RenderSection";
+import ReportFeedbackPanel from "./ReportFeedbackPanel";
 
 // Map icon names to components for dynamic reports
 const ICON_MAP = {
@@ -13,8 +14,37 @@ function getIcon(iconName) {
   return ICON_MAP[iconName] || BarChart3;
 }
 
-export default function FullReport({ report, isFav, onToggleFav }) {
+export default function FullReport({ report, isFav, onToggleFav, api, onReportUpdated }) {
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [iterateLoading, setIterateLoading] = useState(false);
+  const [iterateError, setIterateError] = useState(null);
+  const [sectionFeedbacks, setSectionFeedbacks] = useState({});
+
+  const prefersReducedMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const handleIterate = async (globalFeedback, sectionFeedback) => {
+    setIterateLoading(true);
+    setIterateError(null);
+    try {
+      const result = await api.iterateReport(report.id, globalFeedback, sectionFeedback);
+      if (result.error) {
+        setIterateError(result.error);
+      } else {
+        // Clear feedback state and sessionStorage after successful iterate
+        sessionStorage.removeItem("feedback-global-" + report.id);
+        sessionStorage.removeItem("feedback-sections-" + report.id);
+        setSectionFeedbacks({});
+        setFeedbackOpen(false);
+        if (onReportUpdated) onReportUpdated(result.report);
+      }
+    } catch {
+      setIterateError("La génération a échoué. Vérifiez votre connexion et réessayez.");
+    } finally {
+      setIterateLoading(false);
+    }
+  };
+
   const Icon = getIcon(report.icon);
   const kpis = typeof report.kpis === "string" ? JSON.parse(report.kpis) : (report.kpis || []);
   const sections = typeof report.sections === "string" ? JSON.parse(report.sections) : (report.sections || []);
@@ -41,6 +71,21 @@ export default function FullReport({ report, isFav, onToggleFav }) {
           <p style={{ fontSize: 13, color: "var(--mp-text-muted)", margin: 0, marginLeft: 46 }}>{report.subtitle}</p>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
+          <button
+            onClick={() => setFeedbackOpen(!feedbackOpen)}
+            style={{
+              background: "transparent",
+              border: feedbackOpen ? "1px solid var(--mp-accent)" : "1px solid var(--mp-border)",
+              borderRadius: "var(--radius-sm)", padding: "8px 14px", cursor: "pointer",
+              display: "flex", alignItems: "center", gap: 6,
+              color: feedbackOpen ? "var(--mp-accent)" : "var(--mp-text-muted)",
+              fontSize: 12, fontFamily: "var(--font-body)",
+              transition: "color 150ms ease, border-color 150ms ease",
+            }}
+          >
+            <MessageSquare size={14} />
+            Améliorer
+          </button>
           <button onClick={onToggleFav} style={{
             background: "var(--mp-bg-card)", border: "1px solid var(--mp-border)",
             borderRadius: "var(--radius-sm)", padding: "8px 14px", cursor: "pointer",
@@ -128,8 +173,35 @@ export default function FullReport({ report, isFav, onToggleFav }) {
         </div>
       )}
 
+      {/* Feedback panel */}
+      <div style={{
+        maxHeight: feedbackOpen ? 2000 : 0,
+        overflow: "hidden",
+        transition: prefersReducedMotion ? "none" : "max-height 200ms ease, opacity 200ms ease",
+        opacity: feedbackOpen ? 1 : 0,
+        marginBottom: feedbackOpen ? 20 : 0,
+      }}>
+        {feedbackOpen && (
+          <ReportFeedbackPanel
+            report={report}
+            onSubmit={handleIterate}
+            loading={iterateLoading}
+            error={iterateError}
+          />
+        )}
+      </div>
+
       {/* Sections */}
-      {sections.map((s, i) => <RenderSection key={i} section={s} />)}
+      {sections.map((s, i) => (
+        <RenderSection
+          key={i}
+          section={s}
+          feedbackMode={feedbackOpen}
+          sectionFeedback={sectionFeedbacks[i] || ""}
+          onSectionFeedback={(idx, text) => setSectionFeedbacks(prev => ({ ...prev, [idx]: text }))}
+          sectionIndex={i}
+        />
+      ))}
     </div>
   );
 }

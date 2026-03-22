@@ -4,7 +4,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, AreaChart, Area, ComposedChart,
 } from "recharts";
-import { ChevronDown, ChevronUp, Table, BarChart3 } from "lucide-react";
+import { ChevronDown, ChevronUp, Table, BarChart3, MessageSquare } from "lucide-react";
 import { useChartTheme } from "../data/theme";
 
 function formatValue(val, fmt) {
@@ -117,8 +117,9 @@ function DataTable({ section }) {
   );
 }
 
-export default function RenderSection({ section }) {
+export default function RenderSection({ section, feedbackMode, sectionFeedback, onSectionFeedback, sectionIndex }) {
   const [expanded, setExpanded] = useState(true);
+  const [annotating, setAnnotating] = useState(false);
   const ct = useChartTheme();
   const h = 300;
   const c = section.config || {};
@@ -283,20 +284,40 @@ export default function RenderSection({ section }) {
       overflow: "hidden",
       transition: "background 0.3s, border-color 0.3s",
     }}>
-      <button
-        onClick={() => setExpanded(!expanded)}
-        style={{
-          width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "14px 20px", background: "none", border: "none", cursor: "pointer",
-          color: "var(--mp-text)", fontFamily: "var(--font-body)",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          {section.type === "table" ? <Table size={14} color="var(--mp-text-muted)" /> : <BarChart3 size={14} color="var(--mp-text-muted)" />}
-          <span style={{ fontSize: 14, fontWeight: 500 }}>{section.title}</span>
-        </div>
-        {expanded ? <ChevronUp size={16} color="var(--mp-text-muted)" /> : <ChevronDown size={16} color="var(--mp-text-muted)" />}
-      </button>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <button
+          onClick={() => setExpanded(!expanded)}
+          style={{
+            flex: 1, display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "14px 20px", background: "none", border: "none", cursor: "pointer",
+            color: "var(--mp-text)", fontFamily: "var(--font-body)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {section.type === "table" ? <Table size={14} color="var(--mp-text-muted)" /> : <BarChart3 size={14} color="var(--mp-text-muted)" />}
+            <span style={{ fontSize: 14, fontWeight: 500 }}>{section.title}</span>
+          </div>
+          {expanded ? <ChevronUp size={16} color="var(--mp-text-muted)" /> : <ChevronDown size={16} color="var(--mp-text-muted)" />}
+        </button>
+        {feedbackMode && (
+          <button
+            onClick={() => setAnnotating(!annotating)}
+            title="Annoter cette section"
+            aria-label="Annoter cette section"
+            style={{
+              background: "none", border: "none", cursor: "pointer",
+              padding: "9px 14px", borderRadius: "var(--radius-sm)",
+              display: "flex", alignItems: "center",
+              flexShrink: 0,
+            }}
+          >
+            <MessageSquare
+              size={14}
+              color={sectionFeedback ? "var(--mp-accent)" : "var(--mp-text-muted)"}
+            />
+          </button>
+        )}
+      </div>
       {expanded && (
         <div style={{ padding: "0 20px 20px" }}>
           {section.insight && (
@@ -312,6 +333,23 @@ export default function RenderSection({ section }) {
             </div>
           )}
           {renderChart()}
+          {feedbackMode && annotating && (
+            <textarea
+              value={sectionFeedback || ""}
+              onChange={e => onSectionFeedback(sectionIndex, e.target.value)}
+              placeholder="Feedback spécifique à cette section (optionnel)"
+              aria-label={`Feedback pour ${section.title}`}
+              style={{
+                width: "100%", marginTop: 8, fontSize: 14,
+                fontFamily: "var(--font-body)",
+                background: "var(--mp-bg)", border: "1px solid var(--mp-border)",
+                borderRadius: "var(--radius-sm)", padding: "8px 12px",
+                color: "var(--mp-text)", resize: "vertical", minHeight: 72,
+                boxSizing: "border-box",
+                opacity: 1, transition: "opacity 150ms ease",
+              }}
+            />
+          )}
         </div>
       )}
     </div>

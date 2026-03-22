@@ -215,6 +215,8 @@ function WorkspaceContent() {
                 report={viewingReport}
                 isFav={!!viewingReport.starred}
                 onToggleFav={() => toggleStar(viewingReport.id)}
+                api={api}
+                onReportUpdated={(updatedReport) => setViewingReport(updatedReport)}
               />
             ) : (
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: 60 }}>
