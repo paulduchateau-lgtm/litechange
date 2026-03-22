@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { X, LayoutDashboard, MessageSquare, Settings, Trash2, Menu, Sun, Moon, RotateCcw, Wifi, WifiOff, Loader2, ArrowLeft } from "lucide-react";
+import { X, LayoutDashboard, MessageSquare, Settings, Trash2, Menu, Sun, Moon, RotateCcw, Wifi, WifiOff, Loader2, ArrowLeft, FilePenLine } from "lucide-react";
 import { useTheme } from "../data/theme";
 import { getAiMode, setAiMode } from "../lib/api";
 
 const NAV_ITEMS = [
   { id: "dashboard", Icon: LayoutDashboard, label: "Tableau de bord" },
+  { id: "editor/new", Icon: FilePenLine, label: "Editeur" },
   { id: "chat", Icon: MessageSquare, label: "Explorer" },
   { id: "admin", Icon: Settings, label: "Admin" },
 ];
@@ -156,7 +157,7 @@ export default function Sidebar({ page, setPage, sidebarOpen, setSidebarOpen, on
         <div>
           {NAV_ITEMS.map(it => {
             const NavIcon = it.Icon;
-            const isActive = page === it.id || (page === "report" && it.id === "dashboard");
+            const isActive = page === it.id || (page === "report" && it.id === "dashboard") || (page === "editor" && it.id === "editor/new");
             return (
               <button
                 key={it.id}

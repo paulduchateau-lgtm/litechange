@@ -8,6 +8,7 @@ import AdminPage from "./AdminPage";
 import FullReport from "./FullReport";
 import TrashPage from "./TrashPage";
 import OnboardingWizard from "./onboarding/OnboardingWizard";
+import ReportEditorPage from "./ReportEditorPage";
 
 function WorkspaceContent() {
   const { slug } = useParams();
@@ -199,17 +200,32 @@ function WorkspaceContent() {
 
         {currentPage === "report" && (
           <div style={{ padding: 32, overflow: "auto" }}>
-            <button
-              onClick={() => handleSetPage("dashboard")}
-              style={{
-                background: "none", border: "none", cursor: "pointer",
-                color: "var(--mp-text-muted)", fontSize: 13,
-                display: "flex", alignItems: "center", gap: 6,
-                marginBottom: 16, fontFamily: "var(--font-body)", padding: 0,
-              }}
-            >
-              ← Retour au tableau de bord
-            </button>
+            <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
+              <button
+                onClick={() => handleSetPage("dashboard")}
+                style={{
+                  background: "none", border: "none", cursor: "pointer",
+                  color: "var(--mp-text-muted)", fontSize: 13,
+                  display: "flex", alignItems: "center", gap: 6,
+                  fontFamily: "var(--font-body)", padding: 0,
+                }}
+              >
+                ← Retour au tableau de bord
+              </button>
+              {viewingReport && (
+                <button
+                  onClick={() => navigate(`/${slug}/editor/${viewingReport.id}`)}
+                  style={{
+                    background: "none", border: "1px solid var(--mp-border)", cursor: "pointer",
+                    color: "var(--mp-text-secondary)", fontSize: 13, borderRadius: "var(--radius-sm)",
+                    display: "inline-flex", alignItems: "center", gap: 6,
+                    marginLeft: 12, fontFamily: "var(--font-body)", padding: "4px 12px",
+                  }}
+                >
+                  Editer dans l'editeur visuel
+                </button>
+              )}
+            </div>
             {viewingReport ? (
               <FullReport
                 report={viewingReport}
@@ -224,6 +240,14 @@ function WorkspaceContent() {
               </div>
             )}
           </div>
+        )}
+
+        {currentPage === "editor" && (
+          <ReportEditorPage
+            api={api}
+            slug={slug}
+            reportId={subPath.split("/")[1] === "new" ? null : subPath.split("/")[1] || null}
+          />
         )}
 
         {currentPage === "chat" && (
