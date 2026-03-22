@@ -24,6 +24,7 @@ Transform raw organizational data into actionable change management reports — 
 - ✓ Onboarding wizard (5-step: upload, context, verify, suggest, transform)
 - ✓ Dual AI mode (premium: Claude/Mistral, local: Ollama/Ministral 3B)
 - ✓ Chat session persistence with history
+- ✓ Iterative feedback loop with version history and side-by-side comparison — Phase 1 v1.1
 
 ### Active
 
@@ -31,7 +32,6 @@ Transform raw organizational data into actionable change management reports — 
 
 - [ ] Upload existing Excel/Word report to auto-create similar report
 - [ ] WYSIWYG report builder with classic charts and free text
-- [ ] Iterative feedback loop to improve reports
 - [ ] Scheduled report generation with data source refresh
 
 ### Out of Scope
@@ -79,4 +79,4 @@ Transform raw organizational data into actionable change management reports — 
 | Client-side PDF | No server-side rendering dependency | — Pending |
 
 ---
-*Last updated: 2026-03-22 after milestone v1.1 initialization*
+*Last updated: 2026-03-22 after Phase 1 (Feedback Itératif) completion*
