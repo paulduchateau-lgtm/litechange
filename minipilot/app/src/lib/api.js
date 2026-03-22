@@ -214,6 +214,17 @@ export function createWorkspaceApi(slug) {
       return res.json();
     },
 
+    importTemplate: async (file) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(`${BASE}/reports/import-template`, { method: "POST", body: formData });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Erreur lors de l'import" }));
+        throw new Error(err.error || "Erreur lors de l'import");
+      }
+      return res.json();
+    },
+
     iterateReport: async (id, globalFeedback, sectionFeedback) => {
       const res = await fetch(`${BASE}/reports/${id}/iterate`, {
         method: "POST",
