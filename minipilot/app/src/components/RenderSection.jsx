@@ -257,6 +257,30 @@ export default function RenderSection({ section, feedbackMode, sectionFeedback, 
         case "table":
           return <DataTable section={section} />;
 
+        case "text":
+          return section.html
+            ? (
+              <>
+                <style>{`
+                  .wysiwyg-preview p { margin: 0 0 8px; }
+                  .wysiwyg-preview ul, .wysiwyg-preview ol { padding-left: 20px; margin-bottom: 8px; }
+                  .wysiwyg-preview strong { font-weight: 600; }
+                  .wysiwyg-preview em { font-style: italic; }
+                `}</style>
+                <div
+                  className="wysiwyg-preview"
+                  dangerouslySetInnerHTML={{ __html: section.html }}
+                  style={{
+                    fontSize: 14,
+                    lineHeight: 1.7,
+                    color: "var(--mp-text-secondary)",
+                    fontFamily: "var(--font-body)",
+                  }}
+                />
+              </>
+            )
+            : <p style={{ fontSize: 13, color: "var(--mp-text-muted)", fontStyle: "italic" }}>Aucun contenu texte.</p>;
+
         default:
           return null;
       }
