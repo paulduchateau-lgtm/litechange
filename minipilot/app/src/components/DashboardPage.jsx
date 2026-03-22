@@ -1,7 +1,7 @@
-import { Star, BookOpen, FileText, MessageSquare, Activity, Loader2 } from "lucide-react";
+import { Star, BookOpen, FileText, MessageSquare, Activity, Loader2, FileUp } from "lucide-react";
 import ReportCard from "./ReportCard";
 
-export default function DashboardPage({ reports, reportsLoading, toggleStar, trashReport, openReport, goToChat }) {
+export default function DashboardPage({ reports, reportsLoading, toggleStar, trashReport, openReport, goToChat, goToImport }) {
   const sharedReports = reports.shared || [];
   const allPrivate = reports.private || [];
   const favoriteReports = allPrivate.filter(r => r.starred);
@@ -32,14 +32,24 @@ export default function DashboardPage({ reports, reportsLoading, toggleStar, tra
             {total} rapport{total !== 1 ? "s" : ""} disponible{total !== 1 ? "s" : ""}
           </p>
         </div>
-        <button onClick={goToChat} style={{
-          background: "var(--mp-accent)", border: "none", borderRadius: "var(--radius-md)",
-          padding: "10px 20px", color: "var(--mp-accent-on)", cursor: "pointer",
-          fontSize: 14, fontWeight: 500, display: "flex", alignItems: "center", gap: 8,
-          fontFamily: "var(--font-body)",
-        }}>
-          <MessageSquare size={16} /> Nouvelle exploration
-        </button>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={goToImport} style={{
+            background: "transparent", border: "1px solid var(--mp-border)", borderRadius: "var(--radius-md)",
+            padding: "10px 20px", color: "var(--mp-text-secondary)", cursor: "pointer",
+            fontSize: 14, fontWeight: 500, display: "flex", alignItems: "center", gap: 8,
+            fontFamily: "var(--font-body)",
+          }}>
+            <FileUp size={16} /> Importer un modele
+          </button>
+          <button onClick={goToChat} style={{
+            background: "var(--mp-accent)", border: "none", borderRadius: "var(--radius-md)",
+            padding: "10px 20px", color: "var(--mp-accent-on)", cursor: "pointer",
+            fontSize: 14, fontWeight: 500, display: "flex", alignItems: "center", gap: 8,
+            fontFamily: "var(--font-body)",
+          }}>
+            <MessageSquare size={16} /> Nouvelle exploration
+          </button>
+        </div>
       </div>
 
       {/* Overview KPIs */}

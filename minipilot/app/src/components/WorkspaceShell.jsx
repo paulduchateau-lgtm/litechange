@@ -9,6 +9,7 @@ import FullReport from "./FullReport";
 import TrashPage from "./TrashPage";
 import OnboardingWizard from "./onboarding/OnboardingWizard";
 import ReportEditorPage from "./ReportEditorPage";
+import ImportReportPage from "./ImportReportPage";
 
 function WorkspaceContent() {
   const { slug } = useParams();
@@ -93,6 +94,7 @@ function WorkspaceContent() {
   };
 
   const goToChat = () => navigate(`/${slug}/chat`);
+  const goToImport = () => navigate(`/${slug}/import`);
 
   // Determine current page from location — strip the slug prefix
   const subPath = location.pathname.replace(`/${slug}`, "").replace(/^\//, "");
@@ -195,6 +197,7 @@ function WorkspaceContent() {
             trashReport={trashReport}
             openReport={openReport}
             goToChat={goToChat}
+            goToImport={goToImport}
           />
         )}
 
@@ -248,6 +251,10 @@ function WorkspaceContent() {
             slug={slug}
             reportId={subPath.split("/")[1] === "new" ? null : subPath.split("/")[1] || null}
           />
+        )}
+
+        {currentPage === "import" && (
+          <ImportReportPage api={api} slug={slug} />
         )}
 
         {currentPage === "chat" && (
