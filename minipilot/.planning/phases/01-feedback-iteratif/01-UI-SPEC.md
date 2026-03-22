@@ -38,7 +38,7 @@ Declared values (4px grid, sourced from `--sp-*` tokens in `tokens.css`):
 | `--sp-1` | 4px | Icon gaps, dot indicators, tight inline spacing |
 | `--sp-2` | 8px | Button internal gaps, badge padding, compact rows |
 | `--sp-3` | 12px | Feedback textarea internal padding (vertical) |
-| `--sp-4` | 16px | Default element spacing, card internal padding |
+| `--sp-4` | 16px | Default element spacing, card internal padding, textarea horizontal padding |
 | `--sp-5` | 20px | Panel bottom margin, CTA top margin |
 | `--sp-6` | 24px | Section padding, header margin-bottom |
 | `--sp-8` | 32px | Layout column gaps, major element separation |
@@ -46,33 +46,40 @@ Declared values (4px grid, sourced from `--sp-*` tokens in `tokens.css`):
 | `--sp-12` | 48px | — |
 | `--sp-16` | 64px | Page-level vertical rhythm |
 
-Exceptions:
-- Section annotation textarea: `min-height: 72px` (not a spacing token, a sizing constraint)
-- Global feedback textarea: `min-height: 88px`
-- Touch targets on icon annotation buttons: minimum 32x32px (icon is 14px, padding makes up difference)
-- Version selector pill height: 28px (aligns with existing header button row)
+### Spacing Exceptions
+
+| Element | Value | Justification |
+|---------|-------|---------------|
+| Section annotation textarea min-height | 72px | Sizing constraint, not a spacing token |
+| Global feedback textarea min-height | 88px | Sizing constraint, not a spacing token |
+| Icon annotation button touch target | 32×32px | Icon is 14px; padding compensates to minimum touch target |
+| Version selector pill height | 28px | Aligns with existing header button row |
+| Primary CTA button padding | `10px 24px` | Project-level convention from CLAUDE.md button `md` standard (10px vertical, 24px horizontal, 15px font) — approved named exception |
 
 ---
 
 ## Typography
 
+4 sizes, 2 weights maximum.
+
 | Role | Font | Size | Weight | Line Height | Letter Spacing |
 |------|------|------|--------|-------------|----------------|
-| Body | DM Sans (`--font-body`) | 13px | 400 | 1.5 | normal |
-| Label / UI text | DM Sans (`--font-body`) | 14px | 500 | 1.4 | normal |
-| Data label (UPPERCASE) | IBM Plex Mono (`--font-data`) | 10px | 500 | 1 | 0.1em |
+| Body / UI text | DM Sans (`--font-body`) | 14px | 400 | 1.5 | normal |
+| Data label (UPPERCASE) | IBM Plex Mono (`--font-data`) | 10px | 600 | 1 | 0.1em |
 | Data value / KPI | DM Sans (`--font-body`) | 22px | 600 | 1.2 | -0.02em |
 | Section heading | Source Serif 4 (`--font-display`) | 16px | 400 | 1.3 | -0.01em |
-| Version badge / diff tag | IBM Plex Mono (`--font-data`) | 10px | 500 | 1 | 0.08em |
+
+**Weights in use: 400 (body, headings) and 600 (data labels, KPI values, emphasis).**
 
 **Source:** CLAUDE.md Typography section + direct observation of `FullReport.jsx` and `tokens.css`.
 
 Rules for this phase:
-- Feedback textarea placeholder: DM Sans 13px, `--mp-text-muted`
+- Feedback textarea placeholder: DM Sans 14px, `--mp-text-muted`
 - "Améliorer ce rapport" panel title: Source Serif 4 400, 16px
-- Version history list entries: DM Sans 13px, weight 400 (timestamp in IBM Plex Mono 11px)
-- Diff change badge (e.g. "Modifié"): IBM Plex Mono 10px UPPERCASE, `--mp-accent` color
-- AI generation progress message: DM Sans 13px italic, `--mp-text-secondary`
+- Version history list entries: DM Sans 14px, weight 400; timestamps in IBM Plex Mono 10px UPPERCASE `--mp-text-muted`
+- Diff change badge (e.g. "MODIFIÉ"): IBM Plex Mono 10px UPPERCASE, `--mp-accent` color
+- AI generation progress message: DM Sans 14px italic, `--mp-text-secondary`
+- Per-section feedback textarea font: DM Sans 14px (unified with body — no separate 12px size)
 
 ---
 
@@ -89,7 +96,7 @@ Rules for this phase:
 - Annotated section indicator dot (MessageSquare icon when annotation exists)
 - "Générer la version améliorée" primary CTA button background
 - "Améliorer ce rapport" toggle button active state border
-- Diff badge "Modifié" text color
+- Diff badge "MODIFIÉ" text color
 - Version number highlight in version selector (current version only)
 - Focus ring outline on feedback textareas
 
@@ -109,28 +116,30 @@ Rules for this phase:
 
 ## Component Inventory
 
+**Primary visual anchor:** The "Générer la version améliorée" CTA button is the single dominant focal point on screen. Its `--mp-accent` background (#B0D838) is the only filled accent surface visible in the drawer — all other elements use text or border accents only. This ensures users know immediately where the primary action is.
+
 ### New Components
 
 **`ReportFeedbackPanel`** (collapsible drawer at bottom of `FullReport`)
 - Trigger: "Améliorer ce rapport" ghost button added to existing header action bar
 - Panel: `--mp-bg-card` background, 1px `--mp-border` border, `--radius-md`, padding `20px 24px`
 - Title: Source Serif 4, 400, 16px, `--mp-text`
-- Global feedback textarea: DM Sans 13px, `--mp-bg` background, 1px `--mp-border`, `--radius-sm`, padding `10px 14px`, `resize: vertical`, `min-height: 88px`
-- Per-section textareas: identical to global but `min-height: 56px`, 12px font
+- Global feedback textarea: DM Sans 14px, `--mp-bg` background, 1px `--mp-border`, `--radius-sm`, padding `12px 16px`, `resize: vertical`, `min-height: 88px`
+- Per-section textareas: identical to global but `min-height: 56px`
 - Section labels above textareas: IBM Plex Mono 10px UPPERCASE `--mp-text-muted`
-- CTA button: Primary style — `--mp-accent` bg, `--mp-accent-on` text, `--radius-md`, `10px 24px` padding, DM Sans 500 14px
+- CTA button: Primary style — `--mp-accent` bg, `--mp-accent-on` text, `--radius-md`, `10px 24px` padding (named exception — see Spacing Exceptions), DM Sans 400 14px
 - CTA disabled state: `opacity: 0.4`, `cursor: not-allowed`
 - CTA loading state: "Génération en cours…" text, `cursor: wait`, `opacity: 0.6`
 - Open/close animation: height transition 200ms ease, `overflow: hidden`
 
 **`ReportVersionPanel`** (collapsible panel in `FullReport` header zone)
-- Trigger: version badge showing "Version N" (IBM Plex Mono 10px UPPERCASE) with ChevronDown icon
+- Trigger: version badge showing "VERSION N" (IBM Plex Mono 10px UPPERCASE) with ChevronDown icon
 - Panel: `--mp-bg-elevated` background, `--mp-border` border, `--radius-md`
-- Version list: DM Sans 13px entries, timestamp in IBM Plex Mono 11px `--mp-text-muted`
+- Version list: DM Sans 14px entries, timestamps in IBM Plex Mono 10px UPPERCASE `--mp-text-muted`
 - Active version: `--mp-accent-dim` background, `--mp-accent` left-border 2px
 - Hover: `rgba(255,255,255, 0.04)` background, no green tint
-- "Comparer" action per version: ghost button, DM Sans 12px, `--mp-text-muted`
-- Empty state: "Aucun historique disponible. Améliorez ce rapport pour créer votre première version." DM Sans 13px `--mp-text-muted`, centered, padding 24px
+- "Comparer" action per version: ghost button, DM Sans 14px, `--mp-text-muted`
+- Empty state: "Aucun historique disponible. Améliorez ce rapport pour créer votre première version." DM Sans 14px `--mp-text-muted`, centered, padding 24px
 
 **`ReportCompareView`** (overlay inside `FullReport` route)
 - Layout: two-column grid, `gap: 32px`, each column min-width 0
@@ -155,7 +164,7 @@ Rules for this phase:
 - When `feedbackMode` prop is `true`: show MessageSquare icon button in section header (top-right)
 - Icon active color (annotation exists): `--mp-accent`
 - Icon inactive color: `--mp-text-muted`
-- Inline annotation textarea: appears below chart/content, `min-height: 72px`, DM Sans 13px
+- Inline annotation textarea: appears below chart/content, `min-height: 72px`, DM Sans 14px
 - Textarea animation: fade-in 150ms ease when opened
 
 ---
@@ -169,7 +178,7 @@ Rules for this phase:
 3. Global textarea is autofocused on open
 4. CTA is disabled until at least one feedback field has content (1+ non-whitespace char)
 5. User clicks "Générer la version améliorée" → button enters loading state → POST to `/api/w/:slug/reports/:id/iterate`
-6. On success: `feedbackOpen` closes, report re-renders with new content, version badge updates to "Version N+1"
+6. On success: `feedbackOpen` closes, report re-renders with new content, version badge updates to "VERSION N+1"
 7. On error: inline error alert (left-border 3px `--mp-error`, `--mp-error` tinted bg) — "La génération a échoué. Vérifiez votre connexion et réessayez."
 8. Session storage cleared after successful iterate (feedback consumed)
 
@@ -192,7 +201,7 @@ Rules for this phase:
 
 ### FEED-04: Version History Panel
 
-1. Version badge ("Version N") in report header is clickable → opens version list panel
+1. Version badge ("VERSION N") in report header is clickable → opens version list panel
 2. Panel renders below header, above objective block
 3. List items: version number + date + feedback preview (first 60 chars, truncated with ellipsis)
 4. Current version row is visually distinguished (`--mp-accent` left border, accent-dim bg)
@@ -202,7 +211,7 @@ Rules for this phase:
 
 1. "Comparer" from version panel sets `compareMode = true`, `compareVersions = [selected, current]`
 2. `ReportCompareView` overlays the normal report content (replaces it, not a modal)
-3. Left pane: selected past version. Right pane: current version. Pane labels show "Version N" + date
+3. Left pane: selected past version. Right pane: current version. Pane labels show "VERSION N" + date
 4. Changed sections get diff badges — determined by field-by-field compare (title, insight, data.length)
 5. "Retour au rapport" button exits compare mode → normal `FullReport` re-renders
 
@@ -218,7 +227,7 @@ Rules for this phase:
 | Global feedback placeholder | "Qu'est-ce qui fonctionne bien ? Qu'est-ce qui doit changer ?" |
 | Section feedback placeholder | "Feedback spécifique à cette section (optionnel)" |
 | CTA loading state | "Génération en cours…" |
-| Version badge (current) | "Version {N}" |
+| Version badge (current) | "VERSION {N}" |
 | Version history trigger | "Historique" |
 | Compare exit | "Retour au rapport" |
 | Empty version history heading | "Aucune version précédente" |
