@@ -268,5 +268,54 @@ export function createWorkspaceApi(slug) {
       const res = await fetch(`${BASE}/stats/usage`);
       return res.json();
     },
+
+    // Schedules
+    getSchedules: async () => {
+      const res = await fetch(`${BASE}/schedules`);
+      return res.json();
+    },
+
+    createSchedule: async (data) => {
+      const res = await fetch(`${BASE}/schedules`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      return res.json();
+    },
+
+    getSchedule: async (id) => {
+      const res = await fetch(`${BASE}/schedules/${id}`);
+      return res.json();
+    },
+
+    updateSchedule: async (id, data) => {
+      const res = await fetch(`${BASE}/schedules/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      return res.json();
+    },
+
+    deleteSchedule: async (id) => {
+      const res = await fetch(`${BASE}/schedules/${id}`, { method: "DELETE" });
+      return res.json();
+    },
+
+    getScheduleRuns: async (id) => {
+      const res = await fetch(`${BASE}/schedules/${id}/runs`);
+      return res.json();
+    },
+
+    runScheduleNow: async (id) => {
+      const res = await fetch(`${BASE}/schedules/${id}/run-now`, { method: "POST" });
+      return res.json();
+    },
+
+    getFiles: async () => {
+      const res = await fetch(`${BASE}/files`);
+      return res.json();
+    },
   };
 }
