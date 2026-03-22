@@ -35,7 +35,7 @@ Milestone v1.1 transforms Minipilot from an AI-only report generator into a full
 Plans:
 - [x] 01-01-PLAN.md — Backend: DB migration (report_versions table), iterate/versions API endpoints, frontend API client
 - [x] 01-02-PLAN.md — Frontend: Feedback panel (global + section annotations), FullReport integration, AI iteration flow
-- [ ] 01-03-PLAN.md — Frontend: Version history panel, side-by-side comparison view with diff badges
+- [x] 01-03-PLAN.md — Frontend: Version history panel, side-by-side comparison view with diff badges
 
 ### Phase 2: Editeur WYSIWYG
 **Goal**: Users can create and edit reports from scratch using a visual editor without writing any code
@@ -47,7 +47,10 @@ Plans:
   3. User can reorder sections by dragging and dropping them into a new position
   4. User sees the final report layout update live as they make edits
   5. User can save a complete report built entirely from the WYSIWYG editor without AI generation
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 02-01-PLAN.md — Install deps, create editor primitives (palette, text editor, chart form, section card), add "text" to RenderSection
+- [ ] 02-02-PLAN.md — Wire editor page (DnD list, two-column layout, live preview, routing, sidebar, save)
 
 ### Phase 3: Import de Rapports
 **Goal**: Users can upload an existing Excel or Word report and get a recreated version populated with their workspace data
@@ -80,7 +83,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1. Feedback Itératif | 3/3 | Complete   | 2026-03-22 | - |
-| 2. Editeur WYSIWYG | v1.1 | 0/TBD | Not started | - |
+| 2. Editeur WYSIWYG | v1.1 | 0/2 | Planned | - |
 | 3. Import de Rapports | v1.1 | 0/TBD | Not started | - |
 | 4. Scheduling | v1.1 | 0/TBD | Not started | - |
 
