@@ -93,6 +93,17 @@ db.exec(`
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
+  CREATE TABLE IF NOT EXISTS report_versions (
+    id TEXT PRIMARY KEY,
+    report_id TEXT NOT NULL REFERENCES reports(id) ON DELETE CASCADE,
+    version_num INTEGER NOT NULL,
+    snapshot TEXT NOT NULL,
+    feedback TEXT,
+    section_feedback TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+  CREATE INDEX IF NOT EXISTS idx_rv_report_id ON report_versions(report_id);
+
   CREATE TABLE IF NOT EXISTS usage_logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     action TEXT,
@@ -122,6 +133,7 @@ try { db.exec("ALTER TABLE project_context ADD COLUMN workspace_id TEXT"); } cat
 try { db.exec("ALTER TABLE reports ADD COLUMN workspace_id TEXT REFERENCES workspaces(id)"); } catch {}
 try { db.exec("ALTER TABLE usage_logs ADD COLUMN workspace_id TEXT"); } catch {}
 try { db.exec("ALTER TABLE reports ADD COLUMN trashed INTEGER DEFAULT 0"); } catch {}
+try { db.exec("ALTER TABLE reports ADD COLUMN current_version INTEGER DEFAULT 1"); } catch {}
 
 // Backfill: if data exists but no workspaces, create a default workspace
 {
@@ -1725,6 +1737,7 @@ function deserializeReport(row) {
     starred: row.starred === 1,
     source: row.source,
     createdAt: row.created_at,
+    currentVersion: row.current_version || 1,
   };
 }
 
@@ -2829,6 +2842,132 @@ app.post("/api/w/:slug/reports/:id/restore", (req, res) => {
     res.json({ success: true, report: deserializeReport(db.prepare("SELECT * FROM reports WHERE id = ?").get(id)) });
   } catch (err) {
     console.error("[POST /api/w/:slug/reports/:id/restore]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── POST /api/w/:slug/reports/:id/iterate ────────────────────────────────────
+
+app.post("/api/w/:slug/reports/:id/iterate", async (req, res) => {
+  try {
+    const { slug, id } = req.params;
+    const ws = db.prepare("SELECT * FROM workspaces WHERE slug = ?").get(slug);
+    if (!ws) return res.status(404).json({ error: "Workspace introuvable." });
+
+    const { globalFeedback = "", sectionFeedback = [] } = req.body;
+    const existing = db.prepare("SELECT * FROM reports WHERE id = ? AND workspace_id = ?").get(id, ws.id);
+    if (!existing) return res.status(404).json({ error: "Rapport introuvable." });
+
+    const currentReport = deserializeReport(existing);
+
+    // Ensure baseline version exists (v1 snapshot)
+    const versionCount = db.prepare(
+      "SELECT COUNT(*) AS cnt FROM report_versions WHERE report_id = ?"
+    ).get(id).cnt;
+    if (versionCount === 0) {
+      db.prepare(`
+        INSERT INTO report_versions (id, report_id, version_num, snapshot, feedback, section_feedback)
+        VALUES (?, ?, 1, ?, NULL, NULL)
+      `).run(uuidv4(), id, JSON.stringify(currentReport));
+      db.prepare("UPDATE reports SET current_version = 1 WHERE id = ?").run(id);
+    }
+
+    const sectionFeedbackText = sectionFeedback
+      .filter(sf => sf.text?.trim())
+      .map(sf => `Section ${sf.index + 1} ("${currentReport.sections[sf.index]?.title || '?'}"): ${sf.text}`)
+      .join("\n");
+
+    const dataSummary = buildDataSummary(10, ws.id);
+    const dataText = aiMode === "local" ? "" : dataSummary.map(t =>
+      `Table "${t.name}" (${t.rowCount} lignes) : ${t.columns.map(c => c.name).join(", ")}`
+    ).join("\n");
+
+    const prompt = `Tu es un expert analytique. Voici un rapport existant :
+
+RAPPORT ACTUEL (JSON) :
+${JSON.stringify(currentReport, null, 2)}
+
+FEEDBACK GLOBAL :
+${globalFeedback || "Aucun feedback global."}
+
+FEEDBACK PAR SECTION :
+${sectionFeedbackText || "Aucun feedback par section."}${dataText ? `\nDONNÉES DISPONIBLES :\n${dataText}` : ""}
+
+Génère une version améliorée. Conserve la structure JSON exacte. Réponds UNIQUEMENT avec le JSON valide.`;
+
+    const iterateMaxTokens = aiMode === "local" ? 2000 : 4000;
+    const aiResult = await aiComplete("", prompt, { maxTokens: iterateMaxTokens });
+
+    const extracted = extractReportFromResponse(aiResult.text.trim());
+    if (!extracted) return res.status(422).json({ error: "L'IA n'a pas retourné un JSON valide.", raw: aiResult.text });
+
+    const improved = { ...extracted.json, id: currentReport.id };
+
+    const doIterate = db.transaction(() => {
+      const maxV = db.prepare(
+        "SELECT COALESCE(MAX(version_num), 1) AS v FROM report_versions WHERE report_id = ?"
+      ).get(id).v;
+      const nextV = maxV + 1;
+      db.prepare(`
+        INSERT INTO report_versions (id, report_id, version_num, snapshot, feedback, section_feedback)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `).run(uuidv4(), id, nextV, JSON.stringify(improved), globalFeedback, JSON.stringify(sectionFeedback));
+      db.prepare(`
+        UPDATE reports SET title=?, subtitle=?, objective=?, kpis=?, sections=?, current_version=?
+        WHERE id=?
+      `).run(
+        improved.title, improved.subtitle || null, improved.objective || null,
+        JSON.stringify(improved.kpis || []), JSON.stringify(improved.sections || []),
+        nextV, id
+      );
+      return nextV;
+    });
+
+    const newVersion = doIterate();
+    res.json({ report: { ...improved, currentVersion: newVersion }, version: newVersion });
+  } catch (err) {
+    console.error("[POST iterate]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /api/w/:slug/reports/:id/versions ────────────────────────────────────
+
+app.get("/api/w/:slug/reports/:id/versions", (req, res) => {
+  try {
+    const { slug, id } = req.params;
+    const ws = db.prepare("SELECT * FROM workspaces WHERE slug = ?").get(slug);
+    if (!ws) return res.status(404).json({ error: "Workspace introuvable." });
+
+    const versions = db.prepare(`
+      SELECT id, report_id, version_num, feedback, section_feedback, created_at
+      FROM report_versions WHERE report_id = ? ORDER BY version_num ASC
+    `).all(id);
+
+    res.json({ versions: versions.map(v => ({
+      ...v,
+      sectionFeedback: v.section_feedback ? JSON.parse(v.section_feedback) : [],
+    })) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /api/w/:slug/reports/:id/versions/:vnum ───────────────────────────────
+
+app.get("/api/w/:slug/reports/:id/versions/:vnum", (req, res) => {
+  try {
+    const { slug, id, vnum } = req.params;
+    const ws = db.prepare("SELECT * FROM workspaces WHERE slug = ?").get(slug);
+    if (!ws) return res.status(404).json({ error: "Workspace introuvable." });
+
+    const version = db.prepare(
+      "SELECT * FROM report_versions WHERE report_id = ? AND version_num = ?"
+    ).get(id, parseInt(vnum));
+    if (!version) return res.status(404).json({ error: "Version introuvable." });
+
+    res.json({ version: { ...version, snapshot: JSON.parse(version.snapshot) } });
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
