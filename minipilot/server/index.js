@@ -2949,7 +2949,11 @@ RÈGLE CRITIQUE SUR LE FORMAT DE SORTIE :
 app.get("/api/w/:slug/reports", (req, res) => {
   try {
     const rows = db.prepare("SELECT * FROM reports WHERE workspace_id = ? AND (trashed IS NULL OR trashed = 0) ORDER BY created_at DESC").all(req.workspace.id);
-    const reports = rows.map(deserializeReport);
+    const reports = rows.map(r => {
+      const report = deserializeReport(r);
+      enrichReportSources(report, req.workspace.id);
+      return report;
+    });
     res.json({ shared: reports.filter(r => r.shared), private: reports.filter(r => !r.shared) });
   } catch (err) {
     console.error("[GET /api/w/:slug/reports]", err);
