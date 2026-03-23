@@ -4,7 +4,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, AreaChart, Area, ComposedChart,
 } from "recharts";
-import { ChevronDown, ChevronUp, Table, BarChart3, MessageSquare, Database } from "lucide-react";
+import { ChevronDown, ChevronUp, Table as TableIcon, BarChart3, MessageSquare, Database, Download, Eye } from "lucide-react";
 import { useChartTheme } from "../data/theme";
 
 function formatValue(val, fmt) {
@@ -117,33 +117,138 @@ function DataTable({ section }) {
   );
 }
 
-function DataSourcesBadge({ sources }) {
-  const [open, setOpen] = useState(false);
-  if (!sources?.length) return null;
+/**
+ * Extract flat rows from any section shape (data[], data_sets[], etc.)
+ */
+function extractSectionRows(section) {
+  if (Array.isArray(section.data) && section.data.length > 0) return section.data;
+  if (Array.isArray(section.data_sets)) {
+    // Flatten pie_multi data_sets into rows with a "dataset" column
+    const rows = [];
+    for (const ds of section.data_sets) {
+      if (Array.isArray(ds.data)) {
+        for (const row of ds.data) {
+          rows.push({ _groupe: ds.label, ...row });
+        }
+      }
+    }
+    return rows;
+  }
+  return [];
+}
+
+function exportCSV(rows, filename) {
+  if (!rows.length) return;
+  const keys = Object.keys(rows[0]);
+  const lines = [keys.join(";")];
+  for (const row of rows) {
+    lines.push(keys.map(k => {
+      const v = row[k];
+      if (v === null || v === undefined) return "";
+      const s = String(v);
+      return s.includes(";") || s.includes('"') || s.includes("\n") ? `"${s.replace(/"/g, '""')}"` : s;
+    }).join(";"));
+  }
+  const blob = new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportJSON(rows, filename) {
+  const blob = new Blob([JSON.stringify(rows, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+const pillBtn = {
+  display: "inline-flex", alignItems: "center", gap: 5,
+  background: "none", border: "1px solid var(--mp-border)",
+  borderRadius: 9999, padding: "3px 10px", cursor: "pointer",
+  fontFamily: "var(--font-data)", fontSize: 10,
+  textTransform: "uppercase", letterSpacing: "0.1em",
+  color: "var(--mp-text-muted)",
+  transition: "color 150ms ease, border-color 150ms ease",
+};
+
+function DataInspector({ section }) {
+  const [sourcesOpen, setSourcesOpen] = useState(false);
+  const [dataOpen, setDataOpen] = useState(false);
+
+  const sources = section.data_sources;
+  const rows = extractSectionRows(section);
+  const hasSources = sources?.length > 0;
+  const hasData = rows.length > 0;
+
+  if (!hasSources && !hasData) return null;
+
+  const columns = hasData ? Object.keys(rows[0]) : [];
+  const slug = (section.title || "data").replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
+
+  const hoverOn = e => { e.currentTarget.style.color = "var(--mp-text)"; e.currentTarget.style.borderColor = "var(--mp-text-muted)"; };
+  const hoverOff = e => { e.currentTarget.style.color = "var(--mp-text-muted)"; e.currentTarget.style.borderColor = "var(--mp-border)"; };
 
   return (
-    <div style={{ marginBottom: 12 }}>
-      <button
-        onClick={() => setOpen(!open)}
-        style={{
-          display: "inline-flex", alignItems: "center", gap: 5,
-          background: "none", border: "1px solid var(--mp-border)",
-          borderRadius: 9999, padding: "3px 10px", cursor: "pointer",
-          fontFamily: "var(--font-data)", fontSize: 10,
-          textTransform: "uppercase", letterSpacing: "0.1em",
-          color: "var(--mp-text-muted)",
-          transition: "color 150ms ease, border-color 150ms ease",
-        }}
-        onMouseEnter={e => { e.currentTarget.style.color = "var(--mp-text)"; e.currentTarget.style.borderColor = "var(--mp-text-muted)"; }}
-        onMouseLeave={e => { e.currentTarget.style.color = "var(--mp-text-muted)"; e.currentTarget.style.borderColor = "var(--mp-border)"; }}
-        aria-expanded={open}
-        aria-label="Afficher les sources de données"
-      >
-        <Database size={10} />
-        {sources.length} source{sources.length > 1 ? "s" : ""}
-        {open ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
-      </button>
-      {open && (
+    <div style={{ marginBottom: 14 }}>
+      {/* Pill buttons row */}
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+        {hasSources && (
+          <button
+            onClick={() => setSourcesOpen(!sourcesOpen)}
+            style={pillBtn}
+            onMouseEnter={hoverOn} onMouseLeave={hoverOff}
+            aria-expanded={sourcesOpen}
+            aria-label="Afficher les sources de données"
+          >
+            <Database size={10} />
+            {sources.length} source{sources.length > 1 ? "s" : ""}
+            {sourcesOpen ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
+          </button>
+        )}
+        {hasData && (
+          <>
+            <button
+              onClick={() => setDataOpen(!dataOpen)}
+              style={pillBtn}
+              onMouseEnter={hoverOn} onMouseLeave={hoverOff}
+              aria-expanded={dataOpen}
+              aria-label="Voir les données utilisées"
+            >
+              <Eye size={10} />
+              {rows.length} ligne{rows.length > 1 ? "s" : ""}
+              {dataOpen ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
+            </button>
+            <button
+              onClick={() => exportCSV(rows, `${slug}.csv`)}
+              style={pillBtn}
+              onMouseEnter={hoverOn} onMouseLeave={hoverOff}
+              aria-label="Exporter en CSV"
+            >
+              <Download size={10} />
+              CSV
+            </button>
+            <button
+              onClick={() => exportJSON(rows, `${slug}.json`)}
+              style={pillBtn}
+              onMouseEnter={hoverOn} onMouseLeave={hoverOff}
+              aria-label="Exporter en JSON"
+            >
+              <Download size={10} />
+              JSON
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* Sources panel */}
+      {sourcesOpen && hasSources && (
         <div style={{
           marginTop: 8, padding: "10px 14px",
           background: "var(--mp-bg)",
@@ -151,42 +256,79 @@ function DataSourcesBadge({ sources }) {
           border: "1px solid var(--mp-border)",
         }}>
           {sources.map((src, i) => (
-            <div key={i} style={{
-              marginBottom: i < sources.length - 1 ? 10 : 0,
-            }}>
-              <div style={{
-                display: "flex", alignItems: "center", gap: 6,
-                marginBottom: 4,
-              }}>
-                <span style={{
-                  width: 6, height: 6, borderRadius: "50%",
-                  background: "var(--mp-accent)", flexShrink: 0,
-                }} />
-                <span style={{
-                  fontFamily: "var(--font-data)", fontSize: 11,
-                  fontWeight: 500, color: "var(--mp-text)",
-                }}>{src.table}</span>
-                <span style={{
-                  fontFamily: "var(--font-data)", fontSize: 10,
-                  color: "var(--mp-text-muted)",
-                }}>({src.rowCount} lignes)</span>
+            <div key={i} style={{ marginBottom: i < sources.length - 1 ? 10 : 0 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--mp-accent)", flexShrink: 0 }} />
+                <span style={{ fontFamily: "var(--font-data)", fontSize: 11, fontWeight: 500, color: "var(--mp-text)" }}>{src.table}</span>
+                <span style={{ fontFamily: "var(--font-data)", fontSize: 10, color: "var(--mp-text-muted)" }}>({src.rowCount} lignes)</span>
               </div>
-              <div style={{
-                display: "flex", flexWrap: "wrap", gap: 4,
-                paddingLeft: 12,
-              }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 4, paddingLeft: 12 }}>
                 {src.columns.map((col, ci) => (
                   <span key={ci} style={{
                     fontFamily: "var(--font-data)", fontSize: 10,
-                    background: "var(--mp-bg-elevated)",
-                    border: "1px solid var(--mp-border)",
-                    borderRadius: 4, padding: "1px 6px",
-                    color: "var(--mp-text-secondary)",
+                    background: "var(--mp-bg-elevated)", border: "1px solid var(--mp-border)",
+                    borderRadius: 4, padding: "1px 6px", color: "var(--mp-text-secondary)",
                   }}>{col}</span>
                 ))}
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Raw data table */}
+      {dataOpen && hasData && (
+        <div style={{
+          marginTop: 8, borderRadius: "var(--radius-sm)",
+          border: "1px solid var(--mp-border)", overflow: "auto",
+          maxHeight: 320,
+        }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11 }}>
+            <thead>
+              <tr style={{ background: "var(--mp-bg)", position: "sticky", top: 0, zIndex: 1 }}>
+                <th style={{
+                  padding: "7px 10px", textAlign: "center",
+                  fontFamily: "var(--font-data)", fontWeight: 500, fontSize: 9,
+                  textTransform: "uppercase", letterSpacing: "0.1em",
+                  color: "var(--mp-text-muted)", borderBottom: "1px solid var(--mp-border)",
+                  whiteSpace: "nowrap",
+                }}>#</th>
+                {columns.map(col => (
+                  <th key={col} style={{
+                    padding: "7px 10px",
+                    textAlign: typeof rows[0][col] === "number" ? "right" : "left",
+                    fontFamily: "var(--font-data)", fontWeight: 500, fontSize: 9,
+                    textTransform: "uppercase", letterSpacing: "0.1em",
+                    color: "var(--mp-text-muted)", borderBottom: "1px solid var(--mp-border)",
+                    whiteSpace: "nowrap",
+                  }}>{col}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row, ri) => (
+                <tr key={ri} style={{
+                  background: ri % 2 === 0 ? "transparent" : "var(--mp-bg)",
+                  borderBottom: "1px solid var(--mp-border-subtle)",
+                }}>
+                  <td style={{
+                    padding: "5px 10px", textAlign: "center",
+                    fontFamily: "var(--font-data)", fontSize: 9,
+                    color: "var(--mp-text-muted)", fontVariantNumeric: "tabular-nums",
+                  }}>{ri + 1}</td>
+                  {columns.map(col => (
+                    <td key={col} style={{
+                      padding: "5px 10px",
+                      textAlign: typeof row[col] === "number" ? "right" : "left",
+                      fontFamily: "var(--font-data)", fontSize: 11,
+                      color: "var(--mp-text)", fontVariantNumeric: "tabular-nums",
+                      whiteSpace: "nowrap",
+                    }}>{row[col] === null || row[col] === undefined ? "—" : String(row[col])}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
@@ -394,7 +536,7 @@ export default function RenderSection({ section, feedbackMode, sectionFeedback, 
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            {section.type === "table" ? <Table size={14} color="var(--mp-text-muted)" /> : <BarChart3 size={14} color="var(--mp-text-muted)" />}
+            {section.type === "table" ? <TableIcon size={14} color="var(--mp-text-muted)" /> : <BarChart3 size={14} color="var(--mp-text-muted)" />}
             <span style={{ fontSize: 14, fontWeight: 500 }}>{section.title}</span>
           </div>
           {expanded ? <ChevronUp size={16} color="var(--mp-text-muted)" /> : <ChevronDown size={16} color="var(--mp-text-muted)" />}
@@ -432,7 +574,7 @@ export default function RenderSection({ section, feedbackMode, sectionFeedback, 
               <p style={{ fontSize: 12, color: "var(--mp-text-secondary)", lineHeight: 1.7, margin: 0 }}>{section.insight}</p>
             </div>
           )}
-          <DataSourcesBadge sources={section.data_sources} />
+          <DataInspector section={section} />
           {renderChart()}
           {feedbackMode && annotating && (
             <textarea
