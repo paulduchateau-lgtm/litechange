@@ -244,7 +244,7 @@ export default function ChatInterface({ onOpenReport }) {
                 fontSize: 13, color: "var(--mp-text-muted)",
                 maxWidth: 480, fontFamily: "var(--font-body)", lineHeight: 1.6,
               }}>
-                Decrivez votre besoin metier et Minipilot genere un rapport complet avec KPIs, graphiques et tableaux.
+                Decrivez votre besoin metier et Pilot genere un rapport complet avec KPIs, graphiques et tableaux.
               </p>
             </div>
 
@@ -363,7 +363,7 @@ export default function ChatInterface({ onOpenReport }) {
               color: "var(--mp-text)", fontSize: 14,
               fontFamily: "var(--font-body)", padding: "8px 0",
             }}
-            aria-label="Message pour Minipilot"
+            aria-label="Message pour Pilot"
           />
           <button
             onClick={() => handleSend()}

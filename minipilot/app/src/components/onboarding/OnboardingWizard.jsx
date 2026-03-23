@@ -196,13 +196,17 @@ export default function OnboardingWizard({ onComplete }) {
 
         {/* Header */}
         <div className="animate-fade-up" style={{ marginBottom: 8, textAlign: "center" }}>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 4, justifyContent: "center", marginBottom: 8 }}>
-            <span style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 600 }}>mini</span>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 8 }}>
             <span style={{
               fontFamily: "var(--font-display)", fontSize: 22,
               fontWeight: 300, fontStyle: "italic",
               color: "var(--mp-accent-text)",
-            }}>pilot</span>
+            }}>Pilot</span>
+            <span style={{
+              fontFamily: "var(--font-data)", fontSize: 8,
+              textTransform: "uppercase", letterSpacing: "0.12em",
+              color: "var(--mp-text-muted)", marginTop: 2,
+            }}>by Lite Ops</span>
           </div>
           <h1 style={{
             fontFamily: "var(--font-display)", fontSize: 28,

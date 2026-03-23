@@ -483,27 +483,29 @@ export default function HomePage() {
         background: "var(--mp-bg-elevated)",
       }}>
         {/* Logo */}
-        <div style={{ display: "flex", alignItems: "baseline", gap: 2 }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 2 }}>
+            <span style={{
+              fontFamily: "var(--font-display)",
+              fontSize: 22, fontWeight: 300, fontStyle: "italic",
+              color: "var(--mp-accent-text)",
+            }}>
+              Pilot
+            </span>
+            <span style={{
+              fontFamily: "var(--font-data)", fontSize: 9,
+              textTransform: "uppercase", letterSpacing: "0.1em",
+              color: "var(--mp-text-muted)", marginLeft: 10,
+            }}>
+              v0.4
+            </span>
+          </div>
           <span style={{
-            fontFamily: "var(--font-display)",
-            fontSize: 22, fontWeight: 600,
-            color: "var(--mp-text)",
+            fontFamily: "var(--font-data)", fontSize: 8,
+            textTransform: "uppercase", letterSpacing: "0.12em",
+            color: "var(--mp-text-muted)", marginTop: 1,
           }}>
-            mini
-          </span>
-          <span style={{
-            fontFamily: "var(--font-display)",
-            fontSize: 22, fontWeight: 300, fontStyle: "italic",
-            color: "var(--mp-accent-text)",
-          }}>
-            pilot
-          </span>
-          <span style={{
-            fontFamily: "var(--font-data)", fontSize: 9,
-            textTransform: "uppercase", letterSpacing: "0.1em",
-            color: "var(--mp-text-muted)", marginLeft: 10,
-          }}>
-            v0.3
+            by Lite Ops
           </span>
         </div>
 
@@ -664,7 +666,7 @@ export default function HomePage() {
           textTransform: "uppercase", letterSpacing: "0.1em",
           color: "var(--mp-text-muted)",
         }}>
-          LiteChange · Minipilot
+          Lite Ops · Pilot
         </span>
       </footer>
     </div>

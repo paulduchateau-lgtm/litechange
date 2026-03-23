@@ -121,6 +121,7 @@ db.exec(`
     slug TEXT UNIQUE NOT NULL,
     name TEXT NOT NULL,
     industry TEXT,
+    product_type TEXT DEFAULT 'pilot',
     file_count INTEGER DEFAULT 0,
     row_count INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -171,6 +172,7 @@ try { db.exec("ALTER TABLE reports ADD COLUMN workspace_id TEXT REFERENCES works
 try { db.exec("ALTER TABLE usage_logs ADD COLUMN workspace_id TEXT"); } catch {}
 try { db.exec("ALTER TABLE reports ADD COLUMN trashed INTEGER DEFAULT 0"); } catch {}
 try { db.exec("ALTER TABLE reports ADD COLUMN current_version INTEGER DEFAULT 1"); } catch {}
+try { db.exec("ALTER TABLE workspaces ADD COLUMN product_type TEXT DEFAULT 'pilot'"); } catch {}
 
 // Backfill: if data exists but no workspaces, create a default workspace
 {
@@ -914,13 +916,13 @@ app.get("/api/workspaces", (req, res) => {
 
 app.post("/api/workspaces", (req, res) => {
   try {
-    const { name, industry } = req.body;
+    const { name, industry, product_type } = req.body;
     if (!name || !name.trim()) return res.status(400).json({ error: "Nom requis" });
     const id = uuidv4();
     const slug = generateSlug(name.trim());
-    db.prepare("INSERT INTO workspaces (id, slug, name, industry) VALUES (?, ?, ?, ?)")
-      .run(id, slug, name.trim(), industry || null);
-    res.status(201).json({ id, slug, name: name.trim() });
+    db.prepare("INSERT INTO workspaces (id, slug, name, industry, product_type) VALUES (?, ?, ?, ?, ?)")
+      .run(id, slug, name.trim(), industry || null, product_type || "pilot");
+    res.status(201).json({ id, slug, name: name.trim(), product_type: product_type || "pilot" });
   } catch (err) {
     console.error("[POST /api/workspaces]", err);
     res.status(500).json({ error: err.message });

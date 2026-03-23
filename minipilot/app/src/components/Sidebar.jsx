@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { X, LayoutDashboard, MessageSquare, Settings, Trash2, Menu, Sun, Moon, RotateCcw, Wifi, WifiOff, Loader2, ArrowLeft, FilePenLine, Clock } from "lucide-react";
 import { useTheme } from "../data/theme";
 import { getAiMode, setAiMode } from "../lib/api";
+import { useWorkspace } from "../lib/WorkspaceContext";
+import { getProductLabel } from "../lib/productLabel";
 
 const NAV_ITEMS = [
   { id: "dashboard", Icon: LayoutDashboard, label: "Tableau de bord" },
@@ -105,6 +107,8 @@ function AiModeToggle() {
 export default function Sidebar({ page, setPage, sidebarOpen, setSidebarOpen, onStartOnboarding, slug }) {
   const { theme, toggle } = useTheme();
   const navigate = useNavigate();
+  const { workspace } = useWorkspace();
+  const { prefix, full } = getProductLabel(workspace);
   if (!sidebarOpen) {
     return (
       <button
@@ -142,14 +146,24 @@ export default function Sidebar({ page, setPage, sidebarOpen, setSidebarOpen, on
         >
           <X size={18} color="var(--mp-text-muted)" />
         </button>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 2 }}>
-          <span style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 600 }}>mini</span>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
+            {prefix && <span style={{
+              fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 600,
+              color: "var(--mp-text)",
+            }}>{prefix}</span>}
+            <span style={{
+              fontFamily: "var(--font-display)", fontSize: 20,
+              fontWeight: 300, fontStyle: "italic",
+              color: "var(--mp-accent-text)",
+            }}>Pilot</span>
+            <span className="data-label" style={{ marginLeft: 6, fontSize: 9 }}>v0.4</span>
+          </div>
           <span style={{
-            fontFamily: "var(--font-display)", fontSize: 20,
-            fontWeight: 300, fontStyle: "italic",
-            color: "var(--mp-accent-text)",
-          }}>pilot</span>
-          <span className="data-label" style={{ marginLeft: 8, fontSize: 9 }}>v0.3</span>
+            fontFamily: "var(--font-data)", fontSize: 8,
+            textTransform: "uppercase", letterSpacing: "0.12em",
+            color: "var(--mp-text-muted)", marginTop: 2,
+          }}>by Lite Ops</span>
         </div>
       </div>
 

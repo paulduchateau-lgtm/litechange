@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Routes, Route, useParams, useNavigate, useLocation } from "react-router-dom";
-import { WorkspaceProvider, useWorkspaceApi } from "../lib/WorkspaceContext";
+import { WorkspaceProvider, useWorkspaceApi, useWorkspace } from "../lib/WorkspaceContext";
+import { getProductName } from "../lib/productLabel";
 import Sidebar from "./Sidebar";
 import DashboardPage from "./DashboardPage";
 import ChatPage from "./ChatPage";
@@ -18,6 +19,7 @@ function WorkspaceContent() {
   const navigate = useNavigate();
   const location = useLocation();
   const api = useWorkspaceApi();
+  const { workspace } = useWorkspace();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [onboarded, setOnboarded] = useState(null);
@@ -25,6 +27,14 @@ function WorkspaceContent() {
   const [reports, setReports] = useState({ shared: [], private: [] });
   const [reportsLoading, setReportsLoading] = useState(true);
   const [viewingReport, setViewingReport] = useState(null);
+
+  // Dynamic browser tab title based on workspace product type
+  useEffect(() => {
+    if (workspace) {
+      const label = getProductName(workspace);
+      document.title = `${label} — ${workspace.name}`;
+    }
+  }, [workspace]);
 
   useEffect(() => {
     checkOnboarding();

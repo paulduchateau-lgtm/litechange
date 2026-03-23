@@ -393,7 +393,7 @@ export default function ChatPage({ reports, toggleStar, openReport, onReportGene
                   Quelle analyse souhaitez-vous ?
                 </p>
                 <p style={{ fontSize: 13, color: "var(--mp-text-muted)", maxWidth: 480 }}>
-                  Decrivez votre besoin et Minipilot genere un rapport complet avec KPIs, graphiques et tableaux.
+                  Decrivez votre besoin et Pilot genere un rapport complet avec KPIs, graphiques et tableaux.
                 </p>
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", maxWidth: 640 }}>
