@@ -788,6 +788,71 @@ function buildColumnStats(workspaceId = null) {
 }
 
 /**
+ * Enrich a section with data_sources metadata by matching its data keys
+ * against known table columns. Returns the section with data_sources added.
+ */
+function enrichSectionSources(section, dataSummary) {
+  if (!section || section.data_sources) return section; // already has sources
+
+  const dataKeys = new Set();
+
+  // Collect all keys from section data
+  if (Array.isArray(section.data)) {
+    for (const row of section.data) {
+      if (row && typeof row === "object") Object.keys(row).forEach(k => dataKeys.add(k));
+    }
+  }
+  // Also from pie_multi data_sets
+  if (Array.isArray(section.data_sets)) {
+    for (const ds of section.data_sets) {
+      if (Array.isArray(ds.data)) {
+        for (const row of ds.data) {
+          if (row && typeof row === "object") Object.keys(row).forEach(k => dataKeys.add(k));
+        }
+      }
+    }
+  }
+  // Also from config keys
+  const cfg = section.config || {};
+  if (cfg.xKey) dataKeys.add(cfg.xKey);
+  if (Array.isArray(cfg.yKeys)) cfg.yKeys.forEach(k => dataKeys.add(k));
+  if (Array.isArray(cfg.bars)) cfg.bars.forEach(b => dataKeys.add(b.key));
+  if (cfg.line?.key) dataKeys.add(cfg.line.key);
+
+  if (dataKeys.size === 0) return section;
+
+  // Match against known tables/columns
+  const sources = [];
+  for (const table of dataSummary) {
+    const tableColNames = table.columns.map(c => c.name);
+    const matched = tableColNames.filter(cn => dataKeys.has(cn));
+    if (matched.length > 0) {
+      sources.push({
+        table: table.name,
+        columns: matched,
+        rowCount: table.rowCount,
+      });
+    }
+  }
+
+  if (sources.length > 0) {
+    section.data_sources = sources;
+  }
+
+  return section;
+}
+
+/**
+ * Enrich all sections in a report with data_sources metadata.
+ */
+function enrichReportSources(report, workspaceId) {
+  if (!report?.sections?.length) return report;
+  const dataSummary = buildDataSummary(1, workspaceId);
+  report.sections = report.sections.map(s => enrichSectionSources(s, dataSummary));
+  return report;
+}
+
+/**
  * Build a comprehensive data context for AI chat — includes full distributions,
  * cross-tabulations, and all data rows (up to a reasonable limit).
  */
@@ -2581,6 +2646,9 @@ Réponds UNIQUEMENT avec un JSON valide, sans markdown :
     const report = JSON.parse(jsonText);
     report.id = report.id || `report_${uuidv4()}`;
 
+    // Enrich sections with data source metadata
+    enrichReportSources(report, workspaceId);
+
     db.prepare(`
       INSERT INTO reports (id, title, subtitle, objective, color, icon, kpis, sections, shared, starred, source, workspace_id)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 0, 'ai', ?)
@@ -2918,7 +2986,10 @@ app.get("/api/w/:slug/reports/:id", (req, res) => {
     const { id } = req.params;
     const row = db.prepare("SELECT * FROM reports WHERE id = ? AND workspace_id = ?").get(id, req.workspace.id);
     if (!row) return res.status(404).json({ error: "Rapport introuvable." });
-    res.json(deserializeReport(row));
+    const report = deserializeReport(row);
+    // Enrich sections with data source metadata (for older reports)
+    enrichReportSources(report, req.workspace.id);
+    res.json(report);
   } catch (err) {
     console.error("[GET /api/w/:slug/reports/:id]", err);
     res.status(500).json({ error: err.message });
@@ -3053,6 +3124,9 @@ Génère une version améliorée. Conserve la structure JSON exacte. Réponds UN
     if (!extracted) return res.status(422).json({ error: "L'IA n'a pas retourné un JSON valide.", raw: aiResult.text });
 
     const improved = { ...extracted.json, id: currentReport.id };
+
+    // Enrich sections with data source metadata
+    enrichReportSources(improved, ws.id);
 
     const doIterate = db.transaction(() => {
       const maxV = db.prepare(
@@ -3526,6 +3600,9 @@ Réponds UNIQUEMENT avec un JSON valide (sans markdown, sans \`\`\`) représenta
         delete section.data;
       }
     }
+
+    // Enrich with data source metadata
+    enrichSectionSources(section, dataSummary);
 
     res.json({ section });
   } catch (err) {

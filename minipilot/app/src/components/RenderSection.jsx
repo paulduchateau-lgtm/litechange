@@ -4,7 +4,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, AreaChart, Area, ComposedChart,
 } from "recharts";
-import { ChevronDown, ChevronUp, Table, BarChart3, MessageSquare } from "lucide-react";
+import { ChevronDown, ChevronUp, Table, BarChart3, MessageSquare, Database } from "lucide-react";
 import { useChartTheme } from "../data/theme";
 
 function formatValue(val, fmt) {
@@ -113,6 +113,82 @@ function DataTable({ section }) {
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+function DataSourcesBadge({ sources }) {
+  const [open, setOpen] = useState(false);
+  if (!sources?.length) return null;
+
+  return (
+    <div style={{ marginBottom: 12 }}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{
+          display: "inline-flex", alignItems: "center", gap: 5,
+          background: "none", border: "1px solid var(--mp-border)",
+          borderRadius: 9999, padding: "3px 10px", cursor: "pointer",
+          fontFamily: "var(--font-data)", fontSize: 10,
+          textTransform: "uppercase", letterSpacing: "0.1em",
+          color: "var(--mp-text-muted)",
+          transition: "color 150ms ease, border-color 150ms ease",
+        }}
+        onMouseEnter={e => { e.currentTarget.style.color = "var(--mp-text)"; e.currentTarget.style.borderColor = "var(--mp-text-muted)"; }}
+        onMouseLeave={e => { e.currentTarget.style.color = "var(--mp-text-muted)"; e.currentTarget.style.borderColor = "var(--mp-border)"; }}
+        aria-expanded={open}
+        aria-label="Afficher les sources de données"
+      >
+        <Database size={10} />
+        {sources.length} source{sources.length > 1 ? "s" : ""}
+        {open ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
+      </button>
+      {open && (
+        <div style={{
+          marginTop: 8, padding: "10px 14px",
+          background: "var(--mp-bg)",
+          borderRadius: "var(--radius-sm)",
+          border: "1px solid var(--mp-border)",
+        }}>
+          {sources.map((src, i) => (
+            <div key={i} style={{
+              marginBottom: i < sources.length - 1 ? 10 : 0,
+            }}>
+              <div style={{
+                display: "flex", alignItems: "center", gap: 6,
+                marginBottom: 4,
+              }}>
+                <span style={{
+                  width: 6, height: 6, borderRadius: "50%",
+                  background: "var(--mp-accent)", flexShrink: 0,
+                }} />
+                <span style={{
+                  fontFamily: "var(--font-data)", fontSize: 11,
+                  fontWeight: 500, color: "var(--mp-text)",
+                }}>{src.table}</span>
+                <span style={{
+                  fontFamily: "var(--font-data)", fontSize: 10,
+                  color: "var(--mp-text-muted)",
+                }}>({src.rowCount} lignes)</span>
+              </div>
+              <div style={{
+                display: "flex", flexWrap: "wrap", gap: 4,
+                paddingLeft: 12,
+              }}>
+                {src.columns.map((col, ci) => (
+                  <span key={ci} style={{
+                    fontFamily: "var(--font-data)", fontSize: 10,
+                    background: "var(--mp-bg-elevated)",
+                    border: "1px solid var(--mp-border)",
+                    borderRadius: 4, padding: "1px 6px",
+                    color: "var(--mp-text-secondary)",
+                  }}>{col}</span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -356,6 +432,7 @@ export default function RenderSection({ section, feedbackMode, sectionFeedback, 
               <p style={{ fontSize: 12, color: "var(--mp-text-secondary)", lineHeight: 1.7, margin: 0 }}>{section.insight}</p>
             </div>
           )}
+          <DataSourcesBadge sources={section.data_sources} />
           {renderChart()}
           {feedbackMode && annotating && (
             <textarea
