@@ -145,6 +145,7 @@ export default function ReportEditorPage({ api, slug, reportId }) {
         {/* Section palette */}
         <EditorSectionPalette
           onAdd={section => setSections(prev => [...prev, section])}
+          api={api}
         />
 
         {/* DnD section list */}

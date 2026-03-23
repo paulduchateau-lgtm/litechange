@@ -3410,6 +3410,128 @@ app.get("/api/w/:slug/files", (req, res) => {
   }
 });
 
+// ── DATA CONCEPTS (for WYSIWYG editor AI assist) ─────────────────────────────
+
+app.get("/api/w/:slug/data/concepts", (req, res) => {
+  try {
+    const workspaceId = req.workspace.id;
+    const colStats = buildColumnStats(workspaceId);
+    const concepts = [];
+    for (const [table, cols] of Object.entries(colStats)) {
+      for (const [colName, stats] of Object.entries(cols)) {
+        concepts.push({
+          table,
+          column: colName,
+          type: stats.type,
+          ...(stats.type === "number"
+            ? { min: stats.min, max: stats.max, avg: stats.avg }
+            : { uniqueCount: stats.uniqueCount, sampleValues: stats.sampleValues }),
+        });
+      }
+    }
+    res.json({ concepts });
+  } catch (err) {
+    console.error("[GET /api/w/:slug/data/concepts]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── AI GENERATE SINGLE SECTION (for WYSIWYG editor) ──────────────────────────
+
+app.post("/api/w/:slug/ai/generate-section", async (req, res) => {
+  try {
+    const { type, description } = req.body;
+    if (!type || !description) return res.status(400).json({ error: "type et description requis." });
+
+    const workspaceId = req.workspace.id;
+    const context = db.prepare("SELECT * FROM project_context WHERE workspace_id = ?").get(workspaceId);
+    const dataSummary = buildDataSummary(30, workspaceId);
+    const colStats = buildColumnStats(workspaceId);
+
+    const contextText = context
+      ? `Projet : ${context.project_name || "—"}\nSecteur : ${context.industry || "—"}\nObjectifs : ${context.objectives || "—"}`
+      : "Aucun contexte renseigné.";
+
+    const dataText = dataSummary.map(t =>
+      `Table "${t.name}" (${t.rowCount} lignes) :\nColonnes : ${t.columns.map(c => `${c.name}(${c.type})`).join(", ")}\nExemples :\n${t.sample.map(r => JSON.stringify(r)).join("\n")}`
+    ).join("\n\n");
+
+    const statsText = Object.entries(colStats).map(([table, cols]) => {
+      const entries = Object.entries(cols).map(([col, s]) =>
+        s.type === "number" ? `  ${col}: min=${s.min}, max=${s.max}, avg=${s.avg}` : `  ${col}: ${s.uniqueCount} valeurs uniques (ex: ${(s.sampleValues || []).join(", ")})`
+      ).join("\n");
+      return `Table "${table}" :\n${entries}`;
+    }).join("\n\n");
+
+    const chartRules = {
+      bar: 'config: { xKey: "...", yKeys: ["..."], colors: ["..."] }, data: [{xKey: "label", yKey1: number, ...}, ...]',
+      pie: 'type DOIT être "pie_multi". config: {}, data_sets: [{label: "...", data: [{name: "...", value: number}, ...]}]',
+      table: 'config: { columns: [{key: "...", label: "...", align: "left|center|right", fmt: "number|d"}] }, data: [{col1: val1, col2: val2, ...}, ...]',
+      area_multi: 'config: { xKey: "...", yKeys: ["..."], colors: ["..."], names: ["..."] }, data: [{xKey: "label", yKey1: number, ...}, ...]',
+      composed: 'config: { xKey: "...", bars: [{key: "...", color: "...", name: "..."}], line: {key: "...", color: "...", name: "..."} }, data: [{xKey: "label", barKey: number, lineKey: number, ...}, ...]',
+      grouped_bar: 'config: { xKey: "...", yKeys: ["..."], colors: ["..."], names: ["..."] }, data: [{xKey: "label", yKey1: number, yKey2: number, ...}, ...]',
+      text: 'type: "text", html: "<p>...</p>" (rich HTML content)',
+    };
+    const typeRule = chartRules[type] || chartRules.bar;
+    const actualType = type === "pie" ? "pie_multi" : type;
+
+    const prompt = `Tu es un expert data pour l'analyse de données organisationnelles.
+
+CONTEXTE :
+${contextText}
+
+DONNÉES DISPONIBLES :
+${dataText}
+
+STATISTIQUES :
+${statsText}
+
+L'utilisateur construit un rapport dans un éditeur visuel. Il veut ajouter UNE section de type "${type}".
+Sa demande en langage naturel : "${description}"
+
+RÈGLES :
+- Utilise UNIQUEMENT des données réelles issues des tableaux ci-dessus. Ne fabrique AUCUNE donnée.
+- Agrège, filtre ou regroupe les données selon la demande.
+- Couleurs disponibles : "#4A90B8" (signal), "#C45A32" (warm), "#D4A03A" (warning), "#3A8A4A" (success), "#B0D838" (accent)
+- Format de la section de type "${type}" : ${typeRule}
+
+Réponds UNIQUEMENT avec un JSON valide (sans markdown, sans \`\`\`) représentant UNE SEULE section :
+{
+  "title": "Titre descriptif",
+  "type": "${actualType}",
+  "insight": "Observation analytique clé basée sur les données",
+  "data": [...],
+  "config": { ... }
+}`;
+
+    const isLocal = aiMode === "local";
+    const aiResult = await aiComplete("", prompt, { maxTokens: isLocal ? 2000 : 4000 });
+    const rawText = aiResult.text.trim();
+    const jsonText = rawText.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
+    const section = JSON.parse(jsonText);
+
+    // Ensure type is correct
+    if (type === "pie" && section.type !== "pie_multi") section.type = "pie_multi";
+    if (!section.type) section.type = actualType;
+
+    // Normalize pie_multi: AI may put data_sets content in "data" instead of "data_sets"
+    if (section.type === "pie_multi" && !section.data_sets) {
+      if (Array.isArray(section.data) && section.data.length && section.data[0]?.data) {
+        section.data_sets = section.data;
+        delete section.data;
+      } else if (Array.isArray(section.data) && section.data.length && section.data[0]?.name !== undefined) {
+        section.data_sets = [{ label: section.title || "Répartition", data: section.data }];
+        delete section.data;
+      }
+    }
+
+    res.json({ section });
+  } catch (err) {
+    console.error("[POST /api/w/:slug/ai/generate-section]", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ─── 404 handler ──────────────────────────────────────────────────────────────
 
 app.use((req, res) => {

@@ -317,5 +317,19 @@ export function createWorkspaceApi(slug) {
       const res = await fetch(`${BASE}/files`);
       return res.json();
     },
+
+    getDataConcepts: async () => {
+      const res = await fetch(`${BASE}/data/concepts`);
+      return res.json();
+    },
+
+    generateSection: async (type, description) => {
+      const res = await fetch(`${BASE}/ai/generate-section`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, description }),
+      });
+      return res.json();
+    },
   };
 }

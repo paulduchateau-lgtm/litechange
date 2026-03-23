@@ -150,11 +150,11 @@ export default function ReportCompareView({ report, compareVersionNum, api, onEx
           display: "grid",
           gridTemplateColumns: isNarrow ? "1fr" : "1fr 1fr",
           gap: 32,
-          overflowX: isNarrow ? "auto" : "visible",
+          overflow: "hidden",
         }}
       >
         {/* Left pane — past version */}
-        <div>
+        <div style={{ minWidth: 0, overflow: "hidden" }}>
           <div style={colHeaderStyle}>
             <span>VERSION {compareVersionNum}</span>
             <span>{pastVersion ? formatDate(pastVersion.created_at) : ""}</span>
@@ -178,7 +178,7 @@ export default function ReportCompareView({ report, compareVersionNum, api, onEx
         </div>
 
         {/* Right pane — current version */}
-        <div>
+        <div style={{ minWidth: 0, overflow: "hidden" }}>
           <div style={colHeaderStyle}>
             <span>VERSION {report.currentVersion || 1}</span>
             <span style={{ color: "var(--mp-accent)" }}>(actuelle)</span>
