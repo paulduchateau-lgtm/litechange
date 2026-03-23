@@ -25,14 +25,15 @@ Transform raw organizational data into actionable change management reports — 
 - ✓ Dual AI mode (premium: Claude/Mistral, local: Ollama/Ministral 3B)
 - ✓ Chat session persistence with history
 - ✓ Iterative feedback loop with version history and side-by-side comparison — Phase 1 v1.1
+- ✓ WYSIWYG report editor with chart palette, rich text, drag & drop — Phase 2 v1.1
+- ✓ Import existing Excel/Word reports with AI-powered recreation — Phase 3 v1.1
+- ✓ Scheduled report generation with data source refresh — Phase 4 v1.1
 
 ### Active
 
-<!-- Current scope — Milestone v1.1 features. -->
+<!-- Current scope — no active features, v1.1 complete. -->
 
-- [ ] Upload existing Excel/Word report to auto-create similar report
-- [ ] WYSIWYG report builder with classic charts and free text
-- [ ] Scheduled report generation with data source refresh
+(none — v1.1 milestone complete)
 
 ### Out of Scope
 

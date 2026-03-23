@@ -6,18 +6,18 @@ Milestone v1.1 transforms Minipilot from an AI-only report generator into a full
 
 ## Milestones
 
-- 🚧 **v1.1 Report Studio** — Phases 1-4 (in progress)
+- ✅ **v1.1 Report Studio** — Phases 1-4 (complete)
 
 ## Phases
 
-### 🚧 v1.1 Report Studio (In Progress)
+### ✅ v1.1 Report Studio (Complete)
 
 **Milestone Goal:** Users can import existing reports, edit them visually, refine them iteratively, and schedule automated generation with data refresh.
 
 - [x] **Phase 1: Feedback Itératif** — Users can annotate and iterate on AI-generated reports with version history (completed 2026-03-22)
 - [x] **Phase 2: Editeur WYSIWYG** — Users can build and edit reports manually with a visual chart and text palette (completed 2026-03-22)
 - [x] **Phase 3: Import de Rapports** — Users can upload existing Excel/Word reports and recreate them with their workspace data (completed 2026-03-22)
-- [ ] **Phase 4: Scheduling** — Users can schedule automated report generation with data source refresh
+- [x] **Phase 4: Scheduling** — Users can schedule automated report generation with data source refresh (completed 2026-03-22)
 
 ## Phase Details
 
@@ -79,8 +79,8 @@ Plans:
   5. User can select an existing report template or describe a new one as the basis for scheduled generation
 **Plans**: 2 plans
 Plans:
-- [ ] 04-01-PLAN.md — Backend: install node-cron, create scheduler.js module, DB migration (schedules + schedule_runs), API endpoints, startup rehydration
-- [ ] 04-02-PLAN.md — Frontend: API client methods, 4-step scheduling wizard, schedule list page, sidebar nav, routing
+- [x] 04-01-PLAN.md — Backend: install node-cron, create scheduler.js module, DB migration (schedules + schedule_runs), API endpoints, startup rehydration
+- [x] 04-02-PLAN.md — Frontend: API client methods, 4-step scheduling wizard, schedule list page, sidebar nav, routing
 
 ## Progress
 
@@ -91,7 +91,7 @@ Plans:
 | 1. Feedback Itératif | 3/3 | Complete   | 2026-03-22 | - |
 | 2. Editeur WYSIWYG | 2/2 | Complete   | 2026-03-22 | - |
 | 3. Import de Rapports | 2/2 | Complete   | 2026-03-22 | - |
-| 4. Scheduling | v1.1 | 0/2 | Not started | - |
+| 4. Scheduling | 2/2 | Complete   | 2026-03-22 | - |
 
 ---
 *Roadmap created: 2026-03-22*
