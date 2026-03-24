@@ -1,0 +1,2230 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Design System -- Showcase</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ═══════════════════════════════════════════════
+       SIDEBAR NAVIGATION
+       ═══════════════════════════════════════════════ */
+
+    .showcase-sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 100vh;
+      overflow-y: auto;
+      background: #1C1D1A;
+      padding: var(--liteops-space-6) var(--liteops-space-5);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .showcase-sidebar__logo {
+      font-family: var(--liteops-font-display);
+      font-size: 20px;
+      margin-bottom: var(--liteops-space-8);
+      padding-bottom: var(--liteops-space-4);
+      border-bottom: 1px solid rgba(232, 230, 225, 0.08);
+    }
+
+    .showcase-sidebar__logo-lite {
+      font-style: italic;
+      font-weight: 300;
+      color: #C8FF3C;
+    }
+
+    .showcase-sidebar__logo-ops {
+      font-weight: 400;
+      color: #E8E6E1;
+    }
+
+    .showcase-sidebar__group-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #6B7260;
+      margin-top: var(--liteops-space-5);
+      margin-bottom: var(--liteops-space-2);
+      padding-left: var(--liteops-space-3);
+    }
+
+    .showcase-sidebar__link {
+      display: block;
+      font-family: var(--liteops-font-body);
+      font-size: 12px;
+      color: #C0BEB8;
+      text-decoration: none;
+      padding: 5px var(--liteops-space-3);
+      border-radius: var(--liteops-radius-sm);
+      transition: background var(--liteops-duration-normal), color var(--liteops-duration-normal);
+    }
+
+    .showcase-sidebar__link:hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: #ECEAE4;
+    }
+
+    .showcase-sidebar__link--external {
+      color: #8A8880;
+      font-size: 11px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       MAIN CONTENT
+       ═══════════════════════════════════════════════ */
+
+    .showcase-main {
+      margin-left: 220px;
+      flex: 1;
+      padding: var(--liteops-space-10) var(--liteops-space-8);
+      max-width: 1140px;
+    }
+
+    .showcase-header {
+      margin-bottom: var(--liteops-space-16);
+    }
+
+    .showcase-header__title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .showcase-header__subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+      margin-bottom: var(--liteops-space-6);
+    }
+
+    .showcase-header__stats {
+      display: flex;
+      gap: var(--liteops-space-3);
+      flex-wrap: wrap;
+    }
+
+    .showcase-stat {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: var(--liteops-radius-pill);
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      background: var(--liteops-accent-subtle);
+      color: var(--liteops-accent-text);
+    }
+
+    .showcase-stat::before {
+      content: '';
+      display: block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--liteops-accent-text);
+      flex-shrink: 0;
+    }
+
+    /* ── Category Heading ── */
+    .category-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-top: var(--liteops-space-16);
+      margin-bottom: var(--liteops-space-8);
+      padding-bottom: var(--liteops-space-3);
+      border-bottom: 2px solid var(--liteops-border-primary);
+    }
+
+    /* ── Showcase Card ── */
+    .sc-card {
+      margin-bottom: var(--liteops-space-12);
+      scroll-margin-top: var(--liteops-space-6);
+    }
+
+    .sc-card__name {
+      font-family: var(--liteops-font-body);
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-1);
+    }
+
+    .sc-card__desc {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-secondary);
+      margin-bottom: var(--liteops-space-5);
+    }
+
+    .sc-card__preview {
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-secondary);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-6);
+      margin-bottom: var(--liteops-space-4);
+    }
+
+    .sc-card__preview--dark {
+      background: #1C1D1A;
+      border-color: rgba(232, 230, 225, 0.08);
+    }
+
+    .sc-card__preview--scaled {
+      overflow: hidden;
+      position: relative;
+    }
+
+    .sc-card__code {
+      background: #1C1D1A;
+      border-radius: var(--liteops-radius-sm);
+      padding: var(--liteops-space-4) var(--liteops-space-5);
+      overflow-x: auto;
+    }
+
+    .sc-card__code pre {
+      margin: 0;
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      line-height: 1.6;
+      color: #C0BEB8;
+      white-space: pre;
+    }
+
+    .sc-card__divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-top: var(--liteops-space-8);
+    }
+
+    /* ── Flex row helper ── */
+    .flex-row { display: flex; flex-wrap: wrap; gap: var(--liteops-space-4); align-items: center; }
+    .flex-col { display: flex; flex-direction: column; gap: var(--liteops-space-4); }
+
+    /* ═══════════════════════════════════════════════
+       BUTTON COMPONENT
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--liteops-space-2);
+      font-family: var(--liteops-font-body);
+      font-weight: 500;
+      border: 1px solid transparent;
+      border-radius: var(--liteops-radius-md);
+      cursor: pointer;
+      transition: all var(--liteops-duration-normal) ease;
+      text-decoration: none;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .liteops-Button--sm { padding: 6px 16px; font-size: 13px; }
+    .liteops-Button--md { padding: 10px 24px; font-size: 15px; }
+    .liteops-Button--lg { padding: 14px 32px; font-size: 17px; }
+
+    .liteops-Button--primary {
+      background: var(--liteops-interactive-primary);
+      color: var(--liteops-interactive-primary-text);
+    }
+    .liteops-Button--primary:hover { background: var(--liteops-interactive-primary-hover); }
+
+    .liteops-Button--secondary {
+      background: var(--liteops-interactive-secondary);
+      border-color: var(--liteops-border-primary);
+      color: var(--liteops-interactive-secondary-text);
+    }
+    .liteops-Button--secondary:hover { background: var(--liteops-interactive-secondary-hover); }
+
+    .liteops-Button--ghost {
+      background: transparent;
+      color: var(--liteops-text-primary);
+    }
+    .liteops-Button--ghost:hover { background: var(--liteops-interactive-ghost-hover); }
+
+    .liteops-Button--danger {
+      background: var(--liteops-status-error);
+      color: var(--liteops-white);
+    }
+    .liteops-Button--danger:hover { opacity: 0.9; }
+
+    .liteops-Button:focus-visible {
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+
+    .liteops-Button[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* ═══════════════════════════════════════════════
+       BADGE COMPONENT
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: var(--liteops-radius-pill);
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      line-height: 1.4;
+    }
+
+    .liteops-Badge::before {
+      content: '';
+      display: block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .liteops-Badge--success { background: var(--liteops-status-success-bg); color: var(--liteops-status-success); }
+    .liteops-Badge--success::before { background: var(--liteops-status-success); }
+    .liteops-Badge--warning { background: var(--liteops-status-warning-bg); color: var(--liteops-status-warning); }
+    .liteops-Badge--warning::before { background: var(--liteops-status-warning); }
+    .liteops-Badge--error { background: var(--liteops-status-error-bg); color: var(--liteops-status-error); }
+    .liteops-Badge--error::before { background: var(--liteops-status-error); }
+    .liteops-Badge--info { background: var(--liteops-status-info-bg); color: var(--liteops-status-info); }
+    .liteops-Badge--info::before { background: var(--liteops-status-info); }
+    .liteops-Badge--accent { background: var(--liteops-accent-subtle); color: var(--liteops-accent-text); }
+    .liteops-Badge--accent::before { background: var(--liteops-accent-text); }
+
+    /* ═══════════════════════════════════════════════
+       INPUT COMPONENT
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Input { display: flex; flex-direction: column; }
+
+    .liteops-Input__label {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--liteops-text-primary);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .liteops-Input__field {
+      width: 100%;
+      padding: 10px 14px;
+      font-family: var(--liteops-font-body);
+      font-size: 15px;
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-primary);
+      border-radius: var(--liteops-radius-sm);
+      color: var(--liteops-text-primary);
+      transition: border-color var(--liteops-duration-normal) ease;
+      outline: none;
+    }
+
+    .liteops-Input__field::placeholder { color: var(--liteops-text-tertiary); }
+
+    .liteops-Input__field:focus-visible {
+      border-color: var(--liteops-border-focus);
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+
+    .liteops-Input__helper {
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+      color: var(--liteops-text-tertiary);
+      margin-top: 4px;
+    }
+
+    .liteops-Input__error {
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+      color: var(--liteops-status-error);
+      margin-top: 4px;
+      display: none;
+    }
+
+    .liteops-Input.is-error .liteops-Input__field { border-color: var(--liteops-border-error); }
+    .liteops-Input.is-error .liteops-Input__error { display: block; }
+    .liteops-Input.is-error .liteops-Input__helper { display: none; }
+    .liteops-Input.is-disabled .liteops-Input__field { opacity: 0.5; cursor: not-allowed; background: var(--liteops-surface-tertiary); }
+    .liteops-Input.is-disabled .liteops-Input__label { color: var(--liteops-text-disabled); }
+
+    /* ═══════════════════════════════════════════════
+       SELECT COMPONENT
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Select { display: flex; flex-direction: column; }
+
+    .liteops-Select__label {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--liteops-text-primary);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .liteops-Select__field {
+      width: 100%;
+      padding: 10px 14px;
+      font-family: var(--liteops-font-body);
+      font-size: 15px;
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-primary);
+      border-radius: var(--liteops-radius-sm);
+      color: var(--liteops-text-primary);
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%238C8A82' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .liteops-Select__field:focus-visible {
+      border-color: var(--liteops-border-focus);
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       TEXTAREA COMPONENT
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Textarea { display: flex; flex-direction: column; }
+
+    .liteops-Textarea__label {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--liteops-text-primary);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .liteops-Textarea__field {
+      width: 100%;
+      padding: 10px 14px;
+      font-family: var(--liteops-font-body);
+      font-size: 15px;
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-primary);
+      border-radius: var(--liteops-radius-sm);
+      color: var(--liteops-text-primary);
+      outline: none;
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .liteops-Textarea__field::placeholder { color: var(--liteops-text-tertiary); }
+
+    .liteops-Textarea__field:focus-visible {
+      border-color: var(--liteops-border-focus);
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       SWITCH COMPONENT
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Switch {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--liteops-space-3);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .liteops-Switch__input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+
+    .liteops-Switch__track {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      border-radius: var(--liteops-radius-pill);
+      background: var(--liteops-border-primary);
+      transition: background var(--liteops-duration-normal) ease;
+      flex-shrink: 0;
+    }
+
+    .liteops-Switch__thumb {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--liteops-white);
+      box-shadow: var(--liteops-shadow-sm);
+      transition: transform var(--liteops-duration-normal) ease;
+    }
+
+    .liteops-Switch__input:checked ~ .liteops-Switch__track {
+      background: var(--liteops-accent-primary);
+    }
+
+    .liteops-Switch__input:checked ~ .liteops-Switch__track .liteops-Switch__thumb {
+      transform: translateX(20px);
+    }
+
+    .liteops-Switch__label {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-primary);
+    }
+
+    /* ═══════════════════════════════════════════════
+       CHECKBOX / RADIO COMPONENT
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Checkbox,
+    .liteops-Radio {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--liteops-space-3);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .liteops-Checkbox__input,
+    .liteops-Radio__input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+
+    .liteops-Checkbox__indicator {
+      position: relative;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--liteops-border-primary);
+      border-radius: var(--liteops-radius-sm);
+      background: var(--liteops-surface-secondary);
+      transition: all var(--liteops-duration-normal) ease;
+      flex-shrink: 0;
+    }
+
+    .liteops-Checkbox__indicator::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 5px;
+      width: 5px;
+      height: 9px;
+      border: solid var(--liteops-white);
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+      opacity: 0;
+      transition: opacity var(--liteops-duration-normal) ease;
+    }
+
+    .liteops-Checkbox__input:checked ~ .liteops-Checkbox__indicator {
+      background: var(--liteops-accent-primary);
+      border-color: var(--liteops-accent-primary);
+    }
+
+    .liteops-Checkbox__input:checked ~ .liteops-Checkbox__indicator::after {
+      opacity: 1;
+    }
+
+    .liteops-Radio__indicator {
+      position: relative;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--liteops-border-primary);
+      border-radius: 50%;
+      background: var(--liteops-surface-secondary);
+      transition: all var(--liteops-duration-normal) ease;
+      flex-shrink: 0;
+    }
+
+    .liteops-Radio__indicator::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--liteops-white);
+      opacity: 0;
+      transition: opacity var(--liteops-duration-normal) ease;
+    }
+
+    .liteops-Radio__input:checked ~ .liteops-Radio__indicator {
+      background: var(--liteops-accent-primary);
+      border-color: var(--liteops-accent-primary);
+    }
+
+    .liteops-Radio__input:checked ~ .liteops-Radio__indicator::after {
+      opacity: 1;
+    }
+
+    .liteops-Checkbox__label,
+    .liteops-Radio__label {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-primary);
+    }
+
+    /* ═══════════════════════════════════════════════
+       SLIDER COMPONENT
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Slider { display: flex; flex-direction: column; gap: var(--liteops-space-2); }
+
+    .liteops-Slider__header { display: flex; justify-content: space-between; align-items: center; }
+
+    .liteops-Slider__label {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-Slider__value {
+      font-family: var(--liteops-font-mono);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-Slider__input {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--liteops-surface-tertiary);
+      outline: none;
+    }
+
+    .liteops-Slider__input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--liteops-accent-primary);
+      cursor: pointer;
+      box-shadow: var(--liteops-shadow-sm);
+    }
+
+    /* ═══════════════════════════════════════════════
+       GLASS PANEL COMPONENT
+       ═══════════════════════════════════════════════ */
+
+    .liteops-GlassPanel {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-6);
+      box-shadow: var(--liteops-shadow-md);
+    }
+
+    [data-theme="light"] .liteops-GlassPanel {
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    /* ═══════════════════════════════════════════════
+       SKELETON COMPONENT
+       ═══════════════════════════════════════════════ */
+
+    @keyframes liteops-skeleton-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .liteops-Skeleton {
+      background: var(--liteops-surface-tertiary);
+      border-radius: var(--liteops-radius-sm);
+      animation: liteops-skeleton-pulse 1.8s var(--liteops-easing-in-out) infinite;
+    }
+
+    .liteops-Skeleton--rect { width: 100%; height: 120px; border-radius: var(--liteops-radius-md); }
+    .liteops-Skeleton--circle { width: 48px; height: 48px; border-radius: 50%; }
+    .liteops-Skeleton--text { width: 100%; height: 14px; border-radius: 4px; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .liteops-Skeleton { animation: none; }
+    }
+
+    /* ═══════════════════════════════════════════════
+       KPI CARD MOLECULE
+       ═══════════════════════════════════════════════ */
+
+    .liteops-KpiCard {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background: var(--liteops-surface-elevated);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-5) var(--liteops-space-6);
+      box-shadow: var(--liteops-shadow-sm);
+      border: 1px solid var(--liteops-border-secondary);
+    }
+
+    .liteops-KpiCard__label {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .liteops-KpiCard__value {
+      font-family: var(--liteops-font-body);
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--liteops-text-primary);
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .liteops-KpiCard__trend {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      margin-top: var(--liteops-space-1);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .liteops-KpiCard__trend--up { color: var(--liteops-status-success); }
+    .liteops-KpiCard__trend--down { color: var(--liteops-status-error); }
+
+    /* ═══════════════════════════════════════════════
+       ALERT MOLECULE
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Alert {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--liteops-space-3);
+      padding: var(--liteops-space-4) var(--liteops-space-5);
+      border-radius: var(--liteops-radius-sm);
+      border-left: 3px solid;
+    }
+
+    .liteops-Alert__icon { flex-shrink: 0; width: 18px; height: 18px; margin-top: 1px; }
+
+    .liteops-Alert__content { display: flex; flex-direction: column; gap: 2px; }
+
+    .liteops-Alert__title {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-Alert__description {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-secondary);
+    }
+
+    .liteops-Alert--success { background: var(--liteops-status-success-bg); border-left-color: var(--liteops-status-success); }
+    .liteops-Alert--success .liteops-Alert__icon { color: var(--liteops-status-success); }
+    .liteops-Alert--warning { background: var(--liteops-status-warning-bg); border-left-color: var(--liteops-status-warning); }
+    .liteops-Alert--warning .liteops-Alert__icon { color: var(--liteops-status-warning); }
+    .liteops-Alert--error { background: var(--liteops-status-error-bg); border-left-color: var(--liteops-status-error); }
+    .liteops-Alert--error .liteops-Alert__icon { color: var(--liteops-status-error); }
+    .liteops-Alert--info { background: var(--liteops-status-info-bg); border-left-color: var(--liteops-status-info); }
+    .liteops-Alert--info .liteops-Alert__icon { color: var(--liteops-status-info); }
+
+    /* ═══════════════════════════════════════════════
+       FORM GROUP MOLECULE
+       ═══════════════════════════════════════════════ */
+
+    .liteops-FormGroup { display: flex; flex-direction: column; gap: var(--liteops-space-1); }
+
+    .liteops-FormGroup__label {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--liteops-text-primary);
+      margin-bottom: 2px;
+    }
+
+    .liteops-FormGroup__helper {
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+      color: var(--liteops-text-tertiary);
+      margin-top: 2px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       NAV ITEM MOLECULE
+       ═══════════════════════════════════════════════ */
+
+    .liteops-NavItem {
+      display: flex;
+      align-items: center;
+      gap: var(--liteops-space-3);
+      padding: 8px var(--liteops-space-3);
+      border-radius: var(--liteops-radius-sm);
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+      color: #C0BEB8;
+      text-decoration: none;
+      transition: background var(--liteops-duration-normal), color var(--liteops-duration-normal);
+      cursor: pointer;
+    }
+
+    .liteops-NavItem:hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: #ECEAE4;
+    }
+
+    .liteops-NavItem.is-active {
+      background: rgba(176, 216, 56, 0.05);
+      color: #B0D838;
+    }
+
+    .liteops-NavItem__icon { width: 15px; height: 15px; flex-shrink: 0; }
+
+    /* ═══════════════════════════════════════════════
+       BREADCRUMB MOLECULE
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Breadcrumb { font-family: var(--liteops-font-body); font-size: 13px; }
+
+    .liteops-Breadcrumb__list {
+      display: flex;
+      align-items: center;
+      gap: var(--liteops-space-2);
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .liteops-Breadcrumb__item { display: flex; align-items: center; gap: var(--liteops-space-2); }
+    .liteops-Breadcrumb__link { color: var(--liteops-text-tertiary); text-decoration: none; }
+    .liteops-Breadcrumb__link:hover { color: var(--liteops-text-primary); }
+    .liteops-Breadcrumb__current { color: var(--liteops-text-primary); font-weight: 500; }
+    .liteops-Breadcrumb__separator { color: var(--liteops-text-tertiary); font-size: 11px; }
+
+    /* ═══════════════════════════════════════════════
+       TAB / PILL MOLECULE
+       ═══════════════════════════════════════════════ */
+
+    .liteops-PillTabs { display: flex; gap: var(--liteops-space-1); padding: 3px; background: var(--liteops-surface-tertiary); border-radius: var(--liteops-radius-md); }
+
+    .liteops-PillTabs__tab {
+      padding: var(--liteops-space-2) var(--liteops-space-4);
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--liteops-text-secondary);
+      background: transparent;
+      border: none;
+      border-radius: var(--liteops-radius-sm);
+      cursor: pointer;
+      transition: all var(--liteops-duration-normal);
+    }
+
+    .liteops-PillTabs__tab.is-active {
+      background: var(--liteops-surface-secondary);
+      color: var(--liteops-text-primary);
+      box-shadow: var(--liteops-shadow-sm);
+    }
+
+    /* ═══════════════════════════════════════════════
+       PROGRESS BAR MOLECULE
+       ═══════════════════════════════════════════════ */
+
+    .liteops-ProgressBar { width: 100%; }
+    .liteops-ProgressBar__header { display: flex; justify-content: space-between; margin-bottom: var(--liteops-space-2); }
+
+    .liteops-ProgressBar__label {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-ProgressBar__value {
+      font-family: var(--liteops-font-mono);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--liteops-text-secondary);
+    }
+
+    .liteops-ProgressBar__track {
+      width: 100%;
+      height: 8px;
+      background: var(--liteops-surface-tertiary);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .liteops-ProgressBar__fill {
+      height: 100%;
+      border-radius: 4px;
+      background: var(--liteops-accent-primary);
+      transition: width var(--liteops-duration-slow) ease;
+    }
+
+    /* ═══════════════════════════════════════════════
+       TOAST MOLECULE
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Toast {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--liteops-space-3);
+      padding: var(--liteops-space-4) var(--liteops-space-5);
+      background: var(--liteops-surface-elevated);
+      border: 1px solid var(--liteops-border-secondary);
+      border-radius: var(--liteops-radius-md);
+      box-shadow: var(--liteops-shadow-lg);
+      max-width: 400px;
+    }
+
+    .liteops-Toast__icon { flex-shrink: 0; width: 18px; height: 18px; margin-top: 1px; }
+    .liteops-Toast__content { flex: 1; }
+
+    .liteops-Toast__title {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-Toast__description {
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+      color: var(--liteops-text-secondary);
+      margin-top: 2px;
+    }
+
+    .liteops-Toast--success .liteops-Toast__icon { color: var(--liteops-status-success); }
+
+    /* ═══════════════════════════════════════════════
+       SIDEBAR ORGANISM (scaled preview)
+       ═══════════════════════════════════════════════ */
+
+    .sidebar-preview-wrapper {
+      width: 220px;
+      height: 400px;
+      overflow: hidden;
+      background: #1C1D1A;
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-5);
+    }
+
+    .sidebar-preview-wrapper .liteops-NavItem { font-size: 12px; padding: 6px var(--liteops-space-3); }
+
+    /* ═══════════════════════════════════════════════
+       TOPBAR ORGANISM
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--liteops-space-3) var(--liteops-space-6);
+      background: var(--liteops-surface-secondary);
+      border-bottom: 1px solid var(--liteops-border-secondary);
+    }
+
+    .liteops-Topbar__left { display: flex; align-items: center; gap: var(--liteops-space-4); }
+    .liteops-Topbar__right { display: flex; align-items: center; gap: var(--liteops-space-3); }
+
+    .liteops-Topbar__title {
+      font-family: var(--liteops-font-body);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-Topbar__avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--liteops-accent-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--liteops-accent-text);
+    }
+
+    /* ═══════════════════════════════════════════════
+       DATA TABLE ORGANISM
+       ═══════════════════════════════════════════════ */
+
+    .liteops-DataTable { width: 100%; border-collapse: collapse; }
+
+    .liteops-DataTable th {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--liteops-text-tertiary);
+      background: var(--liteops-surface-tertiary);
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      text-align: left;
+      border-bottom: 1px solid var(--liteops-border-secondary);
+    }
+
+    .liteops-DataTable td {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-primary);
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      border-bottom: 1px solid var(--liteops-border-secondary);
+    }
+
+    .liteops-DataTable tr:hover td { background: var(--liteops-accent-subtle); }
+
+    .liteops-DataTable .cell-mono {
+      font-family: var(--liteops-font-mono);
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+
+    /* ═══════════════════════════════════════════════
+       MODAL ORGANISM
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Modal {
+      position: relative;
+      background: var(--liteops-surface-elevated);
+      border: 1px solid var(--liteops-border-secondary);
+      border-radius: var(--liteops-radius-lg);
+      box-shadow: var(--liteops-shadow-2xl);
+      width: 480px;
+      max-width: 100%;
+    }
+
+    .liteops-Modal__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--liteops-space-5) var(--liteops-space-6);
+      border-bottom: 1px solid var(--liteops-border-secondary);
+    }
+
+    .liteops-Modal__title {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-Modal__close {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      border-radius: var(--liteops-radius-sm);
+      cursor: pointer;
+      color: var(--liteops-text-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .liteops-Modal__body {
+      padding: var(--liteops-space-6);
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-secondary);
+    }
+
+    .liteops-Modal__footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--liteops-space-3);
+      padding: var(--liteops-space-4) var(--liteops-space-6);
+      border-top: 1px solid var(--liteops-border-secondary);
+    }
+
+    /* ═══════════════════════════════════════════════
+       HERO SECTION ORGANISM (scaled)
+       ═══════════════════════════════════════════════ */
+
+    .hero-preview-wrapper {
+      height: 300px;
+      overflow: hidden;
+      border-radius: var(--liteops-radius-md);
+    }
+
+    .hero-preview-wrapper .liteops-Hero {
+      transform: scale(0.5);
+      transform-origin: top left;
+      width: 200%;
+      min-height: 600px;
+    }
+
+    .liteops-Hero {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+
+    .liteops-Hero--gradient-green-olive {
+      background: var(--liteops-gradient-hero-green-olive);
+    }
+
+    .liteops-Hero__container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-16) var(--liteops-space-6);
+      width: 100%;
+    }
+
+    .liteops-Hero__heading {
+      font-family: var(--liteops-font-display);
+      font-size: 48px;
+      font-weight: 700;
+      line-height: 1.1;
+      color: #E8E6E1;
+    }
+
+    .liteops-Hero__subheading {
+      font-family: var(--liteops-font-body);
+      font-size: 18px;
+      line-height: 1.6;
+      color: #C0BEB8;
+      margin-top: var(--liteops-space-4);
+      max-width: 520px;
+    }
+
+    .liteops-Hero__actions {
+      display: flex;
+      gap: var(--liteops-space-4);
+      margin-top: var(--liteops-space-6);
+    }
+
+    .liteops-Hero--gradient-green-olive .liteops-Button--primary {
+      background: var(--liteops-lite-400);
+      color: var(--liteops-olive-900);
+    }
+    .liteops-Hero--gradient-green-olive .liteops-Button--secondary {
+      border-color: rgba(232, 230, 225, 0.3);
+      color: #E8E6E1;
+      background: transparent;
+    }
+
+    /* ═══════════════════════════════════════════════
+       CONTENT SECTION ORGANISM
+       ═══════════════════════════════════════════════ */
+
+    .liteops-ContentSection { width: 100%; padding: var(--liteops-space-10) 0; }
+    .liteops-ContentSection__container { max-width: 680px; }
+
+    .liteops-ContentSection__heading {
+      font-family: var(--liteops-font-display);
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-4);
+    }
+
+    .liteops-ContentSection__text {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+      line-height: 1.7;
+      margin-bottom: var(--liteops-space-6);
+    }
+
+    /* ═══════════════════════════════════════════════
+       CARD GRID ORGANISM
+       ═══════════════════════════════════════════════ */
+
+    .liteops-CardGrid { display: grid; gap: var(--liteops-space-6); }
+    .liteops-CardGrid--cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+    .liteops-Card {
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-secondary);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-6);
+      box-shadow: var(--liteops-shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: var(--liteops-space-3);
+    }
+
+    .liteops-Card__title {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-Card__description {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ═══════════════════════════════════════════════
+       AGENT CARD ORGANISM
+       ═══════════════════════════════════════════════ */
+
+    .liteops-AgentCard {
+      background: var(--liteops-surface-elevated);
+      border: 1px solid var(--liteops-border-secondary);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-6);
+      box-shadow: var(--liteops-shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: var(--liteops-space-4);
+      width: 320px;
+    }
+
+    .liteops-AgentCard__header { display: flex; align-items: center; gap: var(--liteops-space-3); }
+
+    .liteops-AgentCard__icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--liteops-radius-sm);
+      background: var(--liteops-accent-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--liteops-accent-text);
+    }
+
+    .liteops-AgentCard__name {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-AgentCard__description {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-secondary);
+    }
+
+    .liteops-AgentCard__footer { display: flex; align-items: center; justify-content: space-between; }
+
+    /* ═══════════════════════════════════════════════
+       PIPELINE VIZ ORGANISM
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Pipeline { display: inline-flex; flex-direction: column; align-items: center; }
+    .liteops-Pipeline__track { display: flex; flex-direction: column; align-items: center; gap: 0; }
+
+    .liteops-Pipeline__node {
+      width: 280px;
+      background: var(--liteops-surface-elevated);
+      border: 1px solid var(--liteops-border-primary);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-4) var(--liteops-space-5);
+      display: flex;
+      align-items: center;
+      gap: var(--liteops-space-3);
+    }
+
+    .liteops-Pipeline__node-number {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--liteops-accent-subtle);
+      color: var(--liteops-accent-text);
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .liteops-Pipeline__node-label {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-Pipeline__connector {
+      width: 2px;
+      height: 24px;
+      background: var(--liteops-border-primary);
+    }
+
+    /* ═══════════════════════════════════════════════
+       MULTI-SELECT ORGANISM
+       ═══════════════════════════════════════════════ */
+
+    .liteops-MultiSelect {
+      display: flex;
+      flex-direction: column;
+      max-width: 360px;
+    }
+
+    .liteops-MultiSelect__label {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--liteops-text-primary);
+      margin-bottom: 6px;
+    }
+
+    .liteops-MultiSelect__control {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 8px 12px;
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-primary);
+      border-radius: var(--liteops-radius-sm);
+      min-height: 42px;
+      align-items: center;
+    }
+
+    .liteops-MultiSelect__tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      background: var(--liteops-accent-subtle);
+      border-radius: var(--liteops-radius-pill);
+      font-family: var(--liteops-font-body);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--liteops-accent-text);
+    }
+
+    .liteops-MultiSelect__tag-remove {
+      width: 14px;
+      height: 14px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: var(--liteops-accent-text);
+      opacity: 0.6;
+      font-size: 14px;
+      line-height: 1;
+      padding: 0;
+    }
+
+    .liteops-MultiSelect__placeholder {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-tertiary);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     SIDEBAR NAVIGATION
+     ═══════════════════════════════════════════════ -->
+
+<nav class="showcase-sidebar" aria-label="Component navigation">
+  <div class="showcase-sidebar__logo">
+    <span class="showcase-sidebar__logo-lite">lite</span><span class="showcase-sidebar__logo-ops">Ops</span>
+  </div>
+
+  <span class="showcase-sidebar__group-label">Atoms</span>
+  <a class="showcase-sidebar__link" href="#button">Button</a>
+  <a class="showcase-sidebar__link" href="#badge">Badge</a>
+  <a class="showcase-sidebar__link" href="#input">Input</a>
+  <a class="showcase-sidebar__link" href="#select">Select</a>
+  <a class="showcase-sidebar__link" href="#textarea">Textarea</a>
+  <a class="showcase-sidebar__link" href="#switch">Switch</a>
+  <a class="showcase-sidebar__link" href="#checkbox-radio">Checkbox / Radio</a>
+  <a class="showcase-sidebar__link" href="#slider">Slider</a>
+  <a class="showcase-sidebar__link" href="#glass-panel">Glass Panel</a>
+  <a class="showcase-sidebar__link" href="#skeleton">Skeleton</a>
+
+  <span class="showcase-sidebar__group-label">Molecules</span>
+  <a class="showcase-sidebar__link" href="#kpi-card">KPI Card</a>
+  <a class="showcase-sidebar__link" href="#alert">Alert</a>
+  <a class="showcase-sidebar__link" href="#form-group">Form Group</a>
+  <a class="showcase-sidebar__link" href="#nav-item">Nav Item</a>
+  <a class="showcase-sidebar__link" href="#breadcrumb">Breadcrumb</a>
+  <a class="showcase-sidebar__link" href="#tab-pill">Tab / Pill</a>
+  <a class="showcase-sidebar__link" href="#progress-bar">Progress Bar</a>
+  <a class="showcase-sidebar__link" href="#toast">Toast</a>
+
+  <span class="showcase-sidebar__group-label">Organisms</span>
+  <a class="showcase-sidebar__link" href="#sidebar">Sidebar</a>
+  <a class="showcase-sidebar__link" href="#topbar">Topbar</a>
+  <a class="showcase-sidebar__link" href="#data-table">Data Table</a>
+  <a class="showcase-sidebar__link" href="#modal">Modal</a>
+  <a class="showcase-sidebar__link" href="#hero-section">Hero Section</a>
+  <a class="showcase-sidebar__link" href="#content-section">Content Section</a>
+  <a class="showcase-sidebar__link" href="#card-grid">Card Grid</a>
+  <a class="showcase-sidebar__link" href="#agent-card">Agent Card</a>
+  <a class="showcase-sidebar__link" href="#pipeline-viz">Pipeline Viz</a>
+  <a class="showcase-sidebar__link" href="#multi-select">Multi-select</a>
+
+  <span class="showcase-sidebar__group-label">Pages</span>
+  <a class="showcase-sidebar__link showcase-sidebar__link--external" href="landing-mockup.html">Landing Mockup</a>
+  <a class="showcase-sidebar__link showcase-sidebar__link--external" href="dashboard-mockup.html">Dashboard Mockup</a>
+  <a class="showcase-sidebar__link showcase-sidebar__link--external" href="before-after.html">Before / After</a>
+
+  <span class="showcase-sidebar__group-label">Docs</span>
+  <a class="showcase-sidebar__link showcase-sidebar__link--external" href="typography.html">Typography</a>
+  <a class="showcase-sidebar__link showcase-sidebar__link--external" href="color-palette.html">Color Palette</a>
+  <a class="showcase-sidebar__link showcase-sidebar__link--external" href="spacing-sizing.html">Spacing & Sizing</a>
+  <a class="showcase-sidebar__link showcase-sidebar__link--external" href="accessibility-checklist.html">Accessibility</a>
+  <a class="showcase-sidebar__link showcase-sidebar__link--external" href="naming-conventions.html">Naming Conventions</a>
+  <a class="showcase-sidebar__link showcase-sidebar__link--external" href="chart-colors.html">Chart Colors</a>
+</nav>
+
+<!-- ═══════════════════════════════════════════════
+     MAIN CONTENT
+     ═══════════════════════════════════════════════ -->
+
+<main class="showcase-main">
+
+  <!-- Header -->
+  <header class="showcase-header">
+    <h1 class="showcase-header__title">LiteOps Design System</h1>
+    <p class="showcase-header__subtitle">Composants, tokens et patterns pour l'identite visuelle institutionnelle</p>
+    <div class="showcase-header__stats">
+      <span class="showcase-stat">10 atoms</span>
+      <span class="showcase-stat">8 molecules</span>
+      <span class="showcase-stat">10 organisms</span>
+      <span class="showcase-stat">3 page mockups</span>
+      <span class="showcase-stat">6 doc pages</span>
+    </div>
+  </header>
+
+
+  <!-- ═══════════════════════════════════════════════
+       ATOMS
+       ═══════════════════════════════════════════════ -->
+
+  <h2 class="category-heading">Atoms</h2>
+
+  <!-- BUTTON -->
+  <div class="sc-card" id="button">
+    <h3 class="sc-card__name">Button</h3>
+    <p class="sc-card__desc">Interactive button -- 4 variants (primary, secondary, ghost, danger), 3 sizes.</p>
+    <div class="sc-card__preview">
+      <div class="flex-row">
+        <button class="liteops-Button liteops-Button--primary liteops-Button--md">Primary</button>
+        <button class="liteops-Button liteops-Button--secondary liteops-Button--md">Secondary</button>
+        <button class="liteops-Button liteops-Button--ghost liteops-Button--md">Ghost</button>
+        <button class="liteops-Button liteops-Button--danger liteops-Button--md">Danger</button>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;button class="liteops-Button liteops-Button--primary liteops-Button--md"&gt;
+  Primary
+&lt;/button&gt;
+&lt;button class="liteops-Button liteops-Button--secondary liteops-Button--md"&gt;
+  Secondary
+&lt;/button&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- BADGE -->
+  <div class="sc-card" id="badge">
+    <h3 class="sc-card__name">Badge</h3>
+    <p class="sc-card__desc">Status badge -- 5 semantic variants with colored dot indicator.</p>
+    <div class="sc-card__preview">
+      <div class="flex-row">
+        <span class="liteops-Badge liteops-Badge--success">En cours</span>
+        <span class="liteops-Badge liteops-Badge--warning">En attente</span>
+        <span class="liteops-Badge liteops-Badge--error">Bloque</span>
+        <span class="liteops-Badge liteops-Badge--info">Information</span>
+        <span class="liteops-Badge liteops-Badge--accent">Nouveau</span>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;span class="liteops-Badge liteops-Badge--success"&gt;En cours&lt;/span&gt;
+&lt;span class="liteops-Badge liteops-Badge--warning"&gt;En attente&lt;/span&gt;
+&lt;span class="liteops-Badge liteops-Badge--error"&gt;Bloque&lt;/span&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- INPUT -->
+  <div class="sc-card" id="input">
+    <h3 class="sc-card__name">Input</h3>
+    <p class="sc-card__desc">Text input -- label, placeholder, helper text, focus ring, error and disabled states.</p>
+    <div class="sc-card__preview">
+      <div class="flex-row" style="align-items: flex-start; gap: var(--liteops-space-6);">
+        <div class="liteops-Input" style="flex: 1; min-width: 200px;">
+          <label class="liteops-Input__label">Nom de l'initiative</label>
+          <input class="liteops-Input__field" type="text" placeholder="Ex: Migration CRM 2025">
+        </div>
+        <div class="liteops-Input is-error" style="flex: 1; min-width: 200px;">
+          <label class="liteops-Input__label">Code projet</label>
+          <input class="liteops-Input__field" type="text" value="AB">
+          <span class="liteops-Input__helper">Min. 4 caracteres</span>
+          <span class="liteops-Input__error">Le code projet doit contenir au moins 4 caracteres</span>
+        </div>
+        <div class="liteops-Input is-disabled" style="flex: 1; min-width: 200px;">
+          <label class="liteops-Input__label">Identifiant</label>
+          <input class="liteops-Input__field" type="text" value="SYS-2025-0042" disabled>
+        </div>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;div class="liteops-Input"&gt;
+  &lt;label class="liteops-Input__label"&gt;Label&lt;/label&gt;
+  &lt;input class="liteops-Input__field" type="text" placeholder="..."&gt;
+&lt;/div&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- SELECT -->
+  <div class="sc-card" id="select">
+    <h3 class="sc-card__name">Select</h3>
+    <p class="sc-card__desc">Dropdown select -- custom arrow, focus ring, themed surfaces.</p>
+    <div class="sc-card__preview">
+      <div class="liteops-Select" style="max-width: 300px;">
+        <label class="liteops-Select__label">Type de changement</label>
+        <select class="liteops-Select__field">
+          <option>Transformation organisationnelle</option>
+          <option>Migration IT</option>
+          <option>Fusion / Acquisition</option>
+        </select>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;div class="liteops-Select"&gt;
+  &lt;label class="liteops-Select__label"&gt;Label&lt;/label&gt;
+  &lt;select class="liteops-Select__field"&gt;
+    &lt;option&gt;Option 1&lt;/option&gt;
+  &lt;/select&gt;
+&lt;/div&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- TEXTAREA -->
+  <div class="sc-card" id="textarea">
+    <h3 class="sc-card__name">Textarea</h3>
+    <p class="sc-card__desc">Multi-line text input -- resizable, placeholder support.</p>
+    <div class="sc-card__preview">
+      <div class="liteops-Textarea" style="max-width: 400px;">
+        <label class="liteops-Textarea__label">Description de l'initiative</label>
+        <textarea class="liteops-Textarea__field" placeholder="Decrivez les objectifs et le perimetre de l'initiative..."></textarea>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;div class="liteops-Textarea"&gt;
+  &lt;label class="liteops-Textarea__label"&gt;Label&lt;/label&gt;
+  &lt;textarea class="liteops-Textarea__field" placeholder="..."&gt;&lt;/textarea&gt;
+&lt;/div&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- SWITCH -->
+  <div class="sc-card" id="switch">
+    <h3 class="sc-card__name">Switch</h3>
+    <p class="sc-card__desc">Toggle switch -- CSS-only state via :checked pseudo-class.</p>
+    <div class="sc-card__preview">
+      <div class="flex-row" style="gap: var(--liteops-space-8);">
+        <label class="liteops-Switch">
+          <input class="liteops-Switch__input" type="checkbox">
+          <span class="liteops-Switch__track"><span class="liteops-Switch__thumb"></span></span>
+          <span class="liteops-Switch__label">Inactif</span>
+        </label>
+        <label class="liteops-Switch">
+          <input class="liteops-Switch__input" type="checkbox" checked>
+          <span class="liteops-Switch__track"><span class="liteops-Switch__thumb"></span></span>
+          <span class="liteops-Switch__label">Actif</span>
+        </label>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;label class="liteops-Switch"&gt;
+  &lt;input class="liteops-Switch__input" type="checkbox" checked&gt;
+  &lt;span class="liteops-Switch__track"&gt;&lt;span class="liteops-Switch__thumb"&gt;&lt;/span&gt;&lt;/span&gt;
+  &lt;span class="liteops-Switch__label"&gt;Actif&lt;/span&gt;
+&lt;/label&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- CHECKBOX / RADIO -->
+  <div class="sc-card" id="checkbox-radio">
+    <h3 class="sc-card__name">Checkbox / Radio</h3>
+    <p class="sc-card__desc">Form controls -- CSS-only state, custom indicators.</p>
+    <div class="sc-card__preview">
+      <div class="flex-row" style="gap: var(--liteops-space-8);">
+        <div class="flex-col">
+          <label class="liteops-Checkbox">
+            <input class="liteops-Checkbox__input" type="checkbox" checked>
+            <span class="liteops-Checkbox__indicator"></span>
+            <span class="liteops-Checkbox__label">Option selectionnee</span>
+          </label>
+          <label class="liteops-Checkbox">
+            <input class="liteops-Checkbox__input" type="checkbox">
+            <span class="liteops-Checkbox__indicator"></span>
+            <span class="liteops-Checkbox__label">Option non selectionnee</span>
+          </label>
+        </div>
+        <div class="flex-col">
+          <label class="liteops-Radio">
+            <input class="liteops-Radio__input" type="radio" name="demo-radio" checked>
+            <span class="liteops-Radio__indicator"></span>
+            <span class="liteops-Radio__label">Choix A</span>
+          </label>
+          <label class="liteops-Radio">
+            <input class="liteops-Radio__input" type="radio" name="demo-radio">
+            <span class="liteops-Radio__indicator"></span>
+            <span class="liteops-Radio__label">Choix B</span>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;label class="liteops-Checkbox"&gt;
+  &lt;input class="liteops-Checkbox__input" type="checkbox" checked&gt;
+  &lt;span class="liteops-Checkbox__indicator"&gt;&lt;/span&gt;
+  &lt;span class="liteops-Checkbox__label"&gt;Option&lt;/span&gt;
+&lt;/label&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- SLIDER -->
+  <div class="sc-card" id="slider">
+    <h3 class="sc-card__name">Slider</h3>
+    <p class="sc-card__desc">Range slider -- label, value display, themed thumb.</p>
+    <div class="sc-card__preview">
+      <div class="liteops-Slider" style="max-width: 360px;">
+        <div class="liteops-Slider__header">
+          <span class="liteops-Slider__label">Seuil de friction</span>
+          <span class="liteops-Slider__value">65%</span>
+        </div>
+        <input class="liteops-Slider__input" type="range" min="0" max="100" value="65">
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;div class="liteops-Slider"&gt;
+  &lt;div class="liteops-Slider__header"&gt;
+    &lt;span class="liteops-Slider__label"&gt;Label&lt;/span&gt;
+    &lt;span class="liteops-Slider__value"&gt;65%&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;input class="liteops-Slider__input" type="range" value="65"&gt;
+&lt;/div&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- GLASS PANEL -->
+  <div class="sc-card" id="glass-panel">
+    <h3 class="sc-card__name">Glass Panel</h3>
+    <p class="sc-card__desc">Frosted glass panel -- backdrop-filter blur, uses hardcoded rgba values (documented exception).</p>
+    <div class="sc-card__preview sc-card__preview--dark" style="background: var(--liteops-gradient-hero-green-olive); padding: var(--liteops-space-10);">
+      <div class="liteops-GlassPanel" data-theme="dark" style="width: 200px; height: 100px; display: flex; align-items: center; justify-content: center;">
+        <span style="font-family: var(--liteops-font-body); font-size: 14px; color: #E8E6E1;">Glass Panel</span>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;div class="liteops-GlassPanel"&gt;
+  Content here
+&lt;/div&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- SKELETON -->
+  <div class="sc-card" id="skeleton">
+    <h3 class="sc-card__name">Skeleton</h3>
+    <p class="sc-card__desc">Loading placeholder -- rectangle, circle, and text-line variants with pulse animation.</p>
+    <div class="sc-card__preview">
+      <div class="flex-row" style="gap: var(--liteops-space-6); align-items: flex-start;">
+        <div class="liteops-Skeleton liteops-Skeleton--rect" style="width: 160px; height: 80px;"></div>
+        <div class="liteops-Skeleton liteops-Skeleton--circle"></div>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: var(--liteops-space-2); min-width: 160px;">
+          <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 80%;"></div>
+          <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 60%;"></div>
+          <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 90%;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;div class="liteops-Skeleton liteops-Skeleton--rect"&gt;&lt;/div&gt;
+&lt;div class="liteops-Skeleton liteops-Skeleton--circle"&gt;&lt;/div&gt;
+&lt;div class="liteops-Skeleton liteops-Skeleton--text"&gt;&lt;/div&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       MOLECULES
+       ═══════════════════════════════════════════════ -->
+
+  <h2 class="category-heading">Molecules</h2>
+
+  <!-- KPI CARD -->
+  <div class="sc-card" id="kpi-card">
+    <h3 class="sc-card__name">KPI Card</h3>
+    <p class="sc-card__desc">Key performance indicator -- numeric value (DM Sans bold), trend arrow (IBM Plex Mono), label.</p>
+    <div class="sc-card__preview">
+      <div class="liteops-KpiCard" style="max-width: 280px;">
+        <span class="liteops-KpiCard__label">Taux d'adoption</span>
+        <span class="liteops-KpiCard__value">74%</span>
+        <span class="liteops-KpiCard__trend liteops-KpiCard__trend--up">&uarr; +3.2%</span>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;div class="liteops-KpiCard"&gt;
+  &lt;span class="liteops-KpiCard__label"&gt;Taux d'adoption&lt;/span&gt;
+  &lt;span class="liteops-KpiCard__value"&gt;74%&lt;/span&gt;
+  &lt;span class="liteops-KpiCard__trend liteops-KpiCard__trend--up"&gt;&amp;uarr; +3.2%&lt;/span&gt;
+&lt;/div&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- ALERT -->
+  <div class="sc-card" id="alert">
+    <h3 class="sc-card__name">Alert</h3>
+    <p class="sc-card__desc">Notification alert -- 4 semantic variants with left border, tinted background, icon.</p>
+    <div class="sc-card__preview">
+      <div class="flex-col">
+        <div class="liteops-Alert liteops-Alert--success" role="alert">
+          <svg class="liteops-Alert__icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="7.5"/><path d="M6 9.5L8 11.5L12 7"/></svg>
+          <div class="liteops-Alert__content"><span class="liteops-Alert__title">Deploiement reussi</span><span class="liteops-Alert__description">L'enquete a ete deployee aupres de 342 collaborateurs.</span></div>
+        </div>
+        <div class="liteops-Alert liteops-Alert--warning" role="alert">
+          <svg class="liteops-Alert__icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2L16.5 15H1.5L9 2Z"/><line x1="9" y1="7" x2="9" y2="10"/><circle cx="9" cy="12.5" r="0.5" fill="currentColor"/></svg>
+          <div class="liteops-Alert__content"><span class="liteops-Alert__title">Taux de reponse faible</span><span class="liteops-Alert__description">Le taux est de 23%. Seuil de representativite : 40%.</span></div>
+        </div>
+        <div class="liteops-Alert liteops-Alert--error" role="alert">
+          <svg class="liteops-Alert__icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="7.5"/><line x1="6.5" y1="6.5" x2="11.5" y2="11.5"/><line x1="11.5" y1="6.5" x2="6.5" y2="11.5"/></svg>
+          <div class="liteops-Alert__content"><span class="liteops-Alert__title">Connexion echouee</span><span class="liteops-Alert__description">Le connecteur SIRH n'a pas repondu.</span></div>
+        </div>
+        <div class="liteops-Alert liteops-Alert--info" role="alert">
+          <svg class="liteops-Alert__icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="7.5"/><line x1="9" y1="8" x2="9" y2="13"/><circle cx="9" cy="5.5" r="0.5" fill="currentColor"/></svg>
+          <div class="liteops-Alert__content"><span class="liteops-Alert__title">Nouvelle version disponible</span><span class="liteops-Alert__description">La taxonomie du changement a ete mise a jour (v2.3).</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;div class="liteops-Alert liteops-Alert--success" role="alert"&gt;
+  &lt;svg class="liteops-Alert__icon" ...&gt;&lt;/svg&gt;
+  &lt;div class="liteops-Alert__content"&gt;
+    &lt;span class="liteops-Alert__title"&gt;Title&lt;/span&gt;
+    &lt;span class="liteops-Alert__description"&gt;Description&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- FORM GROUP -->
+  <div class="sc-card" id="form-group">
+    <h3 class="sc-card__name">Form Group</h3>
+    <p class="sc-card__desc">Composed form field -- label + input + helper text in a structured layout.</p>
+    <div class="sc-card__preview">
+      <div class="liteops-FormGroup" style="max-width: 360px;">
+        <label class="liteops-FormGroup__label" for="fg-demo">Adresse email</label>
+        <input class="liteops-Input__field" id="fg-demo" type="email" placeholder="prenom.nom@organisation.fr">
+        <span class="liteops-FormGroup__helper">Utilisez votre adresse professionnelle</span>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;div class="liteops-FormGroup"&gt;
+  &lt;label class="liteops-FormGroup__label"&gt;Label&lt;/label&gt;
+  &lt;input class="liteops-Input__field" type="text" placeholder="..."&gt;
+  &lt;span class="liteops-FormGroup__helper"&gt;Helper text&lt;/span&gt;
+&lt;/div&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- NAV ITEM -->
+  <div class="sc-card" id="nav-item">
+    <h3 class="sc-card__name">Nav Item</h3>
+    <p class="sc-card__desc">Sidebar navigation item -- icon + label, active and hover states on dark background.</p>
+    <div class="sc-card__preview sc-card__preview--dark" style="width: 240px;">
+      <div class="flex-col" style="gap: var(--liteops-space-1);" data-theme="dark">
+        <a class="liteops-NavItem is-active" href="#">
+          <svg class="liteops-NavItem__icon" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="1" width="13" height="13" rx="2"/><line x1="5" y1="5" x2="10" y2="5"/><line x1="5" y1="8" x2="8" y2="8"/></svg>
+          Tableau de bord
+        </a>
+        <a class="liteops-NavItem" href="#">
+          <svg class="liteops-NavItem__icon" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="7.5" cy="7.5" r="6"/><line x1="7.5" y1="4" x2="7.5" y2="8"/><line x1="7.5" y1="10" x2="7.5" y2="10.5"/></svg>
+          Enquetes
+        </a>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;a class="liteops-NavItem is-active" href="#"&gt;
+  &lt;svg class="liteops-NavItem__icon" ...&gt;&lt;/svg&gt;
+  Tableau de bord
+&lt;/a&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- BREADCRUMB -->
+  <div class="sc-card" id="breadcrumb">
+    <h3 class="sc-card__name">Breadcrumb</h3>
+    <p class="sc-card__desc">Navigation breadcrumb -- 3-level path with separator arrows.</p>
+    <div class="sc-card__preview">
+      <nav class="liteops-Breadcrumb" aria-label="Breadcrumb">
+        <ol class="liteops-Breadcrumb__list">
+          <li class="liteops-Breadcrumb__item"><a class="liteops-Breadcrumb__link" href="#">Accueil</a><span class="liteops-Breadcrumb__separator">/</span></li>
+          <li class="liteops-Breadcrumb__item"><a class="liteops-Breadcrumb__link" href="#">Initiatives</a><span class="liteops-Breadcrumb__separator">/</span></li>
+          <li class="liteops-Breadcrumb__item"><span class="liteops-Breadcrumb__current">Migration CRM 2025</span></li>
+        </ol>
+      </nav>
+    </div>
+    <div class="sc-card__code"><pre>&lt;nav class="liteops-Breadcrumb" aria-label="Breadcrumb"&gt;
+  &lt;ol class="liteops-Breadcrumb__list"&gt;
+    &lt;li class="liteops-Breadcrumb__item"&gt;
+      &lt;a class="liteops-Breadcrumb__link" href="#"&gt;Accueil&lt;/a&gt;
+      &lt;span class="liteops-Breadcrumb__separator"&gt;/&lt;/span&gt;
+    &lt;/li&gt;
+    &lt;li class="liteops-Breadcrumb__item"&gt;
+      &lt;span class="liteops-Breadcrumb__current"&gt;Page&lt;/span&gt;
+    &lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/nav&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- TAB / PILL -->
+  <div class="sc-card" id="tab-pill">
+    <h3 class="sc-card__name">Tab / Pill</h3>
+    <p class="sc-card__desc">Pill-style tab navigation -- segmented control with active state.</p>
+    <div class="sc-card__preview">
+      <div class="liteops-PillTabs">
+        <button class="liteops-PillTabs__tab is-active">Vue d'ensemble</button>
+        <button class="liteops-PillTabs__tab">Indicateurs</button>
+        <button class="liteops-PillTabs__tab">Historique</button>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;div class="liteops-PillTabs"&gt;
+  &lt;button class="liteops-PillTabs__tab is-active"&gt;Tab 1&lt;/button&gt;
+  &lt;button class="liteops-PillTabs__tab"&gt;Tab 2&lt;/button&gt;
+  &lt;button class="liteops-PillTabs__tab"&gt;Tab 3&lt;/button&gt;
+&lt;/div&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- PROGRESS BAR -->
+  <div class="sc-card" id="progress-bar">
+    <h3 class="sc-card__name">Progress Bar</h3>
+    <p class="sc-card__desc">Linear progress indicator -- label, value, themed fill.</p>
+    <div class="sc-card__preview">
+      <div class="liteops-ProgressBar" style="max-width: 400px;">
+        <div class="liteops-ProgressBar__header">
+          <span class="liteops-ProgressBar__label">Taux de completion</span>
+          <span class="liteops-ProgressBar__value">65%</span>
+        </div>
+        <div class="liteops-ProgressBar__track">
+          <div class="liteops-ProgressBar__fill" style="width: 65%;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;div class="liteops-ProgressBar"&gt;
+  &lt;div class="liteops-ProgressBar__header"&gt;
+    &lt;span class="liteops-ProgressBar__label"&gt;Label&lt;/span&gt;
+    &lt;span class="liteops-ProgressBar__value"&gt;65%&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="liteops-ProgressBar__track"&gt;
+    &lt;div class="liteops-ProgressBar__fill" style="width: 65%;"&gt;&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- TOAST -->
+  <div class="sc-card" id="toast">
+    <h3 class="sc-card__name">Toast</h3>
+    <p class="sc-card__desc">Notification toast -- floating card with icon, title, description.</p>
+    <div class="sc-card__preview">
+      <div class="liteops-Toast liteops-Toast--success">
+        <svg class="liteops-Toast__icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="7.5"/><path d="M6 9.5L8 11.5L12 7"/></svg>
+        <div class="liteops-Toast__content">
+          <span class="liteops-Toast__title">Enquete enregistree</span>
+          <span class="liteops-Toast__description">Les modifications ont ete sauvegardees.</span>
+        </div>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;div class="liteops-Toast liteops-Toast--success"&gt;
+  &lt;svg class="liteops-Toast__icon" ...&gt;&lt;/svg&gt;
+  &lt;div class="liteops-Toast__content"&gt;
+    &lt;span class="liteops-Toast__title"&gt;Title&lt;/span&gt;
+    &lt;span class="liteops-Toast__description"&gt;Description&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       ORGANISMS
+       ═══════════════════════════════════════════════ -->
+
+  <h2 class="category-heading">Organisms</h2>
+
+  <!-- SIDEBAR -->
+  <div class="sc-card" id="sidebar">
+    <h3 class="sc-card__name">Sidebar</h3>
+    <p class="sc-card__desc">Application sidebar -- logo, grouped nav items, role-based visibility. Always dark.</p>
+    <div class="sc-card__preview sc-card__preview--scaled">
+      <div class="sidebar-preview-wrapper" data-theme="dark">
+        <div style="margin-bottom: var(--liteops-space-6);">
+          <span style="font-family: var(--liteops-font-display); font-size: 18px;"><span style="font-style: italic; font-weight: 300; color: #C8FF3C;">lite</span><span style="font-weight: 400; color: #E8E6E1;">Ops</span></span>
+        </div>
+        <span style="font-family: var(--liteops-font-mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; color: #6B7260; display: block; margin-bottom: 6px;">Observer</span>
+        <a class="liteops-NavItem is-active" href="#" style="font-size: 12px;">
+          <svg class="liteops-NavItem__icon" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="1" width="13" height="13" rx="2"/><line x1="5" y1="5" x2="10" y2="5"/><line x1="5" y1="8" x2="8" y2="8"/></svg>
+          Tableau de bord
+        </a>
+        <a class="liteops-NavItem" href="#" style="font-size: 12px;">
+          <svg class="liteops-NavItem__icon" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="7.5" cy="7.5" r="6"/><line x1="7.5" y1="4" x2="7.5" y2="8"/></svg>
+          Enquetes
+        </a>
+        <a class="liteops-NavItem" href="#" style="font-size: 12px;">
+          <svg class="liteops-NavItem__icon" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="7.5" cy="4" r="2.5"/><path d="M2 13c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/></svg>
+          Signaux
+        </a>
+        <span style="font-family: var(--liteops-font-mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; color: #6B7260; display: block; margin-top: 16px; margin-bottom: 6px;">Agir</span>
+        <a class="liteops-NavItem" href="#" style="font-size: 12px;">
+          <svg class="liteops-NavItem__icon" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M3 3h9v9H3z"/><line x1="6" y1="6" x2="9" y2="9"/></svg>
+          Plan d'action
+        </a>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;nav class="liteops-Sidebar" data-theme="dark"&gt;
+  &lt;div class="liteops-Sidebar__logo"&gt;...&lt;/div&gt;
+  &lt;span class="liteops-Sidebar__group-label"&gt;Observer&lt;/span&gt;
+  &lt;a class="liteops-NavItem is-active"&gt;Tableau de bord&lt;/a&gt;
+&lt;/nav&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- TOPBAR -->
+  <div class="sc-card" id="topbar">
+    <h3 class="sc-card__name">Topbar</h3>
+    <p class="sc-card__desc">Application top bar -- breadcrumb, page title, user avatar, actions.</p>
+    <div class="sc-card__preview" style="padding: 0; overflow: hidden; border-radius: var(--liteops-radius-md);">
+      <div class="liteops-Topbar">
+        <div class="liteops-Topbar__left">
+          <nav class="liteops-Breadcrumb" aria-label="Breadcrumb">
+            <ol class="liteops-Breadcrumb__list">
+              <li class="liteops-Breadcrumb__item"><a class="liteops-Breadcrumb__link" href="#">Observer</a><span class="liteops-Breadcrumb__separator">/</span></li>
+              <li class="liteops-Breadcrumb__item"><span class="liteops-Breadcrumb__current">Tableau de bord</span></li>
+            </ol>
+          </nav>
+        </div>
+        <div class="liteops-Topbar__right">
+          <button class="liteops-Button liteops-Button--secondary liteops-Button--sm">Exporter</button>
+          <div class="liteops-Topbar__avatar">PD</div>
+        </div>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;div class="liteops-Topbar"&gt;
+  &lt;div class="liteops-Topbar__left"&gt;
+    &lt;nav class="liteops-Breadcrumb"&gt;...&lt;/nav&gt;
+  &lt;/div&gt;
+  &lt;div class="liteops-Topbar__right"&gt;
+    &lt;button class="liteops-Button"&gt;Action&lt;/button&gt;
+    &lt;div class="liteops-Topbar__avatar"&gt;PD&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- DATA TABLE -->
+  <div class="sc-card" id="data-table">
+    <h3 class="sc-card__name">Data Table</h3>
+    <p class="sc-card__desc">Data table -- IBM Plex Mono headers, hover rows, numeric alignment, badge integration.</p>
+    <div class="sc-card__preview" style="overflow-x: auto;">
+      <table class="liteops-DataTable">
+        <thead>
+          <tr>
+            <th scope="col">Initiative</th>
+            <th scope="col">Statut</th>
+            <th scope="col">Adoption</th>
+            <th scope="col">Friction</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Migration CRM 2025</td>
+            <td><span class="liteops-Badge liteops-Badge--success">Active</span></td>
+            <td class="cell-mono">78.4%</td>
+            <td class="cell-mono">23</td>
+          </tr>
+          <tr>
+            <td>Refonte SI Paie</td>
+            <td><span class="liteops-Badge liteops-Badge--warning">En attente</span></td>
+            <td class="cell-mono">42.1%</td>
+            <td class="cell-mono">47</td>
+          </tr>
+          <tr>
+            <td>Deploiement SIRH</td>
+            <td><span class="liteops-Badge liteops-Badge--error">Bloque</span></td>
+            <td class="cell-mono">15.8%</td>
+            <td class="cell-mono">89</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="sc-card__code"><pre>&lt;table class="liteops-DataTable"&gt;
+  &lt;thead&gt;&lt;tr&gt;
+    &lt;th scope="col"&gt;Initiative&lt;/th&gt;
+    &lt;th scope="col"&gt;Statut&lt;/th&gt;
+  &lt;/tr&gt;&lt;/thead&gt;
+  &lt;tbody&gt;&lt;tr&gt;
+    &lt;td&gt;Migration CRM&lt;/td&gt;
+    &lt;td&gt;&lt;span class="liteops-Badge liteops-Badge--success"&gt;Active&lt;/span&gt;&lt;/td&gt;
+  &lt;/tr&gt;&lt;/tbody&gt;
+&lt;/table&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- MODAL -->
+  <div class="sc-card" id="modal">
+    <h3 class="sc-card__name">Modal</h3>
+    <p class="sc-card__desc">Dialog modal -- header, body, footer with actions. Static rendering (position: relative).</p>
+    <div class="sc-card__preview">
+      <div class="liteops-Modal" style="max-width: 480px;">
+        <div class="liteops-Modal__header">
+          <h3 class="liteops-Modal__title">Confirmer la suppression</h3>
+          <button class="liteops-Modal__close" aria-label="Fermer">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>
+          </button>
+        </div>
+        <div class="liteops-Modal__body">
+          Cette action est irreversible. L'initiative et toutes ses donnees associees seront supprimees definitivement.
+        </div>
+        <div class="liteops-Modal__footer">
+          <button class="liteops-Button liteops-Button--secondary liteops-Button--sm">Annuler</button>
+          <button class="liteops-Button liteops-Button--danger liteops-Button--sm">Supprimer</button>
+        </div>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;div class="liteops-Modal"&gt;
+  &lt;div class="liteops-Modal__header"&gt;
+    &lt;h3 class="liteops-Modal__title"&gt;Title&lt;/h3&gt;
+    &lt;button class="liteops-Modal__close"&gt;X&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div class="liteops-Modal__body"&gt;Content&lt;/div&gt;
+  &lt;div class="liteops-Modal__footer"&gt;...buttons...&lt;/div&gt;
+&lt;/div&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- HERO SECTION -->
+  <div class="sc-card" id="hero-section">
+    <h3 class="sc-card__name">Hero Section</h3>
+    <p class="sc-card__desc">Landing page hero -- gradient background, bold heading, CTA buttons. Gradients reserved for this organism only.</p>
+    <div class="sc-card__preview sc-card__preview--scaled" style="padding: 0;">
+      <div class="hero-preview-wrapper">
+        <section class="liteops-Hero liteops-Hero--gradient-green-olive">
+          <div class="liteops-Hero__container">
+            <h1 class="liteops-Hero__heading">Observer le changement. Eclairer les decisions.</h1>
+            <p class="liteops-Hero__subheading">LiteOps donne aux institutions les outils d'observabilite pour mesurer et piloter leurs transformations.</p>
+            <div class="liteops-Hero__actions">
+              <button class="liteops-Button liteops-Button--primary liteops-Button--lg">Demander une demo</button>
+              <button class="liteops-Button liteops-Button--secondary liteops-Button--lg">Decouvrir</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;section class="liteops-Hero liteops-Hero--gradient-green-olive"&gt;
+  &lt;div class="liteops-Hero__container"&gt;
+    &lt;h1 class="liteops-Hero__heading"&gt;Title&lt;/h1&gt;
+    &lt;p class="liteops-Hero__subheading"&gt;Subtitle&lt;/p&gt;
+    &lt;div class="liteops-Hero__actions"&gt;...buttons...&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/section&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- CONTENT SECTION -->
+  <div class="sc-card" id="content-section">
+    <h3 class="sc-card__name">Content Section</h3>
+    <p class="sc-card__desc">Editorial content block -- heading, paragraph, CTA button. Prose max-width 680px.</p>
+    <div class="sc-card__preview">
+      <div class="liteops-ContentSection" style="padding: 0;">
+        <div class="liteops-ContentSection__container">
+          <h2 class="liteops-ContentSection__heading">Fonde sur la recherche academique</h2>
+          <p class="liteops-ContentSection__text">Les indicateurs LiteOps s'appuient sur 15 ans de travaux en conduite du changement, incluant les modeles de Giraud et al. sur la mesure de l'adoption organisationnelle.</p>
+          <button class="liteops-Button liteops-Button--primary liteops-Button--md">En savoir plus</button>
+        </div>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;section class="liteops-ContentSection"&gt;
+  &lt;div class="liteops-ContentSection__container"&gt;
+    &lt;h2 class="liteops-ContentSection__heading"&gt;Heading&lt;/h2&gt;
+    &lt;p class="liteops-ContentSection__text"&gt;Body text&lt;/p&gt;
+    &lt;button class="liteops-Button"&gt;CTA&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/section&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- CARD GRID -->
+  <div class="sc-card" id="card-grid">
+    <h3 class="sc-card__name">Card Grid</h3>
+    <p class="sc-card__desc">Responsive card layout -- 1-4 column variants with hover elevation.</p>
+    <div class="sc-card__preview">
+      <div class="liteops-CardGrid liteops-CardGrid--cols-3">
+        <div class="liteops-Card">
+          <h3 class="liteops-Card__title">Diagnostic</h3>
+          <p class="liteops-Card__description">Evaluez la maturite de votre organisation face au changement.</p>
+        </div>
+        <div class="liteops-Card">
+          <h3 class="liteops-Card__title">Enquetes</h3>
+          <p class="liteops-Card__description">Deploiement d'enquetes personnalisees aupres des collaborateurs.</p>
+        </div>
+        <div class="liteops-Card">
+          <h3 class="liteops-Card__title">Observabilite</h3>
+          <p class="liteops-Card__description">Tableau de bord en temps reel des indicateurs de changement.</p>
+        </div>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;div class="liteops-CardGrid liteops-CardGrid--cols-3"&gt;
+  &lt;div class="liteops-Card"&gt;
+    &lt;h3 class="liteops-Card__title"&gt;Title&lt;/h3&gt;
+    &lt;p class="liteops-Card__description"&gt;Description&lt;/p&gt;
+  &lt;/div&gt;
+  ...
+&lt;/div&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- AGENT CARD -->
+  <div class="sc-card" id="agent-card">
+    <h3 class="sc-card__name">Agent Card</h3>
+    <p class="sc-card__desc">AI agent card -- icon, name, description, badge, action button. Composes Badge + Button atoms.</p>
+    <div class="sc-card__preview">
+      <div class="liteops-AgentCard">
+        <div class="liteops-AgentCard__header">
+          <div class="liteops-AgentCard__icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="8"/><path d="M7 8h6M7 12h4"/></svg>
+          </div>
+          <div>
+            <div class="liteops-AgentCard__name">Agent Diagnostic</div>
+          </div>
+        </div>
+        <p class="liteops-AgentCard__description">Analyse automatique de la maturite organisationnelle et generation de recommandations.</p>
+        <div class="liteops-AgentCard__footer">
+          <span class="liteops-Badge liteops-Badge--success">Actif</span>
+          <button class="liteops-Button liteops-Button--secondary liteops-Button--sm">Configurer</button>
+        </div>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;div class="liteops-AgentCard"&gt;
+  &lt;div class="liteops-AgentCard__header"&gt;
+    &lt;div class="liteops-AgentCard__icon"&gt;...&lt;/div&gt;
+    &lt;div class="liteops-AgentCard__name"&gt;Agent Name&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;p class="liteops-AgentCard__description"&gt;...&lt;/p&gt;
+  &lt;div class="liteops-AgentCard__footer"&gt;...&lt;/div&gt;
+&lt;/div&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- PIPELINE VIZ -->
+  <div class="sc-card" id="pipeline-viz">
+    <h3 class="sc-card__name">Pipeline Viz</h3>
+    <p class="sc-card__desc">Vertical pipeline visualization -- numbered steps with connectors.</p>
+    <div class="sc-card__preview">
+      <div class="liteops-Pipeline">
+        <div class="liteops-Pipeline__track">
+          <div class="liteops-Pipeline__node">
+            <span class="liteops-Pipeline__node-number">1</span>
+            <span class="liteops-Pipeline__node-label">Collecte des donnees</span>
+          </div>
+          <div class="liteops-Pipeline__connector"></div>
+          <div class="liteops-Pipeline__node">
+            <span class="liteops-Pipeline__node-number">2</span>
+            <span class="liteops-Pipeline__node-label">Analyse et scoring</span>
+          </div>
+          <div class="liteops-Pipeline__connector"></div>
+          <div class="liteops-Pipeline__node">
+            <span class="liteops-Pipeline__node-number">3</span>
+            <span class="liteops-Pipeline__node-label">Generation du rapport</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;div class="liteops-Pipeline"&gt;
+  &lt;div class="liteops-Pipeline__track"&gt;
+    &lt;div class="liteops-Pipeline__node"&gt;
+      &lt;span class="liteops-Pipeline__node-number"&gt;1&lt;/span&gt;
+      &lt;span class="liteops-Pipeline__node-label"&gt;Step&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="liteops-Pipeline__connector"&gt;&lt;/div&gt;
+    ...
+  &lt;/div&gt;
+&lt;/div&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+  <!-- MULTI-SELECT -->
+  <div class="sc-card" id="multi-select">
+    <h3 class="sc-card__name">Multi-select</h3>
+    <p class="sc-card__desc">Multi-value selector -- tag chips with remove buttons, placeholder.</p>
+    <div class="sc-card__preview">
+      <div class="liteops-MultiSelect">
+        <label class="liteops-MultiSelect__label">Equipes concernees</label>
+        <div class="liteops-MultiSelect__control">
+          <span class="liteops-MultiSelect__tag">
+            Direction RH
+            <button class="liteops-MultiSelect__tag-remove" aria-label="Retirer Direction RH">&times;</button>
+          </span>
+          <span class="liteops-MultiSelect__tag">
+            DSI
+            <button class="liteops-MultiSelect__tag-remove" aria-label="Retirer DSI">&times;</button>
+          </span>
+          <span class="liteops-MultiSelect__placeholder">Ajouter...</span>
+        </div>
+      </div>
+    </div>
+    <div class="sc-card__code"><pre>&lt;div class="liteops-MultiSelect"&gt;
+  &lt;label class="liteops-MultiSelect__label"&gt;Label&lt;/label&gt;
+  &lt;div class="liteops-MultiSelect__control"&gt;
+    &lt;span class="liteops-MultiSelect__tag"&gt;
+      Tag 1
+      &lt;button class="liteops-MultiSelect__tag-remove"&gt;&amp;times;&lt;/button&gt;
+    &lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre></div>
+    <hr class="sc-card__divider">
+  </div>
+
+</main>
+
+</body>
+</html>
