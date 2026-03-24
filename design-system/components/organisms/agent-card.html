@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Organism — Agent Card</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header { margin-bottom: var(--liteops-space-16); }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--liteops-olive-900);
+      color: var(--liteops-paper-100);
+      box-shadow: var(--liteops-shadow-md);
+      transition: background var(--liteops-duration-normal), color var(--liteops-duration-normal);
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: var(--liteops-paper-100);
+      color: var(--liteops-olive-900);
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: var(--liteops-space-16); }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    /* ── Card Grid ── */
+    .card-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--liteops-space-6);
+    }
+
+    .card-row > .liteops-AgentCard,
+    .card-row > .liteops-AgentCard--compact {
+      width: 320px;
+      flex-shrink: 0;
+    }
+
+    /* ── Dark Panel ── */
+    .dark-panel {
+      background: var(--liteops-olive-900);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-8);
+      margin-top: var(--liteops-space-4);
+    }
+
+    .dark-panel-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-paper-600);
+      margin-bottom: var(--liteops-space-4);
+      display: block;
+    }
+
+    /* ═══════════════════════════════════════════════
+       BADGE COMPONENT (composed from atom)
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: var(--liteops-radius-pill);
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      line-height: 1.4;
+    }
+
+    .liteops-Badge::before {
+      content: '';
+      display: block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .liteops-Badge--success {
+      background: var(--liteops-status-success-bg);
+      color: var(--liteops-status-success);
+    }
+    .liteops-Badge--success::before { background: var(--liteops-status-success); }
+
+    .liteops-Badge--warning {
+      background: var(--liteops-status-warning-bg);
+      color: var(--liteops-status-warning);
+    }
+    .liteops-Badge--warning::before { background: var(--liteops-status-warning); }
+
+    .liteops-Badge--error {
+      background: var(--liteops-status-error-bg);
+      color: var(--liteops-status-error);
+    }
+    .liteops-Badge--error::before { background: var(--liteops-status-error); }
+
+    .liteops-Badge--info {
+      background: var(--liteops-status-info-bg);
+      color: var(--liteops-status-info);
+    }
+    .liteops-Badge--info::before { background: var(--liteops-status-info); }
+
+    /* ═══════════════════════════════════════════════
+       BUTTON COMPONENT (composed from atom)
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--liteops-space-2);
+      font-family: var(--liteops-font-body);
+      font-weight: 500;
+      border: 1px solid transparent;
+      border-radius: var(--liteops-radius-md);
+      cursor: pointer;
+      transition: all var(--liteops-duration-normal) ease;
+      text-decoration: none;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .liteops-Button--sm { padding: 6px 16px; font-size: 13px; }
+
+    .liteops-Button--primary {
+      background: var(--liteops-interactive-primary);
+      color: var(--liteops-interactive-primary-text);
+    }
+    .liteops-Button--primary:hover {
+      background: var(--liteops-interactive-primary-hover);
+    }
+
+    .liteops-Button--ghost {
+      background: transparent;
+      color: var(--liteops-text-primary);
+    }
+    .liteops-Button--ghost:hover {
+      background: var(--liteops-interactive-ghost-hover);
+    }
+
+    .liteops-Button--danger {
+      background: var(--liteops-status-error);
+      color: var(--liteops-white);
+    }
+    .liteops-Button--danger:hover {
+      opacity: 0.9;
+    }
+
+    .liteops-Button:focus-visible {
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       AGENT CARD ORGANISM
+       ═══════════════════════════════════════════════ */
+
+    .liteops-AgentCard {
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-primary);
+      border-radius: var(--liteops-radius-md);
+      box-shadow: var(--liteops-shadow-sm);
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    .liteops-AgentCard__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--liteops-space-4) var(--liteops-space-5);
+      border-bottom: 1px solid var(--liteops-border-secondary);
+    }
+
+    .liteops-AgentCard__headerLeft {
+      display: flex;
+      align-items: center;
+      gap: var(--liteops-space-3);
+    }
+
+    .liteops-AgentCard__icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--liteops-accent-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .liteops-AgentCard__icon svg {
+      width: 16px;
+      height: 16px;
+      color: var(--liteops-accent-text);
+    }
+
+    .liteops-AgentCard__name {
+      font-family: var(--liteops-font-body);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-AgentCard__status {
+      flex-shrink: 0;
+    }
+
+    /* ── Log Preview ── */
+    .liteops-AgentCard__log {
+      padding: var(--liteops-space-4) var(--liteops-space-5);
+      max-height: 160px;
+      overflow-y: auto;
+    }
+
+    .liteops-AgentCard__logEntry {
+      display: flex;
+      flex-direction: column;
+      padding: var(--liteops-space-3) 0;
+    }
+
+    .liteops-AgentCard__logEntry:not(:last-child) {
+      border-bottom: 1px solid var(--liteops-border-secondary);
+    }
+
+    .liteops-AgentCard__logEntry:first-child {
+      padding-top: 0;
+    }
+
+    .liteops-AgentCard__logEntry:last-child {
+      padding-bottom: 0;
+    }
+
+    .liteops-AgentCard__timestamp {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--liteops-text-tertiary);
+      letter-spacing: 0.08em;
+      margin-bottom: 2px;
+    }
+
+    .liteops-AgentCard__logMessage {
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+      color: var(--liteops-text-secondary);
+      line-height: 1.4;
+    }
+
+    /* ── Actions ── */
+    .liteops-AgentCard__actions {
+      padding: var(--liteops-space-3) var(--liteops-space-5);
+      border-top: 1px solid var(--liteops-border-secondary);
+      background: var(--liteops-surface-tertiary);
+      display: flex;
+      gap: var(--liteops-space-3);
+    }
+
+    /* ── Compact Variant ── */
+    .liteops-AgentCard--compact {
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-primary);
+      border-radius: var(--liteops-radius-md);
+      box-shadow: var(--liteops-shadow-sm);
+      overflow: hidden;
+    }
+
+    .liteops-AgentCard--compact .liteops-AgentCard__header {
+      border-bottom: none;
+    }
+
+    .liteops-AgentCard--compact .liteops-AgentCard__actions {
+      border-top: 1px solid var(--liteops-border-secondary);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .liteops-AgentCard,
+      .liteops-AgentCard--compact,
+      .liteops-Button {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark Mode</button>
+
+<div class="page">
+
+  <header class="page-header">
+    <h1 class="page-title">Agent Card</h1>
+    <p class="page-subtitle">AI agent monitoring card organism -- status badge, scrollable log preview, and action buttons. Composes Badge and Button atoms. Primary context: NAMIBIA dashboards.</p>
+  </header>
+
+  <!-- ── 1. Active Agent ── -->
+  <section class="section">
+    <h2 class="section-heading">Active Agent</h2>
+    <span class="section-label">Single agent card in active state with recent logs</span>
+    <hr class="section-divider">
+
+    <div style="max-width: 360px;">
+      <div class="liteops-AgentCard" role="article" aria-label="Agent OCR">
+        <div class="liteops-AgentCard__header">
+          <div class="liteops-AgentCard__headerLeft">
+            <div class="liteops-AgentCard__icon">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="2" width="10" height="12" rx="1.5"/>
+                <circle cx="6.5" cy="6" r="1"/>
+                <circle cx="9.5" cy="6" r="1"/>
+                <path d="M6 9.5h4"/>
+              </svg>
+            </div>
+            <span class="liteops-AgentCard__name">Agent OCR</span>
+          </div>
+          <div class="liteops-AgentCard__status">
+            <span class="liteops-Badge liteops-Badge--success" aria-label="Statut: Actif">Actif</span>
+          </div>
+        </div>
+        <div class="liteops-AgentCard__log" role="log" aria-label="Journal d'activite">
+          <div class="liteops-AgentCard__logEntry">
+            <span class="liteops-AgentCard__timestamp">14:22:01</span>
+            <span class="liteops-AgentCard__logMessage">Document traite: facture_2024_03.pdf</span>
+          </div>
+          <div class="liteops-AgentCard__logEntry">
+            <span class="liteops-AgentCard__timestamp">14:22:08</span>
+            <span class="liteops-AgentCard__logMessage">Extraction terminee: 12 champs identifies</span>
+          </div>
+          <div class="liteops-AgentCard__logEntry">
+            <span class="liteops-AgentCard__timestamp">14:22:12</span>
+            <span class="liteops-AgentCard__logMessage">Envoi vers pipeline RAG</span>
+          </div>
+          <div class="liteops-AgentCard__logEntry">
+            <span class="liteops-AgentCard__timestamp">14:22:15</span>
+            <span class="liteops-AgentCard__logMessage">En attente du prochain document...</span>
+          </div>
+        </div>
+        <div class="liteops-AgentCard__actions">
+          <button class="liteops-Button liteops-Button--ghost liteops-Button--sm">Voir logs</button>
+          <button class="liteops-Button liteops-Button--primary liteops-Button--sm">Relancer</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 2. Agent States ── -->
+  <section class="section">
+    <h2 class="section-heading">Agent States</h2>
+    <span class="section-label">Active, paused, and error states side by side</span>
+    <hr class="section-divider">
+
+    <div class="card-row">
+
+      <!-- Active -->
+      <div class="liteops-AgentCard" role="article" aria-label="Agent OCR">
+        <div class="liteops-AgentCard__header">
+          <div class="liteops-AgentCard__headerLeft">
+            <div class="liteops-AgentCard__icon">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="2" width="10" height="12" rx="1.5"/>
+                <circle cx="6.5" cy="6" r="1"/>
+                <circle cx="9.5" cy="6" r="1"/>
+                <path d="M6 9.5h4"/>
+              </svg>
+            </div>
+            <span class="liteops-AgentCard__name">Agent OCR</span>
+          </div>
+          <div class="liteops-AgentCard__status">
+            <span class="liteops-Badge liteops-Badge--success" aria-label="Statut: Actif">Actif</span>
+          </div>
+        </div>
+        <div class="liteops-AgentCard__log" role="log" aria-label="Journal d'activite">
+          <div class="liteops-AgentCard__logEntry">
+            <span class="liteops-AgentCard__timestamp">14:22:01</span>
+            <span class="liteops-AgentCard__logMessage">Document traite: facture_2024_03.pdf</span>
+          </div>
+          <div class="liteops-AgentCard__logEntry">
+            <span class="liteops-AgentCard__timestamp">14:22:08</span>
+            <span class="liteops-AgentCard__logMessage">Extraction terminee: 12 champs identifies</span>
+          </div>
+          <div class="liteops-AgentCard__logEntry">
+            <span class="liteops-AgentCard__timestamp">14:22:12</span>
+            <span class="liteops-AgentCard__logMessage">Envoi vers pipeline RAG</span>
+          </div>
+        </div>
+        <div class="liteops-AgentCard__actions">
+          <button class="liteops-Button liteops-Button--ghost liteops-Button--sm">Voir logs</button>
+          <button class="liteops-Button liteops-Button--primary liteops-Button--sm">Relancer</button>
+        </div>
+      </div>
+
+      <!-- Paused -->
+      <div class="liteops-AgentCard" role="article" aria-label="Agent RAG">
+        <div class="liteops-AgentCard__header">
+          <div class="liteops-AgentCard__headerLeft">
+            <div class="liteops-AgentCard__icon">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 3h12v10H2z"/>
+                <path d="M5 7h6M5 9.5h4"/>
+              </svg>
+            </div>
+            <span class="liteops-AgentCard__name">Agent RAG</span>
+          </div>
+          <div class="liteops-AgentCard__status">
+            <span class="liteops-Badge liteops-Badge--warning" aria-label="Statut: En pause">En pause</span>
+          </div>
+        </div>
+        <div class="liteops-AgentCard__log" role="log" aria-label="Journal d'activite">
+          <div class="liteops-AgentCard__logEntry">
+            <span class="liteops-AgentCard__timestamp">14:18:42</span>
+            <span class="liteops-AgentCard__logMessage">Index mis a jour: 1,247 documents</span>
+          </div>
+          <div class="liteops-AgentCard__logEntry">
+            <span class="liteops-AgentCard__timestamp">14:18:45</span>
+            <span class="liteops-AgentCard__logMessage">Attente de nouveaux documents</span>
+          </div>
+        </div>
+        <div class="liteops-AgentCard__actions">
+          <button class="liteops-Button liteops-Button--ghost liteops-Button--sm">Voir logs</button>
+          <button class="liteops-Button liteops-Button--primary liteops-Button--sm">Relancer</button>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <div class="liteops-AgentCard" role="article" aria-label="Agent Analyse">
+        <div class="liteops-AgentCard__header">
+          <div class="liteops-AgentCard__headerLeft">
+            <div class="liteops-AgentCard__icon">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="8" cy="8" r="6"/>
+                <path d="M8 5v3.5M8 10.5v.5"/>
+              </svg>
+            </div>
+            <span class="liteops-AgentCard__name">Agent Analyse</span>
+          </div>
+          <div class="liteops-AgentCard__status">
+            <span class="liteops-Badge liteops-Badge--error" aria-label="Statut: Erreur">Erreur</span>
+          </div>
+        </div>
+        <div class="liteops-AgentCard__log" role="log" aria-label="Journal d'activite">
+          <div class="liteops-AgentCard__logEntry">
+            <span class="liteops-AgentCard__timestamp">14:15:30</span>
+            <span class="liteops-AgentCard__logMessage">Erreur connexion base de donnees</span>
+          </div>
+          <div class="liteops-AgentCard__logEntry">
+            <span class="liteops-AgentCard__timestamp">14:15:35</span>
+            <span class="liteops-AgentCard__logMessage">Tentative de reconnexion (3/5)</span>
+          </div>
+          <div class="liteops-AgentCard__logEntry">
+            <span class="liteops-AgentCard__timestamp">14:15:50</span>
+            <span class="liteops-AgentCard__logMessage">Echec de reconnexion -- abandon</span>
+          </div>
+        </div>
+        <div class="liteops-AgentCard__actions">
+          <button class="liteops-Button liteops-Button--ghost liteops-Button--sm">Voir logs</button>
+          <button class="liteops-Button liteops-Button--danger liteops-Button--sm">Arreter</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── 3. Dark Theme ── -->
+  <section class="section">
+    <h2 class="section-heading">Dark Theme</h2>
+    <span class="section-label">Primary context -- agents appear in dashboards</span>
+    <hr class="section-divider">
+
+    <div class="dark-panel" data-theme="dark">
+      <span class="dark-panel-label">Dark dashboard context</span>
+      <div class="card-row">
+
+        <div class="liteops-AgentCard" role="article" aria-label="Agent OCR">
+          <div class="liteops-AgentCard__header">
+            <div class="liteops-AgentCard__headerLeft">
+              <div class="liteops-AgentCard__icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="2" width="10" height="12" rx="1.5"/>
+                  <circle cx="6.5" cy="6" r="1"/>
+                  <circle cx="9.5" cy="6" r="1"/>
+                  <path d="M6 9.5h4"/>
+                </svg>
+              </div>
+              <span class="liteops-AgentCard__name">Agent OCR</span>
+            </div>
+            <div class="liteops-AgentCard__status">
+              <span class="liteops-Badge liteops-Badge--success" aria-label="Statut: Actif">Actif</span>
+            </div>
+          </div>
+          <div class="liteops-AgentCard__log" role="log" aria-label="Journal d'activite">
+            <div class="liteops-AgentCard__logEntry">
+              <span class="liteops-AgentCard__timestamp">14:22:08</span>
+              <span class="liteops-AgentCard__logMessage">Extraction terminee: 12 champs identifies</span>
+            </div>
+            <div class="liteops-AgentCard__logEntry">
+              <span class="liteops-AgentCard__timestamp">14:22:12</span>
+              <span class="liteops-AgentCard__logMessage">Envoi vers pipeline RAG</span>
+            </div>
+          </div>
+          <div class="liteops-AgentCard__actions">
+            <button class="liteops-Button liteops-Button--ghost liteops-Button--sm">Voir logs</button>
+            <button class="liteops-Button liteops-Button--primary liteops-Button--sm">Relancer</button>
+          </div>
+        </div>
+
+        <div class="liteops-AgentCard" role="article" aria-label="Agent Analyse">
+          <div class="liteops-AgentCard__header">
+            <div class="liteops-AgentCard__headerLeft">
+              <div class="liteops-AgentCard__icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="8" cy="8" r="6"/>
+                  <path d="M8 5v3.5M8 10.5v.5"/>
+                </svg>
+              </div>
+              <span class="liteops-AgentCard__name">Agent Analyse</span>
+            </div>
+            <div class="liteops-AgentCard__status">
+              <span class="liteops-Badge liteops-Badge--error" aria-label="Statut: Erreur">Erreur</span>
+            </div>
+          </div>
+          <div class="liteops-AgentCard__log" role="log" aria-label="Journal d'activite">
+            <div class="liteops-AgentCard__logEntry">
+              <span class="liteops-AgentCard__timestamp">14:15:30</span>
+              <span class="liteops-AgentCard__logMessage">Erreur connexion base de donnees</span>
+            </div>
+            <div class="liteops-AgentCard__logEntry">
+              <span class="liteops-AgentCard__timestamp">14:15:50</span>
+              <span class="liteops-AgentCard__logMessage">Echec de reconnexion -- abandon</span>
+            </div>
+          </div>
+          <div class="liteops-AgentCard__actions">
+            <button class="liteops-Button liteops-Button--ghost liteops-Button--sm">Voir logs</button>
+            <button class="liteops-Button liteops-Button--danger liteops-Button--sm">Arreter</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 4. Compact Variant ── -->
+  <section class="section">
+    <h2 class="section-heading">Compact Variant</h2>
+    <span class="section-label">No log preview -- header + actions only, for grid layouts</span>
+    <hr class="section-divider">
+
+    <div class="card-row">
+
+      <div class="liteops-AgentCard--compact" role="article" aria-label="Agent OCR">
+        <div class="liteops-AgentCard__header">
+          <div class="liteops-AgentCard__headerLeft">
+            <div class="liteops-AgentCard__icon">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="2" width="10" height="12" rx="1.5"/>
+                <circle cx="6.5" cy="6" r="1"/>
+                <circle cx="9.5" cy="6" r="1"/>
+                <path d="M6 9.5h4"/>
+              </svg>
+            </div>
+            <span class="liteops-AgentCard__name">Agent OCR</span>
+          </div>
+          <div class="liteops-AgentCard__status">
+            <span class="liteops-Badge liteops-Badge--success" aria-label="Statut: Actif">Actif</span>
+          </div>
+        </div>
+        <div class="liteops-AgentCard__actions">
+          <button class="liteops-Button liteops-Button--ghost liteops-Button--sm">Voir logs</button>
+          <button class="liteops-Button liteops-Button--primary liteops-Button--sm">Relancer</button>
+        </div>
+      </div>
+
+      <div class="liteops-AgentCard--compact" role="article" aria-label="Agent RAG">
+        <div class="liteops-AgentCard__header">
+          <div class="liteops-AgentCard__headerLeft">
+            <div class="liteops-AgentCard__icon">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 3h12v10H2z"/>
+                <path d="M5 7h6M5 9.5h4"/>
+              </svg>
+            </div>
+            <span class="liteops-AgentCard__name">Agent RAG</span>
+          </div>
+          <div class="liteops-AgentCard__status">
+            <span class="liteops-Badge liteops-Badge--warning" aria-label="Statut: En pause">En pause</span>
+          </div>
+        </div>
+        <div class="liteops-AgentCard__actions">
+          <button class="liteops-Button liteops-Button--ghost liteops-Button--sm">Voir logs</button>
+          <button class="liteops-Button liteops-Button--primary liteops-Button--sm">Relancer</button>
+        </div>
+      </div>
+
+      <div class="liteops-AgentCard--compact" role="article" aria-label="Agent Analyse">
+        <div class="liteops-AgentCard__header">
+          <div class="liteops-AgentCard__headerLeft">
+            <div class="liteops-AgentCard__icon">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="8" cy="8" r="6"/>
+                <path d="M8 5v3.5M8 10.5v.5"/>
+              </svg>
+            </div>
+            <span class="liteops-AgentCard__name">Agent Analyse</span>
+          </div>
+          <div class="liteops-AgentCard__status">
+            <span class="liteops-Badge liteops-Badge--error" aria-label="Statut: Erreur">Erreur</span>
+          </div>
+        </div>
+        <div class="liteops-AgentCard__actions">
+          <button class="liteops-Button liteops-Button--ghost liteops-Button--sm">Voir logs</button>
+          <button class="liteops-Button liteops-Button--danger liteops-Button--sm">Arreter</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>
