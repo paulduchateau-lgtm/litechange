@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Atom — Select</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header { margin-bottom: var(--liteops-space-16); }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--liteops-olive-900);
+      color: var(--liteops-paper-100);
+      box-shadow: var(--liteops-shadow-md);
+      transition: background var(--liteops-duration-normal), color var(--liteops-duration-normal);
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: var(--liteops-paper-100);
+      color: var(--liteops-olive-900);
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: var(--liteops-space-16); }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    /* ── Select Grid ── */
+    .select-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--liteops-space-8);
+      margin-bottom: var(--liteops-space-6);
+    }
+
+    @media (max-width: 640px) {
+      .select-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Dark Panel ── */
+    .dark-panel {
+      background: var(--liteops-olive-900);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-8);
+      margin-top: var(--liteops-space-4);
+    }
+
+    .dark-panel-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-paper-600);
+      margin-bottom: var(--liteops-space-4);
+      display: block;
+    }
+
+    /* ═══════════════════════════════════════════════
+       SELECT COMPONENT
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Select {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .liteops-Select__label {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--liteops-text-primary);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .liteops-Select__wrapper {
+      position: relative;
+      display: block;
+    }
+
+    .liteops-Select__field {
+      width: 100%;
+      padding: 10px 36px 10px 14px;
+      font-family: var(--liteops-font-body);
+      font-size: 15px;
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-primary);
+      border-radius: var(--liteops-radius-sm);
+      color: var(--liteops-text-primary);
+      transition: border-color var(--liteops-duration-normal) ease;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      cursor: pointer;
+    }
+
+    .liteops-Select__field:focus-visible {
+      border-color: var(--liteops-border-focus);
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+
+    /* ── Custom Chevron ── */
+    .liteops-Select__icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      pointer-events: none;
+      color: var(--liteops-text-tertiary);
+    }
+
+    .liteops-Select__helper {
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+      color: var(--liteops-text-tertiary);
+      margin-top: 4px;
+    }
+
+    .liteops-Select__error {
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+      color: var(--liteops-status-error);
+      margin-top: 4px;
+      display: none;
+    }
+
+    /* ── Error State ── */
+    .liteops-Select.is-error .liteops-Select__field {
+      border-color: var(--liteops-border-error);
+    }
+
+    .liteops-Select.is-error .liteops-Select__field:focus-visible {
+      border-color: var(--liteops-border-error);
+      outline-color: var(--liteops-border-error);
+    }
+
+    .liteops-Select.is-error .liteops-Select__error {
+      display: block;
+    }
+
+    .liteops-Select.is-error .liteops-Select__helper {
+      display: none;
+    }
+
+    /* ── Disabled State ── */
+    .liteops-Select.is-disabled .liteops-Select__field {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: var(--liteops-surface-tertiary);
+    }
+
+    .liteops-Select.is-disabled .liteops-Select__label {
+      color: var(--liteops-text-disabled);
+    }
+
+    .liteops-Select.is-disabled .liteops-Select__icon {
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark Mode</button>
+
+<div class="page">
+
+  <header class="page-header">
+    <h1 class="page-title">Select</h1>
+    <p class="page-subtitle">Select dropdown atom — custom-styled native select with chevron, focus ring, error and disabled states. All colors via design tokens.</p>
+  </header>
+
+  <!-- ── Default States ── -->
+  <section class="section">
+    <h2 class="section-heading">States</h2>
+    <span class="section-label">Default, with options, error, disabled</span>
+    <hr class="section-divider">
+
+    <div class="select-grid">
+      <!-- Default -->
+      <div class="liteops-Select">
+        <label class="liteops-Select__label" for="select-default">Type de changement</label>
+        <div class="liteops-Select__wrapper">
+          <select class="liteops-Select__field" id="select-default">
+            <option value="" disabled selected>Selectionner...</option>
+            <option value="orga">Organisationnel</option>
+            <option value="tech">Technologique</option>
+            <option value="culture">Culturel</option>
+            <option value="process">Processus</option>
+          </select>
+          <svg class="liteops-Select__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6l4 4 4-4"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- With Helper -->
+      <div class="liteops-Select">
+        <label class="liteops-Select__label" for="select-helper">Phase du projet</label>
+        <div class="liteops-Select__wrapper">
+          <select class="liteops-Select__field" id="select-helper">
+            <option value="" disabled selected>Selectionner...</option>
+            <option value="cadrer">Cadrer</option>
+            <option value="observer">Observer</option>
+            <option value="agir">Agir</option>
+            <option value="rendre-compte">Rendre compte</option>
+          </select>
+          <svg class="liteops-Select__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6l4 4 4-4"/>
+          </svg>
+        </div>
+        <span class="liteops-Select__helper">Correspond au cycle de vie du changement</span>
+      </div>
+
+      <!-- Error -->
+      <div class="liteops-Select is-error">
+        <label class="liteops-Select__label" for="select-error">Priorite</label>
+        <div class="liteops-Select__wrapper">
+          <select class="liteops-Select__field" id="select-error">
+            <option value="" disabled selected>Selectionner...</option>
+            <option value="haute">Haute</option>
+            <option value="moyenne">Moyenne</option>
+            <option value="basse">Basse</option>
+          </select>
+          <svg class="liteops-Select__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6l4 4 4-4"/>
+          </svg>
+        </div>
+        <span class="liteops-Select__helper">Champ obligatoire</span>
+        <span class="liteops-Select__error">Veuillez selectionner une priorite</span>
+      </div>
+
+      <!-- Disabled -->
+      <div class="liteops-Select is-disabled">
+        <label class="liteops-Select__label" for="select-disabled">Statut</label>
+        <div class="liteops-Select__wrapper">
+          <select class="liteops-Select__field" id="select-disabled" disabled>
+            <option value="actif" selected>Actif</option>
+          </select>
+          <svg class="liteops-Select__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6l4 4 4-4"/>
+          </svg>
+        </div>
+        <span class="liteops-Select__helper">Determine par le systeme</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Dark Theme Preview ── -->
+  <section class="section">
+    <h2 class="section-heading">Dark Theme Preview</h2>
+    <span class="section-label">Inline dark panel using data-theme</span>
+    <hr class="section-divider">
+
+    <div class="dark-panel" data-theme="dark">
+      <span class="dark-panel-label">Dark context</span>
+      <div class="select-grid">
+        <div class="liteops-Select">
+          <label class="liteops-Select__label" for="select-dark-default">Equipe cible</label>
+          <div class="liteops-Select__wrapper">
+            <select class="liteops-Select__field" id="select-dark-default">
+              <option value="" disabled selected>Selectionner...</option>
+              <option value="dsi">DSI</option>
+              <option value="rh">Ressources Humaines</option>
+              <option value="finance">Finance</option>
+            </select>
+            <svg class="liteops-Select__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 6l4 4 4-4"/>
+            </svg>
+          </div>
+        </div>
+        <div class="liteops-Select is-error">
+          <label class="liteops-Select__label" for="select-dark-error">Role</label>
+          <div class="liteops-Select__wrapper">
+            <select class="liteops-Select__field" id="select-dark-error">
+              <option value="" disabled selected>Selectionner...</option>
+            </select>
+            <svg class="liteops-Select__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 6l4 4 4-4"/>
+            </svg>
+          </div>
+          <span class="liteops-Select__error">Selection obligatoire</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>
