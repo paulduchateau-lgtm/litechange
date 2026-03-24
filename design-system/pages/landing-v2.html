@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps — IA souveraine pour vos operations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ══════════════════════════════════════════
+       RESET & BASE
+       ══════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-dark: #0C0D0A;
+      --bg-dark-elevated: #161714;
+      --bg-dark-card: #1C1E19;
+      --bg-dark-card-hover: #232520;
+      --bg-light: #F7F6F2;
+      --bg-light-card: #FFFFFF;
+      --text-white: #F0EEE9;
+      --text-white-secondary: #B0AEA6;
+      --text-white-tertiary: #706E66;
+      --text-dark: #1A1C17;
+      --text-dark-secondary: #5A5C54;
+      --green-primary: #B0D838;
+      --green-bright: #C8FF3C;
+      --green-dark: #6B8A1A;
+      --green-muted: #3A5A10;
+      --blue-accent: #4A90B8;
+      --coral: #C45A32;
+      --border-dark: rgba(240, 238, 233, 0.08);
+      --border-dark-hover: rgba(240, 238, 233, 0.15);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --radius-pill: 9999px;
+      --font-display: 'Source Serif 4', Georgia, serif;
+      --font-body: 'DM Sans', -apple-system, sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-dark);
+      color: var(--text-white);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    ul { list-style: none; }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    /* ══════════════════════════════════════════
+       NAVIGATION
+       ══════════════════════════════════════════ */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 20px 0;
+      transition: background 300ms, backdrop-filter 300ms, padding 300ms;
+    }
+
+    .nav.scrolled {
+      background: rgba(12, 13, 10, 0.85);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-dark);
+    }
+
+    .nav__inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav__logo {
+      font-family: var(--font-display);
+      font-size: 26px;
+      display: flex;
+      align-items: baseline;
+    }
+
+    .nav__logo-lite {
+      font-style: italic;
+      font-weight: 300;
+      color: var(--green-primary);
+    }
+
+    .nav__logo-ops {
+      font-weight: 400;
+      color: var(--text-white);
+    }
+
+    .nav__links {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .nav__link {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-white-secondary);
+      transition: color 200ms;
+      position: relative;
+    }
+
+    .nav__link:hover { color: var(--text-white); }
+
+    .nav__cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 24px;
+      background: var(--green-primary);
+      color: var(--bg-dark);
+      font-weight: 600;
+      font-size: 14px;
+      border-radius: var(--radius-pill);
+      border: none;
+      cursor: pointer;
+      transition: background 200ms, transform 200ms;
+    }
+
+    .nav__cta:hover {
+      background: var(--green-bright);
+      transform: translateY(-1px);
+    }
+
+    /* ══════════════════════════════════════════
+       HERO — Full viewport, dark, Cohere-style
+       ══════════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding-top: 80px;
+    }
+
+    /* Subtle gradient mesh background */
+    .hero__bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .hero__bg::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      right: -10%;
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(ellipse, rgba(176, 216, 56, 0.12) 0%, transparent 70%);
+      animation: drift 20s ease-in-out infinite;
+    }
+
+    .hero__bg::after {
+      content: '';
+      position: absolute;
+      bottom: -10%;
+      left: -15%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(ellipse, rgba(74, 144, 184, 0.08) 0%, transparent 70%);
+      animation: drift 25s ease-in-out infinite reverse;
+    }
+
+    @keyframes drift {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -20px) scale(1.05); }
+      66% { transform: translate(-20px, 15px) scale(0.95); }
+    }
+
+    .hero__inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 32px;
+      padding: 80px 0 120px;
+    }
+
+    .hero__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px 6px 8px;
+      background: rgba(176, 216, 56, 0.1);
+      border: 1px solid rgba(176, 216, 56, 0.2);
+      border-radius: var(--radius-pill);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--green-primary);
+      letter-spacing: 0.02em;
+    }
+
+    .hero__badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green-primary);
+      box-shadow: 0 0 8px rgba(176, 216, 56, 0.6);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(176, 216, 56, 0.6); }
+      50% { opacity: 0.7; box-shadow: 0 0 16px rgba(176, 216, 56, 0.3); }
+    }
+
+    .hero__heading {
+      font-family: var(--font-display);
+      font-size: clamp(44px, 6vw, 72px);
+      font-weight: 600;
+      line-height: 1.08;
+      max-width: 900px;
+      letter-spacing: -0.02em;
+      color: var(--text-white);
+    }
+
+    .hero__heading em {
+      font-style: italic;
+      font-weight: 300;
+      color: var(--green-primary);
+    }
+
+    .hero__sub {
+      font-size: 18px;
+      line-height: 1.7;
+      color: var(--text-white-secondary);
+      max-width: 580px;
+    }
+
+    .hero__actions {
+      display: flex;
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 36px;
+      background: var(--green-primary);
+      color: var(--bg-dark);
+      font-family: var(--font-body);
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: background 200ms, transform 200ms, box-shadow 200ms;
+    }
+
+    .btn-primary:hover {
+      background: var(--green-bright);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(176, 216, 56, 0.25);
+    }
+
+    .btn-primary svg { width: 18px; height: 18px; }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 36px;
+      background: transparent;
+      color: var(--text-white);
+      font-family: var(--font-body);
+      font-size: 16px;
+      font-weight: 500;
+      border: 1px solid var(--border-dark-hover);
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: border-color 200ms, background 200ms;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--text-white-tertiary);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    /* ══════════════════════════════════════════
+       LOGO BAR — Trust markers
+       ══════════════════════════════════════════ */
+    .logobar {
+      padding: 64px 0;
+      border-top: 1px solid var(--border-dark);
+      border-bottom: 1px solid var(--border-dark);
+    }
+
+    .logobar__label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-white-tertiary);
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .logobar__grid {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 60px;
+      flex-wrap: wrap;
+    }
+
+    .logobar__item {
+      font-family: var(--font-body);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-white-tertiary);
+      opacity: 0.5;
+      transition: opacity 300ms;
+      white-space: nowrap;
+    }
+
+    .logobar__item:hover { opacity: 0.8; }
+
+    /* ══════════════════════════════════════════
+       SECTION LABEL (reusable)
+       ══════════════════════════════════════════ */
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--green-primary);
+      margin-bottom: 16px;
+    }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 600;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      margin-bottom: 20px;
+    }
+
+    .section-body {
+      font-size: 17px;
+      line-height: 1.7;
+      color: var(--text-white-secondary);
+      max-width: 560px;
+    }
+
+    /* ══════════════════════════════════════════
+       PILLARS — 3 cols, Cohere "Safe. Flexible." style
+       ══════════════════════════════════════════ */
+    .pillars {
+      padding: 120px 0;
+    }
+
+    .pillars__header {
+      text-align: center;
+      margin-bottom: 72px;
+    }
+
+    .pillars__header .section-body {
+      margin: 0 auto;
+    }
+
+    .pillars__grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .pillar {
+      background: var(--bg-dark-card);
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius-lg);
+      padding: 40px 32px;
+      transition: border-color 300ms, transform 300ms;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pillar:hover {
+      border-color: var(--border-dark-hover);
+      transform: translateY(-4px);
+    }
+
+    .pillar__icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(176, 216, 56, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .pillar__icon svg {
+      width: 24px;
+      height: 24px;
+      color: var(--green-primary);
+      stroke-width: 1.5;
+    }
+
+    .pillar__title {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text-white);
+    }
+
+    .pillar__body {
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--text-white-secondary);
+    }
+
+    /* ══════════════════════════════════════════
+       SHOWCASE — Big feature section with visual
+       ══════════════════════════════════════════ */
+    .showcase {
+      padding: 120px 0;
+      border-top: 1px solid var(--border-dark);
+    }
+
+    .showcase__inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .showcase__content { display: flex; flex-direction: column; }
+
+    .showcase__features {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      margin-top: 40px;
+    }
+
+    .showcase__feature {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .showcase__feature-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(176, 216, 56, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .showcase__feature-icon svg {
+      width: 18px;
+      height: 18px;
+      color: var(--green-primary);
+    }
+
+    .showcase__feature-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-white);
+      margin-bottom: 4px;
+    }
+
+    .showcase__feature-body {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-white-secondary);
+    }
+
+    /* Dashboard mock visual */
+    .showcase__visual {
+      background: var(--bg-dark-card);
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .showcase__visual::before {
+      content: '';
+      position: absolute;
+      top: -40%;
+      right: -30%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(ellipse, rgba(176, 216, 56, 0.06) 0%, transparent 70%);
+    }
+
+    .mock-topbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-dark);
+      margin-bottom: 20px;
+    }
+
+    .mock-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .mock-dot--green { background: var(--green-primary); }
+    .mock-dot--dim { background: var(--text-white-tertiary); opacity: 0.3; }
+
+    .mock-topbar-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-white-tertiary);
+      margin-left: 8px;
+    }
+
+    .mock-kpis {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .mock-kpi {
+      background: var(--bg-dark-elevated);
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+    }
+
+    .mock-kpi__label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-white-tertiary);
+      margin-bottom: 8px;
+    }
+
+    .mock-kpi__value {
+      font-family: var(--font-body);
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-white);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .mock-kpi__trend {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    .mock-kpi__trend--up { color: var(--green-primary); }
+    .mock-kpi__trend--down { color: var(--coral); }
+
+    .mock-chart {
+      background: var(--bg-dark-elevated);
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius-sm);
+      padding: 20px;
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      height: 140px;
+    }
+
+    .mock-bar {
+      flex: 1;
+      border-radius: 4px 4px 0 0;
+      background: var(--green-primary);
+      opacity: 0.7;
+      transition: opacity 300ms;
+    }
+
+    .mock-bar:nth-child(even) {
+      background: var(--blue-accent);
+      opacity: 0.5;
+    }
+
+    .showcase__visual:hover .mock-bar { opacity: 1; }
+
+    /* ══════════════════════════════════════════
+       DIFFERENTIATORS — What makes us different
+       ══════════════════════════════════════════ */
+    .diff {
+      padding: 120px 0;
+      background: var(--bg-dark-elevated);
+      border-top: 1px solid var(--border-dark);
+      border-bottom: 1px solid var(--border-dark);
+    }
+
+    .diff__header {
+      text-align: center;
+      margin-bottom: 72px;
+    }
+
+    .diff__header .section-body { margin: 0 auto; }
+
+    .diff__grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .diff-card {
+      background: var(--bg-dark-card);
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      transition: border-color 300ms, transform 300ms;
+    }
+
+    .diff-card:hover {
+      border-color: var(--border-dark-hover);
+      transform: translateY(-2px);
+    }
+
+    .diff-card__number {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--green-primary);
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .diff-card__title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text-white);
+      margin-bottom: 12px;
+    }
+
+    .diff-card__body {
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--text-white-secondary);
+    }
+
+    /* ══════════════════════════════════════════
+       SECTORS — Horizontal scroll cards
+       ══════════════════════════════════════════ */
+    .sectors {
+      padding: 120px 0;
+    }
+
+    .sectors__header {
+      margin-bottom: 56px;
+    }
+
+    .sectors__grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .sector-card {
+      background: var(--bg-dark-card);
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius-lg);
+      padding: 32px 28px;
+      transition: border-color 300ms, transform 300ms;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .sector-card:hover {
+      border-color: var(--border-dark-hover);
+      transform: translateY(-3px);
+    }
+
+    .sector-card__icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(176, 216, 56, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sector-card__icon svg {
+      width: 20px;
+      height: 20px;
+      color: var(--green-primary);
+    }
+
+    .sector-card__name {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-white);
+    }
+
+    .sector-card__body {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-white-secondary);
+    }
+
+    /* ══════════════════════════════════════════
+       TESTIMONIAL — Full-width dark block
+       ══════════════════════════════════════════ */
+    .testimonial {
+      padding: 120px 0;
+      background: var(--bg-dark-elevated);
+      border-top: 1px solid var(--border-dark);
+      border-bottom: 1px solid var(--border-dark);
+    }
+
+    .testimonial__inner {
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .testimonial__quote-mark {
+      font-family: var(--font-display);
+      font-size: 72px;
+      line-height: 1;
+      color: var(--green-primary);
+      opacity: 0.4;
+      margin-bottom: 24px;
+    }
+
+    .testimonial__quote {
+      font-family: var(--font-display);
+      font-size: clamp(22px, 3vw, 28px);
+      font-style: italic;
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--text-white);
+      margin-bottom: 40px;
+    }
+
+    .testimonial__author {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-white);
+    }
+
+    .testimonial__role {
+      font-size: 14px;
+      color: var(--text-white-secondary);
+      margin-top: 4px;
+    }
+
+    /* ══════════════════════════════════════════
+       CTA — Final conversion block
+       ══════════════════════════════════════════ */
+    .cta {
+      padding: 140px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta__bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .cta__bg::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(ellipse, rgba(176, 216, 56, 0.08) 0%, transparent 70%);
+    }
+
+    .cta__inner {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .cta__heading {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 600;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+      max-width: 700px;
+    }
+
+    .cta__heading em {
+      font-style: italic;
+      font-weight: 300;
+      color: var(--green-primary);
+    }
+
+    .cta__body {
+      font-size: 17px;
+      line-height: 1.7;
+      color: var(--text-white-secondary);
+      max-width: 500px;
+      margin-bottom: 40px;
+    }
+
+    .cta__actions {
+      display: flex;
+      gap: 16px;
+    }
+
+    /* ══════════════════════════════════════════
+       FOOTER
+       ══════════════════════════════════════════ */
+    .footer {
+      padding: 80px 0 40px;
+      border-top: 1px solid var(--border-dark);
+    }
+
+    .footer__grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 64px;
+      padding-bottom: 64px;
+      border-bottom: 1px solid var(--border-dark);
+    }
+
+    .footer__brand-name {
+      font-family: var(--font-display);
+      font-size: 22px;
+      margin-bottom: 16px;
+    }
+
+    .footer__brand-name .nav__logo-lite { color: var(--green-primary); }
+    .footer__brand-name .nav__logo-ops { color: var(--text-white); }
+
+    .footer__brand-desc {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-white-secondary);
+      max-width: 280px;
+    }
+
+    .footer__col-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-white-tertiary);
+      margin-bottom: 20px;
+    }
+
+    .footer__links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .footer__link {
+      font-size: 14px;
+      color: var(--text-white-secondary);
+      transition: color 200ms;
+    }
+
+    .footer__link:hover { color: var(--text-white); }
+
+    .footer__bottom {
+      padding-top: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer__copy {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-white-tertiary);
+    }
+
+    .footer__legal {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer__legal a {
+      font-size: 12px;
+      color: var(--text-white-tertiary);
+      transition: color 200ms;
+    }
+
+    .footer__legal a:hover { color: var(--text-white-secondary); }
+
+    /* ══════════════════════════════════════════
+       ANIMATIONS
+       ══════════════════════════════════════════ */
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal {
+        opacity: 0;
+        transform: translateY(32px);
+        transition: opacity 700ms var(--ease-out), transform 700ms var(--ease-out);
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .reveal-delay-1 { transition-delay: 100ms; }
+      .reveal-delay-2 { transition-delay: 200ms; }
+      .reveal-delay-3 { transition-delay: 300ms; }
+      .reveal-delay-4 { transition-delay: 400ms; }
+    }
+
+    /* ══════════════════════════════════════════
+       RESPONSIVE
+       ══════════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .pillars__grid { grid-template-columns: 1fr; gap: 16px; }
+      .showcase__inner { grid-template-columns: 1fr; gap: 48px; }
+      .diff__grid { grid-template-columns: 1fr; }
+      .sectors__grid { grid-template-columns: repeat(2, 1fr); }
+      .footer__grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 0 20px; }
+      .nav__links { display: none; }
+      .hero__heading { font-size: 36px; }
+      .hero__actions { flex-direction: column; align-items: center; }
+      .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+      .logobar__grid { gap: 32px; }
+      .sectors__grid { grid-template-columns: 1fr; }
+      .footer__grid { grid-template-columns: 1fr; gap: 32px; }
+      .footer__bottom { flex-direction: column; gap: 16px; text-align: center; }
+      .cta__actions { flex-direction: column; }
+      .mock-kpis { grid-template-columns: 1fr; }
+    }
+
+    /* ══════════════════════════════════════════
+       FOCUS VISIBLE (Accessibility)
+       ══════════════════════════════════════════ */
+    :focus-visible {
+      outline: 2px solid var(--green-primary);
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     NAVIGATION
+     ══════════════════════════════════════════ -->
+<nav class="nav" role="navigation" aria-label="Navigation principale">
+  <div class="container nav__inner">
+    <a href="#" class="nav__logo" aria-label="LiteOps - Accueil">
+      <span class="nav__logo-lite">lite</span><span class="nav__logo-ops">Ops</span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="#solutions" class="nav__link">Solutions</a></li>
+      <li><a href="#plateforme" class="nav__link">Plateforme</a></li>
+      <li><a href="#secteurs" class="nav__link">Secteurs</a></li>
+      <li><a href="#" class="nav__link">Ressources</a></li>
+    </ul>
+    <a href="#contact" class="nav__cta">Demander une demo</a>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     HERO
+     ══════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero__bg" aria-hidden="true"></div>
+  <div class="container hero__inner">
+    <div class="hero__badge">
+      <span class="hero__badge-dot" aria-hidden="true"></span>
+      100% souverain &middot; Heberge en France
+    </div>
+    <h1 class="hero__heading">
+      Vos operations, <em>eclairees</em> par l'IA
+    </h1>
+    <p class="hero__sub">
+      Agents IA sur-mesure, deployes dans votre infrastructure.
+      Du diagnostic au pilotage, en toute souverainete.
+    </p>
+    <div class="hero__actions">
+      <a href="#contact" class="btn-primary">
+        Demander une demonstration
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10h10M12 7l3 3-3 3"/></svg>
+      </a>
+      <a href="#plateforme" class="btn-secondary">Explorer la plateforme</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     LOGO BAR
+     ══════════════════════════════════════════ -->
+<section class="logobar" aria-label="Clients de reference">
+  <div class="container">
+    <div class="logobar__label">Ils nous font confiance</div>
+    <div class="logobar__grid">
+      <span class="logobar__item">Vyv</span>
+      <span class="logobar__item">Air Liquide</span>
+      <span class="logobar__item">CPAM</span>
+      <span class="logobar__item">Maif</span>
+      <span class="logobar__item">La Poste</span>
+      <span class="logobar__item">Groupe VYV</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     PILLARS — Souverain. Sur-mesure. Simple.
+     ══════════════════════════════════════════ -->
+<section id="solutions" class="pillars">
+  <div class="container">
+    <div class="pillars__header reveal">
+      <div class="section-label">Pourquoi LiteOps</div>
+      <h2 class="section-heading">Souverain. Sur-mesure. Simple.</h2>
+      <p class="section-body">Pas un outil de plus. Une infrastructure IA construite autour de vos contraintes, pas l'inverse.</p>
+    </div>
+    <div class="pillars__grid">
+      <div class="pillar reveal reveal-delay-1">
+        <div class="pillar__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="pillar__title">Souverain par conception</div>
+        <div class="pillar__body">Infrastructure Scaleway, donnees en France, zero transit vers l'etranger. Pas un argument marketing : une architecture.</div>
+      </div>
+      <div class="pillar reveal reveal-delay-2">
+        <div class="pillar__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="pillar__title">Custom, pas configurable</div>
+        <div class="pillar__body">On ne vous donne pas un SaaS a parametrer. On construit vos agents IA sur vos donnees, votre metier, vos processus.</div>
+      </div>
+      <div class="pillar reveal reveal-delay-3">
+        <div class="pillar__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <div class="pillar__title">ROI en semaines</div>
+        <div class="pillar__body">Premier agent en production en 3 semaines. Pas de projet a 18 mois. Vous mesurez l'impact, pas la roadmap d'un editeur.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     SHOWCASE — Platform visual
+     ══════════════════════════════════════════ -->
+<section id="plateforme" class="showcase">
+  <div class="container showcase__inner">
+    <div class="showcase__content reveal">
+      <div class="section-label">Plateforme</div>
+      <h2 class="section-heading">Observez, diagnostiquez, pilotez</h2>
+      <p class="section-body">Un tableau de bord pour comprendre ce qui se passe reellement dans vos transformations. Chaque metrique, sourcee. Chaque signal, actionnable.</p>
+      <div class="showcase__features">
+        <div class="showcase__feature">
+          <div class="showcase__feature-icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h2l3-7 4 14 3-7h2"/></svg>
+          </div>
+          <div>
+            <div class="showcase__feature-title">Signaux en temps reel</div>
+            <div class="showcase__feature-body">KPIs d'adoption, frictions detectees, alertes automatiques. Pas des vanity metrics.</div>
+          </div>
+        </div>
+        <div class="showcase__feature">
+          <div class="showcase__feature-icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M3 8h14"/><path d="M8 3v14"/></svg>
+          </div>
+          <div>
+            <div class="showcase__feature-title">Diagnostic calibre</div>
+            <div class="showcase__feature-body">42 facteurs de resistance, fondes sur 15 ans de recherche academique. Mesurables et actionnables.</div>
+          </div>
+        </div>
+        <div class="showcase__feature">
+          <div class="showcase__feature-icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"/><path d="M10 7v3l2 1"/></svg>
+          </div>
+          <div>
+            <div class="showcase__feature-title">Agents souverains</div>
+            <div class="showcase__feature-body">OCR, RAG, analyse predictive — deployes localement. Aucune donnee vers des serveurs tiers.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="showcase__visual reveal reveal-delay-2">
+      <div class="mock-topbar">
+        <span class="mock-dot mock-dot--green"></span>
+        <span class="mock-dot mock-dot--dim"></span>
+        <span class="mock-dot mock-dot--dim"></span>
+        <span class="mock-topbar-title">Tableau de bord — Initiative Q4</span>
+      </div>
+      <div class="mock-kpis">
+        <div class="mock-kpi">
+          <div class="mock-kpi__label">Adoption</div>
+          <div class="mock-kpi__value">73%</div>
+          <div class="mock-kpi__trend mock-kpi__trend--up">+12% vs M-1</div>
+        </div>
+        <div class="mock-kpi">
+          <div class="mock-kpi__label">Friction</div>
+          <div class="mock-kpi__value">2.1</div>
+          <div class="mock-kpi__trend mock-kpi__trend--down">-0.4 vs M-1</div>
+        </div>
+        <div class="mock-kpi">
+          <div class="mock-kpi__label">Signaux</div>
+          <div class="mock-kpi__value">847</div>
+          <div class="mock-kpi__trend mock-kpi__trend--up">+156 cette sem.</div>
+        </div>
+      </div>
+      <div class="mock-chart">
+        <div class="mock-bar" style="height: 25%"></div>
+        <div class="mock-bar" style="height: 40%"></div>
+        <div class="mock-bar" style="height: 55%"></div>
+        <div class="mock-bar" style="height: 45%"></div>
+        <div class="mock-bar" style="height: 70%"></div>
+        <div class="mock-bar" style="height: 60%"></div>
+        <div class="mock-bar" style="height: 80%"></div>
+        <div class="mock-bar" style="height: 65%"></div>
+        <div class="mock-bar" style="height: 90%"></div>
+        <div class="mock-bar" style="height: 75%"></div>
+        <div class="mock-bar" style="height: 95%"></div>
+        <div class="mock-bar" style="height: 85%"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     DIFFERENTIATORS — Not a SaaS mastodon
+     ══════════════════════════════════════════ -->
+<section class="diff">
+  <div class="container">
+    <div class="diff__header reveal">
+      <div class="section-label">Ce qui nous distingue</div>
+      <h2 class="section-heading">On ne suit pas une roadmap.<br>On suit la votre.</h2>
+      <p class="section-body">Les grands editeurs imposent leur vision. Nous construisons la votre.</p>
+    </div>
+    <div class="diff__grid">
+      <div class="diff-card reveal reveal-delay-1">
+        <span class="diff-card__number">01</span>
+        <div class="diff-card__title">Francais, local, present</div>
+        <div class="diff-card__body">Equipe basee en France. On se deplace. On connait vos contraintes reglementaires, vos rythmes budgetaires, vos interlocuteurs. Pas de ticket support a San Francisco.</div>
+      </div>
+      <div class="diff-card reveal reveal-delay-2">
+        <span class="diff-card__number">02</span>
+        <div class="diff-card__title">Sur-mesure, pas catalogue</div>
+        <div class="diff-card__body">Chaque agent IA est construit pour votre metier. Risque, RH, Finance, Change : on ne vend pas un outil generique, on livre un systeme adapte.</div>
+      </div>
+      <div class="diff-card reveal reveal-delay-3">
+        <span class="diff-card__number">03</span>
+        <div class="diff-card__title">Votre infra, vos regles</div>
+        <div class="diff-card__body">Deploiement on-premise ou cloud souverain Scaleway. Vos donnees ne quittent jamais votre perimetre. Zero dependance a un hyperscaler americain.</div>
+      </div>
+      <div class="diff-card reveal reveal-delay-4">
+        <span class="diff-card__number">04</span>
+        <div class="diff-card__title">Academiquement fonde</div>
+        <div class="diff-card__body">Nos modeles de diagnostic sont issus de 15 ans de recherche avec Laurent Giraud. Pas du marketing : de la science du changement organisationnel.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     SECTORS
+     ══════════════════════════════════════════ -->
+<section id="secteurs" class="sectors">
+  <div class="container">
+    <div class="sectors__header reveal">
+      <div class="section-label">Secteurs</div>
+      <h2 class="section-heading">Concu pour les institutions exigeantes</h2>
+      <p class="section-body">Chaque secteur a ses contraintes. On les connait parce qu'on y travaille.</p>
+    </div>
+    <div class="sectors__grid">
+      <div class="sector-card reveal reveal-delay-1">
+        <div class="sector-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/></svg>
+        </div>
+        <div class="sector-card__name">Banque</div>
+        <div class="sector-card__body">Conformite, fusions, migrations IT. Pilotage du changement a grande echelle sous contrainte reglementaire.</div>
+      </div>
+      <div class="sector-card reveal reveal-delay-2">
+        <div class="sector-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="sector-card__name">Assurance</div>
+        <div class="sector-card__body">Transformation des reseaux, digitalisation parcours. Accompagner 15 000 collaborateurs sans les perdre.</div>
+      </div>
+      <div class="sector-card reveal reveal-delay-3">
+        <div class="sector-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/><path d="M1 21h22"/><path d="M9 7h6"/><path d="M9 11h6"/><path d="M9 15h2"/></svg>
+        </div>
+        <div class="sector-card__name">Sante</div>
+        <div class="sector-card__body">Mutuelles, CPAM, reseaux de soin. IA au service de la coordination et du suivi patient.</div>
+      </div>
+      <div class="sector-card reveal reveal-delay-4">
+        <div class="sector-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/></svg>
+        </div>
+        <div class="sector-card__name">Secteur public</div>
+        <div class="sector-card__body">Modernisation des administrations. Accompagner les agents publics dans la transformation numerique.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     TESTIMONIAL
+     ══════════════════════════════════════════ -->
+<section class="testimonial">
+  <div class="container">
+    <div class="testimonial__inner reveal">
+      <div class="testimonial__quote-mark" aria-hidden="true">"</div>
+      <blockquote class="testimonial__quote">
+        LiteOps a transforme notre facon de piloter le changement. Pour la premiere fois, on avait une visibilite reelle — pas des PowerPoints, des donnees.
+      </blockquote>
+      <div class="testimonial__author">Cyril Vegni</div>
+      <div class="testimonial__role">Directeur de la transformation</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CTA
+     ══════════════════════════════════════════ -->
+<section id="contact" class="cta">
+  <div class="cta__bg" aria-hidden="true"></div>
+  <div class="container cta__inner reveal">
+    <h2 class="cta__heading">Pret a reprendre le <em>controle</em> ?</h2>
+    <p class="cta__body">30 minutes pour comprendre comment LiteOps s'adapte a votre contexte. Pas de demo generique.</p>
+    <div class="cta__actions">
+      <a href="#" class="btn-primary">
+        Planifier un echange
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10h10M12 7l3 3-3 3"/></svg>
+      </a>
+      <a href="#" class="btn-secondary">Voir un cas client</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     FOOTER
+     ══════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+      <div>
+        <div class="footer__brand-name">
+          <span class="nav__logo-lite" style="font-family: var(--font-display); font-style: italic; font-weight: 300;">lite</span><span class="nav__logo-ops" style="font-family: var(--font-display); font-weight: 400;">Ops</span>
+        </div>
+        <p class="footer__brand-desc">IA souveraine pour les institutions francaises. Agents metier, infrastructure locale, impact mesurable.</p>
+      </div>
+      <div>
+        <div class="footer__col-title">Plateforme</div>
+        <ul class="footer__links">
+          <li><a href="#" class="footer__link">Agents IA</a></li>
+          <li><a href="#" class="footer__link">Observabilite</a></li>
+          <li><a href="#" class="footer__link">Diagnostic</a></li>
+          <li><a href="#" class="footer__link">Securite</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Ressources</div>
+        <ul class="footer__links">
+          <li><a href="#" class="footer__link">Documentation</a></li>
+          <li><a href="#" class="footer__link">Recherche</a></li>
+          <li><a href="#" class="footer__link">Blog</a></li>
+          <li><a href="#" class="footer__link">Cas clients</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Entreprise</div>
+        <ul class="footer__links">
+          <li><a href="#" class="footer__link">A propos</a></li>
+          <li><a href="#" class="footer__link">Equipe</a></li>
+          <li><a href="#" class="footer__link">Contact</a></li>
+          <li><a href="#" class="footer__link">Carrieres</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span class="footer__copy">&copy; 2026 LiteOps. Tous droits reserves. Heberge en France par Scaleway.</span>
+      <div class="footer__legal">
+        <a href="#">Mentions legales</a>
+        <a href="#">Confidentialite</a>
+        <a href="#">CGU</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════
+     SCRIPTS
+     ══════════════════════════════════════════ -->
+<script>
+  // Scroll-triggered reveals
+  (function() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.querySelectorAll('.reveal').forEach(function(el) {
+        el.classList.add('visible');
+      });
+      return;
+    }
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal').forEach(function(el) { observer.observe(el); });
+  })();
+
+  // Nav scroll effect
+  (function() {
+    var nav = document.querySelector('.nav');
+    var scrolled = false;
+    window.addEventListener('scroll', function() {
+      var isScrolled = window.scrollY > 40;
+      if (isScrolled !== scrolled) {
+        scrolled = isScrolled;
+        nav.classList.toggle('scrolled', scrolled);
+      }
+    }, { passive: true });
+  })();
+</script>
+
+</body>
+</html>

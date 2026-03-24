@@ -4,9 +4,47 @@
     {
       "name": "minipilot",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--", "--port", "5183"],
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5183"
+      ],
       "port": 5183,
       "cwd": "minipilot/app"
+    },
+    {
+      "name": "roadmap-server",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "--watch",
+        "index.js"
+      ],
+      "port": 3002,
+      "cwd": "roadmap/server"
+    },
+    {
+      "name": "roadmap",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
+      "port": 5184,
+      "cwd": "roadmap/app"
+    },
+    {
+      "name": "design-system",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "serve",
+        "design-system/pages",
+        "-l",
+        "5190",
+        "--no-clipboard"
+      ],
+      "port": 5190
     }
   ]
 }
