@@ -52,11 +52,11 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **ORGN-02**: Data table — sortable column headers (IBM Plex Mono uppercase), numeric right-alignment, zebra rows, row hover, overflow wrapper
 - [ ] **ORGN-03**: Modal/dialog — overlay backdrop, centered content, close button, action bar
 - [ ] **ORGN-04**: Topbar navigation — logo, breadcrumb area, user menu, theme toggle
-- [ ] **ORGN-05**: Hero section with gradient background (green-to-olive), bold Source Serif 4 heading, CTA buttons, enterprise imagery area
+- [x] **ORGN-05**: Hero section with gradient background (green-to-olive), bold Source Serif 4 heading, CTA buttons, enterprise imagery area
 - [ ] **ORGN-06**: Agent card component — agent name, status indicator, log preview, action buttons
 - [ ] **ORGN-07**: Pipeline visualization — connected node diagram showing workflow steps with status colors
-- [ ] **ORGN-08**: Responsive card grid layout — 1 to 4 columns with proper gap scaling
-- [ ] **ORGN-09**: Content section pattern — heading, body text, optional CTA, optional illustration area (for landing pages)
+- [x] **ORGN-08**: Responsive card grid layout — 1 to 4 columns with proper gap scaling
+- [x] **ORGN-09**: Content section pattern — heading, body text, optional CTA, optional illustration area (for landing pages)
 - [ ] **ORGN-10**: Dropdown/multi-select component with search filtering and tag display
 
 ### Pages & Documentation
@@ -146,11 +146,11 @@ Deferred to future release. Tracked but not in current roadmap.
 | ORGN-02 | Phase 3 | Pending |
 | ORGN-03 | Phase 3 | Pending |
 | ORGN-04 | Phase 3 | Pending |
-| ORGN-05 | Phase 3 | Pending |
+| ORGN-05 | Phase 3 | Complete |
 | ORGN-06 | Phase 3 | Pending |
 | ORGN-07 | Phase 3 | Pending |
-| ORGN-08 | Phase 3 | Pending |
-| ORGN-09 | Phase 3 | Pending |
+| ORGN-08 | Phase 3 | Complete |
+| ORGN-09 | Phase 3 | Complete |
 | ORGN-10 | Phase 3 | Pending |
 | PAGE-01 | Phase 4 | Pending |
 | PAGE-02 | Phase 4 | Pending |
