@@ -53,11 +53,11 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **ORGN-03**: Modal/dialog — overlay backdrop, centered content, close button, action bar
 - [ ] **ORGN-04**: Topbar navigation — logo, breadcrumb area, user menu, theme toggle
 - [x] **ORGN-05**: Hero section with gradient background (green-to-olive), bold Source Serif 4 heading, CTA buttons, enterprise imagery area
-- [ ] **ORGN-06**: Agent card component — agent name, status indicator, log preview, action buttons
-- [ ] **ORGN-07**: Pipeline visualization — connected node diagram showing workflow steps with status colors
+- [x] **ORGN-06**: Agent card component — agent name, status indicator, log preview, action buttons
+- [x] **ORGN-07**: Pipeline visualization — connected node diagram showing workflow steps with status colors
 - [x] **ORGN-08**: Responsive card grid layout — 1 to 4 columns with proper gap scaling
 - [x] **ORGN-09**: Content section pattern — heading, body text, optional CTA, optional illustration area (for landing pages)
-- [ ] **ORGN-10**: Dropdown/multi-select component with search filtering and tag display
+- [x] **ORGN-10**: Dropdown/multi-select component with search filtering and tag display
 
 ### Pages & Documentation
 
@@ -147,11 +147,11 @@ Deferred to future release. Tracked but not in current roadmap.
 | ORGN-03 | Phase 3 | Complete |
 | ORGN-04 | Phase 3 | Pending |
 | ORGN-05 | Phase 3 | Complete |
-| ORGN-06 | Phase 3 | Pending |
-| ORGN-07 | Phase 3 | Pending |
+| ORGN-06 | Phase 3 | Complete |
+| ORGN-07 | Phase 3 | Complete |
 | ORGN-08 | Phase 3 | Complete |
 | ORGN-09 | Phase 3 | Complete |
-| ORGN-10 | Phase 3 | Pending |
+| ORGN-10 | Phase 3 | Complete |
 | PAGE-01 | Phase 4 | Pending |
 | PAGE-02 | Phase 4 | Pending |
 | PAGE-03 | Phase 4 | Pending |
