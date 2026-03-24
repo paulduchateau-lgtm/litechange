@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Molecule — Form Group</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header { margin-bottom: var(--liteops-space-16); }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--liteops-olive-900);
+      color: var(--liteops-paper-100);
+      box-shadow: var(--liteops-shadow-md);
+      transition: background var(--liteops-duration-normal), color var(--liteops-duration-normal);
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: var(--liteops-paper-100);
+      color: var(--liteops-olive-900);
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: var(--liteops-space-16); }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    /* ── Form Grid ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--liteops-space-8);
+      max-width: 800px;
+    }
+
+    .form-grid--single {
+      grid-template-columns: 1fr;
+      max-width: 400px;
+    }
+
+    @media (max-width: 640px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Dark Panel ── */
+    .dark-panel {
+      background: var(--liteops-olive-900);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-8);
+      margin-top: var(--liteops-space-4);
+    }
+
+    .dark-panel-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-paper-600);
+      margin-bottom: var(--liteops-space-4);
+      display: block;
+    }
+
+    /* ═══════════════════════════════════════════════
+       INPUT ATOM (inlined from atoms/input.html)
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Input__label {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--liteops-text-primary);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .liteops-Input__field {
+      width: 100%;
+      padding: 10px 14px;
+      font-family: var(--liteops-font-body);
+      font-size: 15px;
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-primary);
+      border-radius: var(--liteops-radius-sm);
+      color: var(--liteops-text-primary);
+      transition: border-color var(--liteops-duration-normal) ease;
+      outline: none;
+    }
+
+    .liteops-Input__field::placeholder {
+      color: var(--liteops-text-tertiary);
+    }
+
+    .liteops-Input__field:focus-visible {
+      border-color: var(--liteops-border-focus);
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+
+    /* Select styling */
+    select.liteops-Input__field {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%238A8880' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 40px;
+      cursor: pointer;
+    }
+
+    /* Textarea styling */
+    textarea.liteops-Input__field {
+      resize: vertical;
+      min-height: 100px;
+      line-height: 1.5;
+    }
+
+    /* ═══════════════════════════════════════════════
+       FORM GROUP MOLECULE
+       ═══════════════════════════════════════════════ */
+
+    .liteops-FormGroup {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: var(--liteops-space-5);
+    }
+
+    .liteops-FormGroup__label {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--liteops-text-primary);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Required indicator — colored dot, not asterisk */
+    .liteops-FormGroup__label--required::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--liteops-status-error);
+      flex-shrink: 0;
+    }
+
+    .liteops-FormGroup__helper {
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+      color: var(--liteops-text-tertiary);
+      margin-top: var(--liteops-space-1);
+    }
+
+    .liteops-FormGroup__error {
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+      color: var(--liteops-status-error);
+      margin-top: var(--liteops-space-1);
+      display: none;
+    }
+
+    /* ── Error State ── */
+    .liteops-FormGroup.is-error .liteops-Input__field {
+      border-color: var(--liteops-border-error);
+    }
+
+    .liteops-FormGroup.is-error .liteops-Input__field:focus-visible {
+      border-color: var(--liteops-border-error);
+      outline-color: var(--liteops-border-error);
+    }
+
+    .liteops-FormGroup.is-error .liteops-FormGroup__error {
+      display: block;
+    }
+
+    .liteops-FormGroup.is-error .liteops-FormGroup__helper {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark Mode</button>
+
+<div class="page">
+
+  <header class="page-header">
+    <h1 class="page-title">Form Group</h1>
+    <p class="page-subtitle">Form field group molecule — composes label + input atom + helper text + error message into a consistent unit. Supports text, select, and textarea inputs.</p>
+  </header>
+
+  <!-- ── Default States ── -->
+  <section class="section">
+    <h2 class="section-heading">States</h2>
+    <span class="section-label">Default, helper, error, required</span>
+    <hr class="section-divider">
+
+    <div class="form-grid">
+      <!-- Default -->
+      <div class="liteops-FormGroup">
+        <label class="liteops-FormGroup__label" for="fg-default">Nom de l'initiative</label>
+        <input class="liteops-Input__field" id="fg-default" type="text" placeholder="Ex: Migration CRM 2025">
+      </div>
+
+      <!-- With Helper -->
+      <div class="liteops-FormGroup">
+        <label class="liteops-FormGroup__label" for="fg-helper">Adresse email</label>
+        <input class="liteops-Input__field" id="fg-helper" type="email" placeholder="prenom.nom@organisation.fr">
+        <span class="liteops-FormGroup__helper">Utilisez votre adresse professionnelle</span>
+      </div>
+
+      <!-- Error -->
+      <div class="liteops-FormGroup is-error">
+        <label class="liteops-FormGroup__label" for="fg-error">Code projet</label>
+        <input class="liteops-Input__field" id="fg-error" type="text" value="AB">
+        <span class="liteops-FormGroup__helper">Minimum 4 caracteres</span>
+        <span class="liteops-FormGroup__error">Le code projet doit contenir au moins 4 caracteres</span>
+      </div>
+
+      <!-- Required -->
+      <div class="liteops-FormGroup">
+        <label class="liteops-FormGroup__label liteops-FormGroup__label--required" for="fg-required">Nom du responsable</label>
+        <input class="liteops-Input__field" id="fg-required" type="text" placeholder="Prenom Nom">
+        <span class="liteops-FormGroup__helper">Champ obligatoire</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Select Input ── -->
+  <section class="section">
+    <h2 class="section-heading">Select Input</h2>
+    <span class="section-label">Form group with select element</span>
+    <hr class="section-divider">
+
+    <div class="form-grid--single">
+      <div class="liteops-FormGroup">
+        <label class="liteops-FormGroup__label liteops-FormGroup__label--required" for="fg-select">Type de changement</label>
+        <select class="liteops-Input__field" id="fg-select">
+          <option value="" disabled selected>Selectionnez un type...</option>
+          <option value="org">Reorganisation</option>
+          <option value="digital">Transformation digitale</option>
+          <option value="process">Changement de processus</option>
+          <option value="cultural">Transformation culturelle</option>
+          <option value="merger">Fusion / Acquisition</option>
+        </select>
+        <span class="liteops-FormGroup__helper">Classification selon la taxonomie du changement</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Textarea Input ── -->
+  <section class="section">
+    <h2 class="section-heading">Textarea Input</h2>
+    <span class="section-label">Form group with textarea element</span>
+    <hr class="section-divider">
+
+    <div class="form-grid--single">
+      <div class="liteops-FormGroup">
+        <label class="liteops-FormGroup__label" for="fg-textarea">Description de l'initiative</label>
+        <textarea class="liteops-Input__field" id="fg-textarea" placeholder="Decrivez les objectifs, le perimetre, et les parties prenantes..."></textarea>
+        <span class="liteops-FormGroup__helper">Maximum 500 caracteres</span>
+      </div>
+
+      <div class="liteops-FormGroup is-error" style="margin-top: var(--liteops-space-4);">
+        <label class="liteops-FormGroup__label liteops-FormGroup__label--required" for="fg-textarea-error">Justification</label>
+        <textarea class="liteops-Input__field" id="fg-textarea-error"></textarea>
+        <span class="liteops-FormGroup__helper">Expliquez pourquoi ce changement est necessaire</span>
+        <span class="liteops-FormGroup__error">La justification est requise pour les initiatives de niveau strategique</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Dark Theme Preview ── -->
+  <section class="section">
+    <h2 class="section-heading">Dark Theme Preview</h2>
+    <span class="section-label">Inline dark panel using data-theme</span>
+    <hr class="section-divider">
+
+    <div class="dark-panel" data-theme="dark">
+      <span class="dark-panel-label">Dark context</span>
+      <div class="form-grid">
+        <div class="liteops-FormGroup">
+          <label class="liteops-FormGroup__label liteops-FormGroup__label--required" for="fg-dark-name">Nom du projet</label>
+          <input class="liteops-Input__field" id="fg-dark-name" type="text" placeholder="Saisir le nom...">
+          <span class="liteops-FormGroup__helper">Nom visible dans le tableau de bord</span>
+        </div>
+
+        <div class="liteops-FormGroup is-error">
+          <label class="liteops-FormGroup__label" for="fg-dark-error">Champ requis</label>
+          <input class="liteops-Input__field" id="fg-dark-error" type="text" value="">
+          <span class="liteops-FormGroup__error">Ce champ est obligatoire</span>
+        </div>
+
+        <div class="liteops-FormGroup">
+          <label class="liteops-FormGroup__label" for="fg-dark-select">Priorite</label>
+          <select class="liteops-Input__field" id="fg-dark-select">
+            <option value="" disabled selected>Choisir...</option>
+            <option value="high">Haute</option>
+            <option value="medium">Moyenne</option>
+            <option value="low">Basse</option>
+          </select>
+        </div>
+
+        <div class="liteops-FormGroup">
+          <label class="liteops-FormGroup__label" for="fg-dark-textarea">Notes</label>
+          <textarea class="liteops-Input__field" id="fg-dark-textarea" placeholder="Ajouter des notes..."></textarea>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Molecule — KPI Card</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header { margin-bottom: var(--liteops-space-16); }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--liteops-olive-900);
+      color: var(--liteops-paper-100);
+      box-shadow: var(--liteops-shadow-md);
+      transition: background var(--liteops-duration-normal), color var(--liteops-duration-normal);
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: var(--liteops-paper-100);
+      color: var(--liteops-olive-900);
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: var(--liteops-space-16); }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    /* ── KPI Grid ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--liteops-space-5);
+    }
+
+    @media (max-width: 640px) {
+      .kpi-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Dark Panel ── */
+    .dark-panel {
+      background: var(--liteops-olive-900);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-8);
+      margin-top: var(--liteops-space-4);
+    }
+
+    .dark-panel-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-paper-600);
+      margin-bottom: var(--liteops-space-4);
+      display: block;
+    }
+
+    /* ═══════════════════════════════════════════════
+       KPI CARD MOLECULE
+       ═══════════════════════════════════════════════ */
+
+    .liteops-KpiCard {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background: var(--liteops-surface-elevated);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-5) var(--liteops-space-6);
+      box-shadow: var(--liteops-shadow-sm);
+      border: 1px solid var(--liteops-border-secondary);
+    }
+
+    .liteops-KpiCard__label {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .liteops-KpiCard__value {
+      font-family: var(--liteops-font-body);
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--liteops-text-primary);
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .liteops-KpiCard__trend {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      margin-top: var(--liteops-space-1);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .liteops-KpiCard__trend--up {
+      color: var(--liteops-status-success);
+    }
+
+    .liteops-KpiCard__trend--down {
+      color: var(--liteops-status-error);
+    }
+
+    .liteops-KpiCard__badge {
+      position: absolute;
+      top: var(--liteops-space-3);
+      right: var(--liteops-space-3);
+    }
+
+    /* ── Badge (inlined from atom) ── */
+
+    .liteops-Badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: var(--liteops-radius-pill);
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      line-height: 1.4;
+    }
+
+    .liteops-Badge::before {
+      content: '';
+      display: block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .liteops-Badge--success {
+      background: var(--liteops-status-success-bg);
+      color: var(--liteops-status-success);
+    }
+    .liteops-Badge--success::before { background: var(--liteops-status-success); }
+
+    .liteops-Badge--warning {
+      background: var(--liteops-status-warning-bg);
+      color: var(--liteops-status-warning);
+    }
+    .liteops-Badge--warning::before { background: var(--liteops-status-warning); }
+
+    .liteops-Badge--error {
+      background: var(--liteops-status-error-bg);
+      color: var(--liteops-status-error);
+    }
+    .liteops-Badge--error::before { background: var(--liteops-status-error); }
+
+    .liteops-Badge--info {
+      background: var(--liteops-status-info-bg);
+      color: var(--liteops-status-info);
+    }
+    .liteops-Badge--info::before { background: var(--liteops-status-info); }
+
+    .liteops-Badge--accent {
+      background: var(--liteops-accent-subtle);
+      color: var(--liteops-accent-text);
+    }
+    .liteops-Badge--accent::before { background: var(--liteops-accent-text); }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark Mode</button>
+
+<div class="page">
+
+  <header class="page-header">
+    <h1 class="page-title">KPI Card</h1>
+    <p class="page-subtitle">Key performance indicator molecule — numeric value (DM Sans bold), trend arrow (IBM Plex Mono), label, and optional badge. Composes Badge atom.</p>
+  </header>
+
+  <!-- ── Dashboard Grid ── -->
+  <section class="section">
+    <h2 class="section-heading">Dashboard Grid</h2>
+    <span class="section-label">Typical 2x2 layout with mixed trends</span>
+    <hr class="section-divider">
+
+    <div class="kpi-grid">
+      <!-- Adoption rate — positive trend + badge -->
+      <div class="liteops-KpiCard">
+        <span class="liteops-KpiCard__badge">
+          <span class="liteops-Badge liteops-Badge--success">Actif</span>
+        </span>
+        <span class="liteops-KpiCard__label">Taux d'adoption</span>
+        <span class="liteops-KpiCard__value">78.4%</span>
+        <span class="liteops-KpiCard__trend liteops-KpiCard__trend--up">&uarr; 12.4%</span>
+      </div>
+
+      <!-- Friction detected — negative trend -->
+      <div class="liteops-KpiCard">
+        <span class="liteops-KpiCard__label">Friction detectee</span>
+        <span class="liteops-KpiCard__value">23</span>
+        <span class="liteops-KpiCard__trend liteops-KpiCard__trend--up">&uarr; 5</span>
+      </div>
+
+      <!-- Active signals — negative trend -->
+      <div class="liteops-KpiCard">
+        <span class="liteops-KpiCard__label">Signaux actifs</span>
+        <span class="liteops-KpiCard__value">12</span>
+        <span class="liteops-KpiCard__trend liteops-KpiCard__trend--down">&darr; 3</span>
+      </div>
+
+      <!-- Surveys completed — no trend -->
+      <div class="liteops-KpiCard">
+        <span class="liteops-KpiCard__badge">
+          <span class="liteops-Badge liteops-Badge--info">Complet</span>
+        </span>
+        <span class="liteops-KpiCard__label">Enquetes completees</span>
+        <span class="liteops-KpiCard__value">156</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Variants ── -->
+  <section class="section">
+    <h2 class="section-heading">Badge Variants</h2>
+    <span class="section-label">KPI cards with different badge statuses</span>
+    <hr class="section-divider">
+
+    <div class="kpi-grid">
+      <div class="liteops-KpiCard">
+        <span class="liteops-KpiCard__badge">
+          <span class="liteops-Badge liteops-Badge--warning">En attente</span>
+        </span>
+        <span class="liteops-KpiCard__label">Taux de reponse</span>
+        <span class="liteops-KpiCard__value">42%</span>
+        <span class="liteops-KpiCard__trend liteops-KpiCard__trend--down">&darr; 8%</span>
+      </div>
+
+      <div class="liteops-KpiCard">
+        <span class="liteops-KpiCard__badge">
+          <span class="liteops-Badge liteops-Badge--accent">Nouveau</span>
+        </span>
+        <span class="liteops-KpiCard__label">Score engagement</span>
+        <span class="liteops-KpiCard__value">7.2</span>
+        <span class="liteops-KpiCard__trend liteops-KpiCard__trend--up">&uarr; 0.8</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Dark Theme Preview ── -->
+  <section class="section">
+    <h2 class="section-heading">Dark Theme Preview</h2>
+    <span class="section-label">Dashboard context — dark panel using data-theme</span>
+    <hr class="section-divider">
+
+    <div class="dark-panel" data-theme="dark">
+      <span class="dark-panel-label">Dark context</span>
+      <div class="kpi-grid">
+        <div class="liteops-KpiCard">
+          <span class="liteops-KpiCard__badge">
+            <span class="liteops-Badge liteops-Badge--success">Actif</span>
+          </span>
+          <span class="liteops-KpiCard__label">Taux d'adoption</span>
+          <span class="liteops-KpiCard__value">78.4%</span>
+          <span class="liteops-KpiCard__trend liteops-KpiCard__trend--up">&uarr; 12.4%</span>
+        </div>
+
+        <div class="liteops-KpiCard">
+          <span class="liteops-KpiCard__label">Friction detectee</span>
+          <span class="liteops-KpiCard__value">23</span>
+          <span class="liteops-KpiCard__trend liteops-KpiCard__trend--up">&uarr; 5</span>
+        </div>
+
+        <div class="liteops-KpiCard">
+          <span class="liteops-KpiCard__label">Signaux actifs</span>
+          <span class="liteops-KpiCard__value">12</span>
+          <span class="liteops-KpiCard__trend liteops-KpiCard__trend--down">&darr; 3</span>
+        </div>
+
+        <div class="liteops-KpiCard">
+          <span class="liteops-KpiCard__badge">
+            <span class="liteops-Badge liteops-Badge--info">Complet</span>
+          </span>
+          <span class="liteops-KpiCard__label">Enquetes completees</span>
+          <span class="liteops-KpiCard__value">156</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>
