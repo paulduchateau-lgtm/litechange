@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Organism — Multi-Select</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header { margin-bottom: var(--liteops-space-16); }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--liteops-olive-900);
+      color: var(--liteops-paper-100);
+      box-shadow: var(--liteops-shadow-md);
+      transition: background var(--liteops-duration-normal), color var(--liteops-duration-normal);
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: var(--liteops-paper-100);
+      color: var(--liteops-olive-900);
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: var(--liteops-space-16); }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    /* ── Dark Panel ── */
+    .dark-panel {
+      background: var(--liteops-olive-900);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-8);
+      margin-top: var(--liteops-space-4);
+    }
+
+    .dark-panel-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-paper-600);
+      margin-bottom: var(--liteops-space-4);
+      display: block;
+    }
+
+    /* ── State Grid ── */
+    .state-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--liteops-space-10);
+    }
+
+    @media (max-width: 800px) {
+      .state-grid { grid-template-columns: 1fr; }
+    }
+
+    .state-card {
+      display: flex;
+      flex-direction: column;
+      gap: var(--liteops-space-3);
+    }
+
+    .state-card-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+    }
+
+    /* ═══════════════════════════════════════════════
+       BADGE COMPONENT (composed from atom)
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: var(--liteops-radius-pill);
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      line-height: 1.4;
+    }
+
+    .liteops-Badge::before {
+      content: '';
+      display: block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .liteops-Badge--accent {
+      background: var(--liteops-accent-subtle);
+      color: var(--liteops-accent-text);
+    }
+    .liteops-Badge--accent::before { background: var(--liteops-accent-text); }
+
+    /* ═══════════════════════════════════════════════
+       BUTTON COMPONENT (composed from atom)
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--liteops-space-2);
+      font-family: var(--liteops-font-body);
+      font-weight: 500;
+      border: 1px solid transparent;
+      border-radius: var(--liteops-radius-md);
+      cursor: pointer;
+      transition: all var(--liteops-duration-normal) ease;
+      text-decoration: none;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .liteops-Button--ghost {
+      background: transparent;
+      color: var(--liteops-text-tertiary);
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+    .liteops-Button--ghost:hover {
+      background: var(--liteops-interactive-ghost-hover);
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-Button:focus-visible {
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       MULTI-SELECT ORGANISM
+       ═══════════════════════════════════════════════ */
+
+    .liteops-MultiSelect {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    /* ── Trigger ── */
+    .liteops-MultiSelect__trigger {
+      border: 1px solid var(--liteops-border-primary);
+      border-radius: var(--liteops-radius-sm);
+      min-height: 40px;
+      padding: var(--liteops-space-2) var(--liteops-space-3);
+      background: var(--liteops-surface-secondary);
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--liteops-space-2);
+      align-items: center;
+      cursor: text;
+      transition: border-color var(--liteops-duration-normal) ease;
+    }
+
+    .liteops-MultiSelect__trigger:focus-within {
+      border-color: var(--liteops-border-focus);
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+
+    /* ── Tags ── */
+    .liteops-MultiSelect__tags {
+      display: contents;
+    }
+
+    .liteops-MultiSelect__tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: var(--liteops-radius-pill);
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      line-height: 1.4;
+      background: var(--liteops-accent-subtle);
+      color: var(--liteops-accent-text);
+    }
+
+    .liteops-MultiSelect__tag::before {
+      content: '';
+      display: block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--liteops-accent-text);
+      flex-shrink: 0;
+    }
+
+    .liteops-MultiSelect__tagRemove {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 12px;
+      height: 12px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: var(--liteops-accent-text);
+      opacity: 0.6;
+      padding: 0;
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .liteops-MultiSelect__tagRemove:hover {
+      opacity: 1;
+    }
+
+    /* ── Search Input ── */
+    .liteops-MultiSelect__search {
+      border: none;
+      outline: none;
+      background: transparent;
+      flex-grow: 1;
+      min-width: 80px;
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-primary);
+      padding: 2px 0;
+    }
+
+    .liteops-MultiSelect__search::placeholder {
+      color: var(--liteops-text-tertiary);
+    }
+
+    /* ── Clear All ── */
+    .liteops-MultiSelect__clear {
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    /* ── Dropdown ── */
+    .liteops-MultiSelect__dropdown {
+      position: relative;
+      background: var(--liteops-surface-elevated);
+      border: 1px solid var(--liteops-border-primary);
+      border-radius: var(--liteops-radius-sm);
+      box-shadow: var(--liteops-shadow-lg);
+      max-height: 240px;
+      overflow-y: auto;
+      margin-top: var(--liteops-space-1);
+    }
+
+    /* ── Options ── */
+    .liteops-MultiSelect__option {
+      padding: var(--liteops-space-2) var(--liteops-space-3);
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: background var(--liteops-duration-fast) ease;
+    }
+
+    .liteops-MultiSelect__option:hover,
+    .liteops-MultiSelect__option.is-highlighted {
+      background: var(--liteops-accent-subtle);
+    }
+
+    .liteops-MultiSelect__option[aria-selected="true"] {
+      color: var(--liteops-accent-text);
+      font-weight: 500;
+    }
+
+    .liteops-MultiSelect__optionCheck {
+      width: 16px;
+      height: 16px;
+      color: var(--liteops-accent-text);
+      flex-shrink: 0;
+      visibility: hidden;
+    }
+
+    .liteops-MultiSelect__option[aria-selected="true"] .liteops-MultiSelect__optionCheck {
+      visibility: visible;
+    }
+
+    /* ── Placeholder text for empty state ── */
+    .liteops-MultiSelect__placeholder {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-tertiary);
+      pointer-events: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .liteops-MultiSelect__trigger,
+      .liteops-MultiSelect__option,
+      .liteops-Button {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark Mode</button>
+
+<div class="page">
+
+  <header class="page-header">
+    <h1 class="page-title">Multi-Select</h1>
+    <p class="page-subtitle">Multi-select dropdown organism -- search filtering, badge tags for selections, and accessible listbox. Composes Badge atom for selected items. Used for tag assignment, team selection, and dimension filtering.</p>
+  </header>
+
+  <!-- ── 1. Empty State ── -->
+  <section class="section">
+    <h2 class="section-heading">Empty State</h2>
+    <span class="section-label">Trigger with placeholder text, no selections</span>
+    <hr class="section-divider">
+
+    <div class="liteops-MultiSelect">
+      <div class="liteops-MultiSelect__trigger" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-label="Selectionner des categories" tabindex="0">
+        <span class="liteops-MultiSelect__placeholder">Rechercher...</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 2. With Selections ── -->
+  <section class="section">
+    <h2 class="section-heading">With Selections</h2>
+    <span class="section-label">Trigger showing 3 selected tags and search input</span>
+    <hr class="section-divider">
+
+    <div class="liteops-MultiSelect">
+      <div class="liteops-MultiSelect__trigger" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-label="3 categories selectionnees">
+        <div class="liteops-MultiSelect__tags">
+          <span class="liteops-MultiSelect__tag" aria-label="Communication interne selectionne, appuyez sur Supprimer pour retirer">
+            Communication interne
+            <button class="liteops-MultiSelect__tagRemove" aria-label="Retirer Communication interne" tabindex="-1">&times;</button>
+          </span>
+          <span class="liteops-MultiSelect__tag" aria-label="Formation selectionne, appuyez sur Supprimer pour retirer">
+            Formation
+            <button class="liteops-MultiSelect__tagRemove" aria-label="Retirer Formation" tabindex="-1">&times;</button>
+          </span>
+          <span class="liteops-MultiSelect__tag" aria-label="Migration SI selectionne, appuyez sur Supprimer pour retirer">
+            Migration SI
+            <button class="liteops-MultiSelect__tagRemove" aria-label="Retirer Migration SI" tabindex="-1">&times;</button>
+          </span>
+        </div>
+        <input class="liteops-MultiSelect__search" type="text" placeholder="Rechercher..." aria-label="Filtrer les options" tabindex="-1">
+        <button class="liteops-Button liteops-Button--ghost liteops-MultiSelect__clear" aria-label="Tout effacer" tabindex="-1">Tout effacer</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 3. Open Dropdown ── -->
+  <section class="section">
+    <h2 class="section-heading">Open Dropdown</h2>
+    <span class="section-label">Trigger + dropdown visible, 8 options, 3 checked</span>
+    <hr class="section-divider">
+
+    <div class="liteops-MultiSelect">
+      <div class="liteops-MultiSelect__trigger" role="combobox" aria-expanded="true" aria-haspopup="listbox" aria-label="3 categories selectionnees">
+        <div class="liteops-MultiSelect__tags">
+          <span class="liteops-MultiSelect__tag">
+            Communication interne
+            <button class="liteops-MultiSelect__tagRemove" tabindex="-1">&times;</button>
+          </span>
+          <span class="liteops-MultiSelect__tag">
+            Formation
+            <button class="liteops-MultiSelect__tagRemove" tabindex="-1">&times;</button>
+          </span>
+          <span class="liteops-MultiSelect__tag">
+            Migration SI
+            <button class="liteops-MultiSelect__tagRemove" tabindex="-1">&times;</button>
+          </span>
+        </div>
+        <input class="liteops-MultiSelect__search" type="text" placeholder="Rechercher..." tabindex="-1">
+        <button class="liteops-Button liteops-Button--ghost liteops-MultiSelect__clear" tabindex="-1">Tout effacer</button>
+      </div>
+
+      <div class="liteops-MultiSelect__dropdown" role="listbox" aria-label="Options disponibles">
+        <div class="liteops-MultiSelect__option" role="option" aria-selected="false">
+          <span>Resistance au changement</span>
+          <svg class="liteops-MultiSelect__optionCheck" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5L6.5 11.5L2.5 7.5"/></svg>
+        </div>
+        <div class="liteops-MultiSelect__option" role="option" aria-selected="true">
+          <span>Communication interne</span>
+          <svg class="liteops-MultiSelect__optionCheck" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5L6.5 11.5L2.5 7.5"/></svg>
+        </div>
+        <div class="liteops-MultiSelect__option" role="option" aria-selected="true">
+          <span>Formation</span>
+          <svg class="liteops-MultiSelect__optionCheck" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5L6.5 11.5L2.5 7.5"/></svg>
+        </div>
+        <div class="liteops-MultiSelect__option" role="option" aria-selected="false">
+          <span>Restructuration</span>
+          <svg class="liteops-MultiSelect__optionCheck" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5L6.5 11.5L2.5 7.5"/></svg>
+        </div>
+        <div class="liteops-MultiSelect__option" role="option" aria-selected="true">
+          <span>Migration SI</span>
+          <svg class="liteops-MultiSelect__optionCheck" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5L6.5 11.5L2.5 7.5"/></svg>
+        </div>
+        <div class="liteops-MultiSelect__option" role="option" aria-selected="false">
+          <span>Transformation digitale</span>
+          <svg class="liteops-MultiSelect__optionCheck" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5L6.5 11.5L2.5 7.5"/></svg>
+        </div>
+        <div class="liteops-MultiSelect__option" role="option" aria-selected="false">
+          <span>Conduite du changement</span>
+          <svg class="liteops-MultiSelect__optionCheck" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5L6.5 11.5L2.5 7.5"/></svg>
+        </div>
+        <div class="liteops-MultiSelect__option" role="option" aria-selected="false">
+          <span>Gestion des risques</span>
+          <svg class="liteops-MultiSelect__optionCheck" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5L6.5 11.5L2.5 7.5"/></svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 4. Filtered Dropdown ── -->
+  <section class="section">
+    <h2 class="section-heading">Filtered Dropdown</h2>
+    <span class="section-label">Search filtering with "Res" typed, showing matching results</span>
+    <hr class="section-divider">
+
+    <div class="liteops-MultiSelect">
+      <div class="liteops-MultiSelect__trigger" role="combobox" aria-expanded="true" aria-haspopup="listbox" aria-label="Recherche active: Res">
+        <input class="liteops-MultiSelect__search" type="text" value="Res" aria-label="Filtrer les options" tabindex="-1">
+      </div>
+
+      <div class="liteops-MultiSelect__dropdown" role="listbox" aria-label="Resultats filtres">
+        <div class="liteops-MultiSelect__option is-highlighted" role="option" aria-selected="false">
+          <span>Resistance au changement</span>
+          <svg class="liteops-MultiSelect__optionCheck" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5L6.5 11.5L2.5 7.5"/></svg>
+        </div>
+        <div class="liteops-MultiSelect__option" role="option" aria-selected="false">
+          <span>Restructuration</span>
+          <svg class="liteops-MultiSelect__optionCheck" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5L6.5 11.5L2.5 7.5"/></svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 5. Dark Theme ── -->
+  <section class="section">
+    <h2 class="section-heading">Dark Theme</h2>
+    <span class="section-label">Multi-select states in dark theme context</span>
+    <hr class="section-divider">
+
+    <div class="dark-panel" data-theme="dark">
+      <span class="dark-panel-label">Dark context</span>
+
+      <div style="display: flex; flex-direction: column; gap: var(--liteops-space-8);">
+
+        <!-- Dark: Empty -->
+        <div>
+          <span class="dark-panel-label" style="margin-bottom: var(--liteops-space-2);">Empty</span>
+          <div class="liteops-MultiSelect">
+            <div class="liteops-MultiSelect__trigger" role="combobox" aria-expanded="false" aria-haspopup="listbox" tabindex="0">
+              <span class="liteops-MultiSelect__placeholder">Rechercher...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dark: With Selections -->
+        <div>
+          <span class="dark-panel-label" style="margin-bottom: var(--liteops-space-2);">With selections</span>
+          <div class="liteops-MultiSelect">
+            <div class="liteops-MultiSelect__trigger" role="combobox" aria-expanded="false" aria-haspopup="listbox" tabindex="0">
+              <div class="liteops-MultiSelect__tags">
+                <span class="liteops-MultiSelect__tag">
+                  Resistance au changement
+                  <button class="liteops-MultiSelect__tagRemove" tabindex="-1">&times;</button>
+                </span>
+                <span class="liteops-MultiSelect__tag">
+                  Formation
+                  <button class="liteops-MultiSelect__tagRemove" tabindex="-1">&times;</button>
+                </span>
+              </div>
+              <input class="liteops-MultiSelect__search" type="text" placeholder="Rechercher..." tabindex="-1">
+              <button class="liteops-Button liteops-Button--ghost liteops-MultiSelect__clear" tabindex="-1">Tout effacer</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dark: Open Dropdown -->
+        <div>
+          <span class="dark-panel-label" style="margin-bottom: var(--liteops-space-2);">Open dropdown</span>
+          <div class="liteops-MultiSelect">
+            <div class="liteops-MultiSelect__trigger" role="combobox" aria-expanded="true" aria-haspopup="listbox" tabindex="0">
+              <div class="liteops-MultiSelect__tags">
+                <span class="liteops-MultiSelect__tag">
+                  Conduite du changement
+                  <button class="liteops-MultiSelect__tagRemove" tabindex="-1">&times;</button>
+                </span>
+              </div>
+              <input class="liteops-MultiSelect__search" type="text" placeholder="Rechercher..." tabindex="-1">
+            </div>
+
+            <div class="liteops-MultiSelect__dropdown" role="listbox">
+              <div class="liteops-MultiSelect__option" role="option" aria-selected="false">
+                <span>Resistance au changement</span>
+                <svg class="liteops-MultiSelect__optionCheck" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5L6.5 11.5L2.5 7.5"/></svg>
+              </div>
+              <div class="liteops-MultiSelect__option" role="option" aria-selected="true">
+                <span>Conduite du changement</span>
+                <svg class="liteops-MultiSelect__optionCheck" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5L6.5 11.5L2.5 7.5"/></svg>
+              </div>
+              <div class="liteops-MultiSelect__option" role="option" aria-selected="false">
+                <span>Transformation digitale</span>
+                <svg class="liteops-MultiSelect__optionCheck" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5L6.5 11.5L2.5 7.5"/></svg>
+              </div>
+              <div class="liteops-MultiSelect__option" role="option" aria-selected="false">
+                <span>Gestion des risques</span>
+                <svg class="liteops-MultiSelect__optionCheck" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5L6.5 11.5L2.5 7.5"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>

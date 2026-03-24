@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Organism — Pipeline Visualization</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header { margin-bottom: var(--liteops-space-16); }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--liteops-olive-900);
+      color: var(--liteops-paper-100);
+      box-shadow: var(--liteops-shadow-md);
+      transition: background var(--liteops-duration-normal), color var(--liteops-duration-normal);
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: var(--liteops-paper-100);
+      color: var(--liteops-olive-900);
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: var(--liteops-space-16); }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    /* ── Pipeline Row ── */
+    .pipeline-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--liteops-space-12);
+      align-items: flex-start;
+    }
+
+    /* ── Dark Panel ── */
+    .dark-panel {
+      background: var(--liteops-olive-900);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-8);
+      margin-top: var(--liteops-space-4);
+    }
+
+    .dark-panel-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-paper-600);
+      margin-bottom: var(--liteops-space-4);
+      display: block;
+    }
+
+    /* ═══════════════════════════════════════════════
+       PIPELINE VISUALIZATION ORGANISM
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Pipeline {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .liteops-Pipeline__track {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    /* ── Node ── */
+    .liteops-Pipeline__node {
+      width: 280px;
+      background: var(--liteops-surface-elevated);
+      border: 1px solid var(--liteops-border-primary);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-4) var(--liteops-space-5);
+      display: flex;
+      align-items: center;
+      gap: var(--liteops-space-4);
+    }
+
+    /* ── Status Indicator ── */
+    .liteops-Pipeline__status {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .liteops-Pipeline__status--complete {
+      background: var(--liteops-accent-primary);
+    }
+
+    .liteops-Pipeline__status--active {
+      background: var(--liteops-accent-primary);
+      animation: pulse-glow var(--liteops-loop-pulse-glow) infinite;
+    }
+
+    .liteops-Pipeline__status--pending {
+      background: var(--liteops-paper-500);
+    }
+
+    .liteops-Pipeline__status--error {
+      background: var(--liteops-status-error);
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(176, 216, 56, 0.4); }
+      50% { box-shadow: 0 0 8px 4px rgba(176, 216, 56, 0.15); }
+    }
+
+    /* ── Step Number ── */
+    .liteops-Pipeline__step {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--liteops-accent-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--liteops-accent-text);
+      flex-shrink: 0;
+    }
+
+    /* ── Node Content ── */
+    .liteops-Pipeline__nodeContent {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .liteops-Pipeline__label {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--liteops-text-primary);
+      line-height: 1.3;
+    }
+
+    .liteops-Pipeline__description {
+      font-family: var(--liteops-font-body);
+      font-size: 12px;
+      color: var(--liteops-text-tertiary);
+      line-height: 1.3;
+      margin-top: 2px;
+    }
+
+    /* ── Connector ── */
+    .liteops-Pipeline__connector {
+      width: 2px;
+      height: 32px;
+      background: var(--liteops-border-primary);
+    }
+
+    .liteops-Pipeline__connector--active {
+      background: var(--liteops-accent-primary);
+    }
+
+    /* ── Compact Variant ── */
+    .liteops-Pipeline--compact .liteops-Pipeline__node {
+      width: 200px;
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+    }
+
+    .liteops-Pipeline--compact .liteops-Pipeline__description {
+      display: none;
+    }
+
+    .liteops-Pipeline--compact .liteops-Pipeline__connector {
+      height: 20px;
+    }
+
+    .liteops-Pipeline--compact .liteops-Pipeline__step {
+      width: 20px;
+      height: 20px;
+      font-size: 10px;
+    }
+
+    .liteops-Pipeline--compact .liteops-Pipeline__label {
+      font-size: 13px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .liteops-Pipeline__status--active {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark Mode</button>
+
+<div class="page">
+
+  <header class="page-header">
+    <h1 class="page-title">Pipeline Visualization</h1>
+    <p class="page-subtitle">Vertical pipeline organism -- connected nodes with status colors and pulse-glow animation on active nodes. Primary context: NAMIBIA data pipeline monitoring.</p>
+  </header>
+
+  <!-- ── 1. Default Pipeline ── -->
+  <section class="section">
+    <h2 class="section-heading">Default Pipeline</h2>
+    <span class="section-label">5-step pipeline with mixed statuses</span>
+    <hr class="section-divider">
+
+    <div class="liteops-Pipeline" role="img" aria-label="Pipeline de traitement NAMIBIA: 5 etapes, 2 terminees, 1 active, 2 en attente">
+      <div class="liteops-Pipeline__track">
+
+        <div class="liteops-Pipeline__node">
+          <div class="liteops-Pipeline__status liteops-Pipeline__status--complete" aria-label="Termine"></div>
+          <div class="liteops-Pipeline__step">1</div>
+          <div class="liteops-Pipeline__nodeContent">
+            <span class="liteops-Pipeline__label">Collecte documents</span>
+            <span class="liteops-Pipeline__description">Ingestion des fichiers source depuis le SI</span>
+          </div>
+        </div>
+
+        <div class="liteops-Pipeline__connector liteops-Pipeline__connector--active"></div>
+
+        <div class="liteops-Pipeline__node">
+          <div class="liteops-Pipeline__status liteops-Pipeline__status--complete" aria-label="Termine"></div>
+          <div class="liteops-Pipeline__step">2</div>
+          <div class="liteops-Pipeline__nodeContent">
+            <span class="liteops-Pipeline__label">Extraction OCR</span>
+            <span class="liteops-Pipeline__description">Reconnaissance optique et extraction des champs</span>
+          </div>
+        </div>
+
+        <div class="liteops-Pipeline__connector liteops-Pipeline__connector--active"></div>
+
+        <div class="liteops-Pipeline__node">
+          <div class="liteops-Pipeline__status liteops-Pipeline__status--active" aria-label="En cours"></div>
+          <div class="liteops-Pipeline__step">3</div>
+          <div class="liteops-Pipeline__nodeContent">
+            <span class="liteops-Pipeline__label">Enrichissement RAG</span>
+            <span class="liteops-Pipeline__description">Indexation et enrichissement semantique</span>
+          </div>
+        </div>
+
+        <div class="liteops-Pipeline__connector"></div>
+
+        <div class="liteops-Pipeline__node">
+          <div class="liteops-Pipeline__status liteops-Pipeline__status--pending" aria-label="En attente"></div>
+          <div class="liteops-Pipeline__step">4</div>
+          <div class="liteops-Pipeline__nodeContent">
+            <span class="liteops-Pipeline__label">Analyse semantique</span>
+            <span class="liteops-Pipeline__description">Classification et extraction d'insights</span>
+          </div>
+        </div>
+
+        <div class="liteops-Pipeline__connector"></div>
+
+        <div class="liteops-Pipeline__node">
+          <div class="liteops-Pipeline__status liteops-Pipeline__status--pending" aria-label="En attente"></div>
+          <div class="liteops-Pipeline__step">5</div>
+          <div class="liteops-Pipeline__nodeContent">
+            <span class="liteops-Pipeline__label">Generation rapport</span>
+            <span class="liteops-Pipeline__description">Production du rapport de synthese</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 2. All Complete ── -->
+  <section class="section">
+    <h2 class="section-heading">All Complete</h2>
+    <span class="section-label">Pipeline fully completed</span>
+    <hr class="section-divider">
+
+    <div class="liteops-Pipeline" role="img" aria-label="Pipeline terminee: toutes les etapes completees">
+      <div class="liteops-Pipeline__track">
+
+        <div class="liteops-Pipeline__node">
+          <div class="liteops-Pipeline__status liteops-Pipeline__status--complete"></div>
+          <div class="liteops-Pipeline__step">1</div>
+          <div class="liteops-Pipeline__nodeContent">
+            <span class="liteops-Pipeline__label">Collecte documents</span>
+            <span class="liteops-Pipeline__description">Ingestion des fichiers source depuis le SI</span>
+          </div>
+        </div>
+
+        <div class="liteops-Pipeline__connector liteops-Pipeline__connector--active"></div>
+
+        <div class="liteops-Pipeline__node">
+          <div class="liteops-Pipeline__status liteops-Pipeline__status--complete"></div>
+          <div class="liteops-Pipeline__step">2</div>
+          <div class="liteops-Pipeline__nodeContent">
+            <span class="liteops-Pipeline__label">Extraction OCR</span>
+            <span class="liteops-Pipeline__description">Reconnaissance optique et extraction des champs</span>
+          </div>
+        </div>
+
+        <div class="liteops-Pipeline__connector liteops-Pipeline__connector--active"></div>
+
+        <div class="liteops-Pipeline__node">
+          <div class="liteops-Pipeline__status liteops-Pipeline__status--complete"></div>
+          <div class="liteops-Pipeline__step">3</div>
+          <div class="liteops-Pipeline__nodeContent">
+            <span class="liteops-Pipeline__label">Enrichissement RAG</span>
+            <span class="liteops-Pipeline__description">Indexation et enrichissement semantique</span>
+          </div>
+        </div>
+
+        <div class="liteops-Pipeline__connector liteops-Pipeline__connector--active"></div>
+
+        <div class="liteops-Pipeline__node">
+          <div class="liteops-Pipeline__status liteops-Pipeline__status--complete"></div>
+          <div class="liteops-Pipeline__step">4</div>
+          <div class="liteops-Pipeline__nodeContent">
+            <span class="liteops-Pipeline__label">Analyse semantique</span>
+            <span class="liteops-Pipeline__description">Classification et extraction d'insights</span>
+          </div>
+        </div>
+
+        <div class="liteops-Pipeline__connector liteops-Pipeline__connector--active"></div>
+
+        <div class="liteops-Pipeline__node">
+          <div class="liteops-Pipeline__status liteops-Pipeline__status--complete"></div>
+          <div class="liteops-Pipeline__step">5</div>
+          <div class="liteops-Pipeline__nodeContent">
+            <span class="liteops-Pipeline__label">Generation rapport</span>
+            <span class="liteops-Pipeline__description">Production du rapport de synthese</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 3. Error State ── -->
+  <section class="section">
+    <h2 class="section-heading">Error State</h2>
+    <span class="section-label">Pipeline with error at step 3, remaining steps pending</span>
+    <hr class="section-divider">
+
+    <div class="liteops-Pipeline" role="img" aria-label="Pipeline en erreur: etape 3 echouee">
+      <div class="liteops-Pipeline__track">
+
+        <div class="liteops-Pipeline__node">
+          <div class="liteops-Pipeline__status liteops-Pipeline__status--complete"></div>
+          <div class="liteops-Pipeline__step">1</div>
+          <div class="liteops-Pipeline__nodeContent">
+            <span class="liteops-Pipeline__label">Collecte documents</span>
+            <span class="liteops-Pipeline__description">Ingestion des fichiers source depuis le SI</span>
+          </div>
+        </div>
+
+        <div class="liteops-Pipeline__connector liteops-Pipeline__connector--active"></div>
+
+        <div class="liteops-Pipeline__node">
+          <div class="liteops-Pipeline__status liteops-Pipeline__status--complete"></div>
+          <div class="liteops-Pipeline__step">2</div>
+          <div class="liteops-Pipeline__nodeContent">
+            <span class="liteops-Pipeline__label">Extraction OCR</span>
+            <span class="liteops-Pipeline__description">Reconnaissance optique et extraction des champs</span>
+          </div>
+        </div>
+
+        <div class="liteops-Pipeline__connector"></div>
+
+        <div class="liteops-Pipeline__node">
+          <div class="liteops-Pipeline__status liteops-Pipeline__status--error" aria-label="Erreur"></div>
+          <div class="liteops-Pipeline__step">3</div>
+          <div class="liteops-Pipeline__nodeContent">
+            <span class="liteops-Pipeline__label">Enrichissement RAG</span>
+            <span class="liteops-Pipeline__description">Erreur: timeout connexion au service d'indexation</span>
+          </div>
+        </div>
+
+        <div class="liteops-Pipeline__connector"></div>
+
+        <div class="liteops-Pipeline__node">
+          <div class="liteops-Pipeline__status liteops-Pipeline__status--pending"></div>
+          <div class="liteops-Pipeline__step">4</div>
+          <div class="liteops-Pipeline__nodeContent">
+            <span class="liteops-Pipeline__label">Analyse semantique</span>
+            <span class="liteops-Pipeline__description">Classification et extraction d'insights</span>
+          </div>
+        </div>
+
+        <div class="liteops-Pipeline__connector"></div>
+
+        <div class="liteops-Pipeline__node">
+          <div class="liteops-Pipeline__status liteops-Pipeline__status--pending"></div>
+          <div class="liteops-Pipeline__step">5</div>
+          <div class="liteops-Pipeline__nodeContent">
+            <span class="liteops-Pipeline__label">Generation rapport</span>
+            <span class="liteops-Pipeline__description">Production du rapport de synthese</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 4. Dark Theme ── -->
+  <section class="section">
+    <h2 class="section-heading">Dark Theme</h2>
+    <span class="section-label">Primary context -- pipelines appear in monitoring dashboards</span>
+    <hr class="section-divider">
+
+    <div class="dark-panel" data-theme="dark">
+      <span class="dark-panel-label">Dark dashboard context</span>
+
+      <div class="liteops-Pipeline" role="img" aria-label="Pipeline NAMIBIA en theme sombre">
+        <div class="liteops-Pipeline__track">
+
+          <div class="liteops-Pipeline__node">
+            <div class="liteops-Pipeline__status liteops-Pipeline__status--complete"></div>
+            <div class="liteops-Pipeline__step">1</div>
+            <div class="liteops-Pipeline__nodeContent">
+              <span class="liteops-Pipeline__label">Collecte documents</span>
+              <span class="liteops-Pipeline__description">Ingestion des fichiers source depuis le SI</span>
+            </div>
+          </div>
+
+          <div class="liteops-Pipeline__connector liteops-Pipeline__connector--active"></div>
+
+          <div class="liteops-Pipeline__node">
+            <div class="liteops-Pipeline__status liteops-Pipeline__status--complete"></div>
+            <div class="liteops-Pipeline__step">2</div>
+            <div class="liteops-Pipeline__nodeContent">
+              <span class="liteops-Pipeline__label">Extraction OCR</span>
+              <span class="liteops-Pipeline__description">Reconnaissance optique et extraction des champs</span>
+            </div>
+          </div>
+
+          <div class="liteops-Pipeline__connector liteops-Pipeline__connector--active"></div>
+
+          <div class="liteops-Pipeline__node">
+            <div class="liteops-Pipeline__status liteops-Pipeline__status--active"></div>
+            <div class="liteops-Pipeline__step">3</div>
+            <div class="liteops-Pipeline__nodeContent">
+              <span class="liteops-Pipeline__label">Enrichissement RAG</span>
+              <span class="liteops-Pipeline__description">Indexation et enrichissement semantique</span>
+            </div>
+          </div>
+
+          <div class="liteops-Pipeline__connector"></div>
+
+          <div class="liteops-Pipeline__node">
+            <div class="liteops-Pipeline__status liteops-Pipeline__status--pending"></div>
+            <div class="liteops-Pipeline__step">4</div>
+            <div class="liteops-Pipeline__nodeContent">
+              <span class="liteops-Pipeline__label">Analyse semantique</span>
+              <span class="liteops-Pipeline__description">Classification et extraction d'insights</span>
+            </div>
+          </div>
+
+          <div class="liteops-Pipeline__connector"></div>
+
+          <div class="liteops-Pipeline__node">
+            <div class="liteops-Pipeline__status liteops-Pipeline__status--pending"></div>
+            <div class="liteops-Pipeline__step">5</div>
+            <div class="liteops-Pipeline__nodeContent">
+              <span class="liteops-Pipeline__label">Generation rapport</span>
+              <span class="liteops-Pipeline__description">Production du rapport de synthese</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 5. Compact Variant ── -->
+  <section class="section">
+    <h2 class="section-heading">Compact Variant</h2>
+    <span class="section-label">Narrower nodes, no description -- for sidebars and small panels</span>
+    <hr class="section-divider">
+
+    <div class="liteops-Pipeline liteops-Pipeline--compact" role="img" aria-label="Pipeline compacte">
+      <div class="liteops-Pipeline__track">
+
+        <div class="liteops-Pipeline__node">
+          <div class="liteops-Pipeline__status liteops-Pipeline__status--complete"></div>
+          <div class="liteops-Pipeline__step">1</div>
+          <div class="liteops-Pipeline__nodeContent">
+            <span class="liteops-Pipeline__label">Collecte documents</span>
+            <span class="liteops-Pipeline__description">Hidden in compact</span>
+          </div>
+        </div>
+
+        <div class="liteops-Pipeline__connector liteops-Pipeline__connector--active"></div>
+
+        <div class="liteops-Pipeline__node">
+          <div class="liteops-Pipeline__status liteops-Pipeline__status--complete"></div>
+          <div class="liteops-Pipeline__step">2</div>
+          <div class="liteops-Pipeline__nodeContent">
+            <span class="liteops-Pipeline__label">Extraction OCR</span>
+            <span class="liteops-Pipeline__description">Hidden in compact</span>
+          </div>
+        </div>
+
+        <div class="liteops-Pipeline__connector liteops-Pipeline__connector--active"></div>
+
+        <div class="liteops-Pipeline__node">
+          <div class="liteops-Pipeline__status liteops-Pipeline__status--active"></div>
+          <div class="liteops-Pipeline__step">3</div>
+          <div class="liteops-Pipeline__nodeContent">
+            <span class="liteops-Pipeline__label">Enrichissement RAG</span>
+            <span class="liteops-Pipeline__description">Hidden in compact</span>
+          </div>
+        </div>
+
+        <div class="liteops-Pipeline__connector"></div>
+
+        <div class="liteops-Pipeline__node">
+          <div class="liteops-Pipeline__status liteops-Pipeline__status--pending"></div>
+          <div class="liteops-Pipeline__step">4</div>
+          <div class="liteops-Pipeline__nodeContent">
+            <span class="liteops-Pipeline__label">Analyse semantique</span>
+            <span class="liteops-Pipeline__description">Hidden in compact</span>
+          </div>
+        </div>
+
+        <div class="liteops-Pipeline__connector"></div>
+
+        <div class="liteops-Pipeline__node">
+          <div class="liteops-Pipeline__status liteops-Pipeline__status--pending"></div>
+          <div class="liteops-Pipeline__step">5</div>
+          <div class="liteops-Pipeline__nodeContent">
+            <span class="liteops-Pipeline__label">Generation rapport</span>
+            <span class="liteops-Pipeline__description">Hidden in compact</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>
