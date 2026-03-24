@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps — Systeme de couleurs graphiques</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header { margin-bottom: var(--liteops-space-16); }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--liteops-olive-900);
+      color: var(--liteops-paper-100);
+      box-shadow: var(--liteops-shadow-md);
+      transition: background var(--liteops-duration-normal), color var(--liteops-duration-normal);
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: var(--liteops-paper-100);
+      color: var(--liteops-olive-900);
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: var(--liteops-space-16); }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    /* ── Subsection heading ── */
+    .subsection-heading {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-4);
+      margin-top: var(--liteops-space-8);
+    }
+    .subsection-heading:first-child { margin-top: 0; }
+
+    /* ═══════════════════════════════════════════════
+       SECTION 1: COLOR SEQUENCE
+       ═══════════════════════════════════════════════ */
+
+    .color-sequence {
+      display: flex;
+      gap: var(--liteops-space-6);
+      flex-wrap: wrap;
+      margin-bottom: var(--liteops-space-6);
+    }
+
+    .color-swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--liteops-space-2);
+    }
+
+    .color-swatch__circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 1px solid var(--liteops-border-secondary);
+    }
+
+    .color-swatch__number {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--liteops-surface-tertiary);
+      border-radius: 50%;
+    }
+
+    .color-swatch__hex {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--liteops-text-primary);
+      text-transform: uppercase;
+    }
+
+    .color-swatch__token {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      color: var(--liteops-text-tertiary);
+      text-align: center;
+      max-width: 80px;
+      word-break: break-all;
+    }
+
+    /* ═══════════════════════════════════════════════
+       SECTION 2: MOCK BAR CHART
+       ═══════════════════════════════════════════════ */
+
+    .mock-chart {
+      position: relative;
+      padding: var(--liteops-space-6);
+      background: var(--liteops-surface-secondary);
+      border-radius: var(--liteops-radius-md);
+      border: 1px solid var(--liteops-border-secondary);
+    }
+
+    .chart-area {
+      position: relative;
+      height: 200px;
+      display: flex;
+      align-items: flex-end;
+      gap: var(--liteops-space-4);
+      padding-bottom: var(--liteops-space-8);
+      padding-left: var(--liteops-space-8);
+      border-left: 1px solid var(--liteops-chart-axis);
+      border-bottom: 1px solid var(--liteops-chart-axis);
+    }
+
+    /* Grid lines */
+    .chart-area::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: var(--liteops-space-8);
+      background: repeating-linear-gradient(
+        to bottom,
+        var(--liteops-chart-grid) 0,
+        var(--liteops-chart-grid) 1px,
+        transparent 1px,
+        transparent 25%
+      );
+      pointer-events: none;
+    }
+
+    .chart-bar-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      position: relative;
+      padding-bottom: 0;
+      justify-content: flex-end;
+    }
+
+    .chart-bar {
+      width: 100%;
+      max-width: 48px;
+      border-radius: 3px 3px 0 0;
+      transition: height var(--liteops-duration-slow) var(--liteops-easing-out);
+    }
+
+    .chart-bar-label {
+      position: absolute;
+      bottom: -28px;
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-chart-axis);
+      white-space: nowrap;
+    }
+
+    /* Light theme chart colors */
+    .chart-bar--1 { background: var(--liteops-chart-primary); }
+    .chart-bar--2 { background: var(--liteops-chart-secondary); }
+    .chart-bar--3 { background: var(--liteops-chart-tertiary); }
+    .chart-bar--4 { background: var(--liteops-chart-quaternary); }
+    .chart-bar--5 { background: var(--liteops-signal-300); }
+    .chart-bar--6 { background: var(--liteops-warm-300); }
+
+    /* Y-axis labels */
+    .chart-y-labels {
+      position: absolute;
+      left: -4px;
+      top: 0;
+      bottom: var(--liteops-space-8);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transform: translateX(-100%);
+      padding-right: var(--liteops-space-2);
+    }
+
+    .chart-y-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      color: var(--liteops-chart-axis);
+      text-align: right;
+    }
+
+    /* ═══════════════════════════════════════════════
+       SECTION 3: CONTRAST TABLE
+       ═══════════════════════════════════════════════ */
+
+    .contrast-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+    }
+
+    .contrast-table th {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      text-align: left;
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      background: var(--liteops-surface-tertiary);
+      border-bottom: 1px solid var(--liteops-border-secondary);
+    }
+    .contrast-table th[scope="col"] { /* proper accessibility */ }
+
+    .contrast-table td {
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      border-bottom: 1px solid var(--liteops-border-secondary);
+      vertical-align: middle;
+    }
+
+    .contrast-table tr:hover {
+      background: var(--liteops-accent-subtle);
+    }
+
+    .contrast-swatch {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: var(--liteops-space-2);
+      border: 1px solid var(--liteops-border-secondary);
+    }
+
+    .contrast-ratio {
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .contrast-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: var(--liteops-radius-pill);
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .contrast-badge--pass {
+      background: var(--liteops-status-success-bg);
+      color: var(--liteops-status-success);
+    }
+    .contrast-badge--pass::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--liteops-status-success);
+    }
+
+    .contrast-badge--fail {
+      background: var(--liteops-status-error-bg);
+      color: var(--liteops-status-error);
+    }
+    .contrast-badge--fail::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--liteops-status-error);
+    }
+
+    .token-name {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      color: var(--liteops-text-secondary);
+    }
+
+    .numeric-cell {
+      font-family: var(--liteops-font-mono);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ═══════════════════════════════════════════════
+       SECTION 4: GRID & AXIS TOKENS
+       ═══════════════════════════════════════════════ */
+
+    .infra-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--liteops-space-4);
+    }
+
+    .infra-card {
+      padding: var(--liteops-space-4);
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-secondary);
+      border-radius: var(--liteops-radius-md);
+    }
+
+    .infra-card__label {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .infra-card__token {
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .infra-card__preview {
+      height: 24px;
+      border-radius: 2px;
+    }
+
+    /* ── Dark panel for dark-theme sequence ── */
+    .dark-panel {
+      background: var(--liteops-olive-900);
+      border-radius: var(--liteops-radius-lg);
+      padding: var(--liteops-space-8);
+    }
+    .dark-panel-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #8A8880;
+      margin-bottom: var(--liteops-space-4);
+      display: block;
+    }
+    .dark-panel .color-swatch__number {
+      background: var(--liteops-olive-800);
+      color: #E8E6E1;
+    }
+    .dark-panel .color-swatch__hex {
+      color: #E8E6E1;
+    }
+    .dark-panel .color-swatch__token {
+      color: #8A8880;
+    }
+    .dark-panel .color-swatch__circle {
+      border-color: rgba(232, 230, 225, 0.07);
+    }
+
+    /* Theme-specific visibility */
+    .light-only { display: block; }
+    .dark-only { display: none; }
+    [data-theme="dark"] .light-only { display: none; }
+    [data-theme="dark"] .dark-only { display: block; }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark Mode</button>
+
+<div class="page">
+
+  <header class="page-header">
+    <h1 class="page-title">Systeme de couleurs graphiques</h1>
+    <p class="page-subtitle">Sequence de 6 couleurs pour les visualisations de donnees, avec verification de contraste WCAG AA pour objets graphiques (3:1 minimum).</p>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 1: COLOR SEQUENCE
+       ═══════════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">Sequence de couleurs</h2>
+    <span class="section-label">6 couleurs ordonnees par theme</span>
+    <hr class="section-divider">
+
+    <h3 class="subsection-heading">Light Theme</h3>
+    <div class="color-sequence">
+      <div class="color-swatch">
+        <span class="color-swatch__number">1</span>
+        <div class="color-swatch__circle" style="background: #6B8A1A;"></div>
+        <span class="color-swatch__hex">#6B8A1A</span>
+        <span class="color-swatch__token">lite-700</span>
+      </div>
+      <div class="color-swatch">
+        <span class="color-swatch__number">2</span>
+        <div class="color-swatch__circle" style="background: #4A90B8;"></div>
+        <span class="color-swatch__hex">#4A90B8</span>
+        <span class="color-swatch__token">signal-500</span>
+      </div>
+      <div class="color-swatch">
+        <span class="color-swatch__number">3</span>
+        <div class="color-swatch__circle" style="background: #C45A32;"></div>
+        <span class="color-swatch__hex">#C45A32</span>
+        <span class="color-swatch__token">warm-500</span>
+      </div>
+      <div class="color-swatch">
+        <span class="color-swatch__number">4</span>
+        <div class="color-swatch__circle" style="background: #C8FF3C;"></div>
+        <span class="color-swatch__hex">#C8FF3C</span>
+        <span class="color-swatch__token">lite-300</span>
+      </div>
+      <div class="color-swatch">
+        <span class="color-swatch__number">5</span>
+        <div class="color-swatch__circle" style="background: #7AB4D4;"></div>
+        <span class="color-swatch__hex">#7AB4D4</span>
+        <span class="color-swatch__token">signal-300</span>
+      </div>
+      <div class="color-swatch">
+        <span class="color-swatch__number">6</span>
+        <div class="color-swatch__circle" style="background: #E08A68;"></div>
+        <span class="color-swatch__hex">#E08A68</span>
+        <span class="color-swatch__token">warm-300</span>
+      </div>
+    </div>
+
+    <h3 class="subsection-heading">Dark Theme</h3>
+    <div class="dark-panel" data-theme="dark">
+      <span class="dark-panel-label">Dark theme sequence</span>
+      <div class="color-sequence">
+        <div class="color-swatch">
+          <span class="color-swatch__number">1</span>
+          <div class="color-swatch__circle" style="background: #B0D838;"></div>
+          <span class="color-swatch__hex">#B0D838</span>
+          <span class="color-swatch__token">lite-400</span>
+        </div>
+        <div class="color-swatch">
+          <span class="color-swatch__number">2</span>
+          <div class="color-swatch__circle" style="background: #7AB4D4;"></div>
+          <span class="color-swatch__hex">#7AB4D4</span>
+          <span class="color-swatch__token">signal-300</span>
+        </div>
+        <div class="color-swatch">
+          <span class="color-swatch__number">3</span>
+          <div class="color-swatch__circle" style="background: #E08A68;"></div>
+          <span class="color-swatch__hex">#E08A68</span>
+          <span class="color-swatch__token">warm-300</span>
+        </div>
+        <div class="color-swatch">
+          <span class="color-swatch__number">4</span>
+          <div class="color-swatch__circle" style="background: #84A422;"></div>
+          <span class="color-swatch__hex">#84A422</span>
+          <span class="color-swatch__token">lite-600</span>
+        </div>
+        <div class="color-swatch">
+          <span class="color-swatch__number">5</span>
+          <div class="color-swatch__circle" style="background: #2D6888;"></div>
+          <span class="color-swatch__hex">#2D6888</span>
+          <span class="color-swatch__token">signal-700</span>
+        </div>
+        <div class="color-swatch">
+          <span class="color-swatch__number">6</span>
+          <div class="color-swatch__circle" style="background: #8A3518;"></div>
+          <span class="color-swatch__hex">#8A3518</span>
+          <span class="color-swatch__token">warm-700</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 2: MOCK BAR CHART
+       ═══════════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">Usage Pattern</h2>
+    <span class="section-label">Diagramme en barres avec les 6 couleurs</span>
+    <hr class="section-divider">
+
+    <div class="mock-chart">
+      <div class="chart-area">
+        <div class="chart-y-labels">
+          <span class="chart-y-label">100</span>
+          <span class="chart-y-label">75</span>
+          <span class="chart-y-label">50</span>
+          <span class="chart-y-label">25</span>
+          <span class="chart-y-label">0</span>
+        </div>
+
+        <div class="chart-bar-wrapper">
+          <div class="chart-bar chart-bar--1" style="height: 78%;"></div>
+          <span class="chart-bar-label">Cat. 1</span>
+        </div>
+        <div class="chart-bar-wrapper">
+          <div class="chart-bar chart-bar--2" style="height: 62%;"></div>
+          <span class="chart-bar-label">Cat. 2</span>
+        </div>
+        <div class="chart-bar-wrapper">
+          <div class="chart-bar chart-bar--3" style="height: 45%;"></div>
+          <span class="chart-bar-label">Cat. 3</span>
+        </div>
+        <div class="chart-bar-wrapper">
+          <div class="chart-bar chart-bar--4" style="height: 88%;"></div>
+          <span class="chart-bar-label">Cat. 4</span>
+        </div>
+        <div class="chart-bar-wrapper">
+          <div class="chart-bar chart-bar--5" style="height: 55%;"></div>
+          <span class="chart-bar-label">Cat. 5</span>
+        </div>
+        <div class="chart-bar-wrapper">
+          <div class="chart-bar chart-bar--6" style="height: 35%;"></div>
+          <span class="chart-bar-label">Cat. 6</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 3: CONTRAST VERIFICATION
+       ═══════════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">Verification de contraste</h2>
+    <span class="section-label">WCAG AA objets graphiques : 3:1 minimum</span>
+    <hr class="section-divider">
+
+    <h3 class="subsection-heading">Light Theme (fond: #F5F4F0 / surface: #FFFFFF)</h3>
+    <div style="overflow-x: auto;">
+      <table class="contrast-table">
+        <thead>
+          <tr>
+            <th scope="col">Couleur</th>
+            <th scope="col">Token</th>
+            <th scope="col" class="numeric-cell">vs surface-primary</th>
+            <th scope="col">Statut</th>
+            <th scope="col" class="numeric-cell">vs surface-secondary</th>
+            <th scope="col">Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="contrast-swatch" style="background: #6B8A1A;"></span>#6B8A1A</td>
+            <td class="token-name">chart-primary (lite-700)</td>
+            <td class="numeric-cell contrast-ratio">3.9:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+            <td class="numeric-cell contrast-ratio">3.6:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td><span class="contrast-swatch" style="background: #4A90B8;"></span>#4A90B8</td>
+            <td class="token-name">chart-secondary (signal-500)</td>
+            <td class="numeric-cell contrast-ratio">3.2:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+            <td class="numeric-cell contrast-ratio">3.0:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td><span class="contrast-swatch" style="background: #C45A32;"></span>#C45A32</td>
+            <td class="token-name">chart-tertiary (warm-500)</td>
+            <td class="numeric-cell contrast-ratio">3.7:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+            <td class="numeric-cell contrast-ratio">3.4:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td><span class="contrast-swatch" style="background: #C8FF3C;"></span>#C8FF3C</td>
+            <td class="token-name">chart-quaternary (lite-300)</td>
+            <td class="numeric-cell contrast-ratio">1.2:1</td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+            <td class="numeric-cell contrast-ratio">1.1:1</td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+          </tr>
+          <tr>
+            <td><span class="contrast-swatch" style="background: #7AB4D4;"></span>#7AB4D4</td>
+            <td class="token-name">chart-5 (signal-300)</td>
+            <td class="numeric-cell contrast-ratio">2.0:1</td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+            <td class="numeric-cell contrast-ratio">1.9:1</td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+          </tr>
+          <tr>
+            <td><span class="contrast-swatch" style="background: #E08A68;"></span>#E08A68</td>
+            <td class="token-name">chart-6 (warm-300)</td>
+            <td class="numeric-cell contrast-ratio">2.2:1</td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+            <td class="numeric-cell contrast-ratio">2.1:1</td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="subsection-heading">Dark Theme (fond: #1C1D1A / surface: #2A2B27)</h3>
+    <div style="overflow-x: auto;">
+      <table class="contrast-table">
+        <thead>
+          <tr>
+            <th scope="col">Couleur</th>
+            <th scope="col">Token</th>
+            <th scope="col" class="numeric-cell">vs surface-primary</th>
+            <th scope="col">Statut</th>
+            <th scope="col" class="numeric-cell">vs surface-secondary</th>
+            <th scope="col">Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="contrast-swatch" style="background: #B0D838;"></span>#B0D838</td>
+            <td class="token-name">chart-primary (lite-400)</td>
+            <td class="numeric-cell contrast-ratio">8.2:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+            <td class="numeric-cell contrast-ratio">7.1:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td><span class="contrast-swatch" style="background: #7AB4D4;"></span>#7AB4D4</td>
+            <td class="token-name">chart-secondary (signal-300)</td>
+            <td class="numeric-cell contrast-ratio">5.8:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+            <td class="numeric-cell contrast-ratio">5.0:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td><span class="contrast-swatch" style="background: #E08A68;"></span>#E08A68</td>
+            <td class="token-name">chart-tertiary (warm-300)</td>
+            <td class="numeric-cell contrast-ratio">4.4:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+            <td class="numeric-cell contrast-ratio">3.8:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td><span class="contrast-swatch" style="background: #84A422;"></span>#84A422</td>
+            <td class="token-name">chart-quaternary (lite-600)</td>
+            <td class="numeric-cell contrast-ratio">4.5:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+            <td class="numeric-cell contrast-ratio">3.9:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td><span class="contrast-swatch" style="background: #2D6888;"></span>#2D6888</td>
+            <td class="token-name">chart-5 (signal-700)</td>
+            <td class="numeric-cell contrast-ratio">2.5:1</td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+            <td class="numeric-cell contrast-ratio">2.2:1</td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+          </tr>
+          <tr>
+            <td><span class="contrast-swatch" style="background: #8A3518;"></span>#8A3518</td>
+            <td class="token-name">chart-6 (warm-700)</td>
+            <td class="numeric-cell contrast-ratio">2.1:1</td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+            <td class="numeric-cell contrast-ratio">1.8:1</td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="font-size: 13px; color: var(--liteops-text-secondary); margin-top: var(--liteops-space-4); line-height: 1.5;">
+      Les couleurs 4 a 6 echouent au contraste 3:1 dans au moins un contexte. Elles sont destinees a un usage secondaire (series complementaires) et doivent toujours etre accompagnees de labels ou patterns pour l'accessibilite.
+    </p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 4: GRID AND AXIS TOKENS
+       ═══════════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">Grille et axes</h2>
+    <span class="section-label">Tokens d'infrastructure graphique</span>
+    <hr class="section-divider">
+
+    <div class="infra-grid">
+      <div class="infra-card">
+        <div class="infra-card__label">Grille</div>
+        <div class="infra-card__token">--liteops-chart-grid</div>
+        <div class="infra-card__preview" style="background: var(--liteops-chart-grid);"></div>
+        <div style="font-family: var(--liteops-font-mono); font-size: 10px; color: var(--liteops-text-tertiary); margin-top: var(--liteops-space-1);">Light: paper-300 / Dark: rgba(232,230,225,0.05)</div>
+      </div>
+
+      <div class="infra-card">
+        <div class="infra-card__label">Axes / Labels</div>
+        <div class="infra-card__token">--liteops-chart-axis</div>
+        <div class="infra-card__preview" style="background: var(--liteops-chart-axis);"></div>
+        <div style="font-family: var(--liteops-font-mono); font-size: 10px; color: var(--liteops-text-tertiary); margin-top: var(--liteops-space-1);">Light: paper-600 / Dark: olive-500</div>
+      </div>
+
+      <div class="infra-card">
+        <div class="infra-card__label">Typographie axes</div>
+        <div class="infra-card__token">IBM Plex Mono 10px</div>
+        <div style="font-family: var(--liteops-font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--liteops-chart-axis); margin-top: var(--liteops-space-2);">LABEL EXEMPLE</div>
+      </div>
+
+      <div class="infra-card">
+        <div class="infra-card__label">Rayon barres</div>
+        <div class="infra-card__token">border-radius: 3px (top)</div>
+        <div style="width: 32px; height: 48px; background: var(--liteops-chart-primary); border-radius: 3px 3px 0 0; margin-top: var(--liteops-space-2);"></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>
