@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Atom — Glass Panel</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header {
+      margin-bottom: var(--liteops-space-16);
+    }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: #1C1D1A;
+      color: #E8E6E1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: background 200ms, color 200ms;
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: #F5F4F0;
+      color: #1C1D1A;
+    }
+
+    /* ── Section ── */
+    .section {
+      margin-bottom: var(--liteops-space-16);
+    }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    .section-note {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-secondary);
+      margin-bottom: var(--liteops-space-6);
+      max-width: 680px;
+    }
+
+    .exception-note {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      color: var(--liteops-text-tertiary);
+      background: var(--liteops-surface-tertiary);
+      border-radius: var(--liteops-radius-sm);
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      margin-bottom: var(--liteops-space-6);
+      border-left: 3px solid var(--liteops-status-warning);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       GLASS PANEL COMPONENT
+       ═══════════════════════════════════════════════════ */
+
+    /*
+     * Glass panels use semi-transparent rgba backgrounds
+     * because backdrop-filter requires transparency to show
+     * the frosted-glass effect. This is a documented exception
+     * to the "no hardcoded colors" rule.
+     */
+
+    .liteops-GlassPanel {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-6);
+      box-shadow: var(--liteops-shadow-md);
+    }
+
+    .liteops-GlassPanel--sm {
+      padding: var(--liteops-space-4);
+    }
+
+    .liteops-GlassPanel--md {
+      padding: var(--liteops-space-6);
+    }
+
+    .liteops-GlassPanel--lg {
+      padding: var(--liteops-space-8);
+    }
+
+    /* Light theme variant */
+    [data-theme="light"] .liteops-GlassPanel {
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: var(--liteops-shadow-md);
+    }
+
+    /* ── Demo Backgrounds ── */
+    .demo-gradient-bg {
+      background: var(--liteops-gradient-hero-green-olive);
+      border-radius: var(--liteops-radius-lg);
+      padding: var(--liteops-space-10);
+      margin-bottom: var(--liteops-space-6);
+    }
+
+    .demo-paper-bg {
+      background: var(--liteops-paper-200);
+      border-radius: var(--liteops-radius-lg);
+      padding: var(--liteops-space-10);
+      margin-bottom: var(--liteops-space-6);
+    }
+
+    .demo-dark-solid-bg {
+      background: var(--liteops-olive-900);
+      border-radius: var(--liteops-radius-lg);
+      padding: var(--liteops-space-10);
+      margin-bottom: var(--liteops-space-6);
+    }
+
+    .demo-row {
+      display: flex;
+      gap: var(--liteops-space-6);
+      flex-wrap: wrap;
+    }
+
+    .demo-panel {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    /* ── Panel Inner Content Styles ── */
+    .panel-title {
+      font-family: var(--liteops-font-display);
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .panel-text {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-secondary);
+      margin-bottom: var(--liteops-space-4);
+    }
+
+    .panel-kpi {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-1);
+    }
+
+    .panel-kpi-value {
+      font-family: var(--liteops-font-body);
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--liteops-text-primary);
+    }
+
+    /* Force light text on gradient/dark backgrounds */
+    .demo-gradient-bg .panel-title,
+    .demo-dark-solid-bg .panel-title {
+      color: #E8E6E1;
+    }
+
+    .demo-gradient-bg .panel-text,
+    .demo-dark-solid-bg .panel-text {
+      color: #C0BEB8;
+    }
+
+    .demo-gradient-bg .panel-kpi,
+    .demo-dark-solid-bg .panel-kpi {
+      color: #8A8880;
+    }
+
+    .demo-gradient-bg .panel-kpi-value,
+    .demo-dark-solid-bg .panel-kpi-value {
+      color: #E8E6E1;
+    }
+
+    /* Force dark text on paper backgrounds */
+    .demo-paper-bg .panel-title { color: #1C1D1A; }
+    .demo-paper-bg .panel-text { color: #4E5444; }
+    .demo-paper-bg .panel-kpi { color: #8C8A82; }
+    .demo-paper-bg .panel-kpi-value { color: #1C1D1A; }
+
+    /* ── Size Label ── */
+    .size-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: var(--liteops-space-3);
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: var(--liteops-radius-pill);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .demo-gradient-bg .size-label,
+    .demo-dark-solid-bg .size-label {
+      color: #C0BEB8;
+    }
+
+    .demo-paper-bg .size-label {
+      color: #6E6C64;
+      background: rgba(0, 0, 0, 0.06);
+    }
+
+    /* ── Nested Demo ── */
+    .nested-outer {
+      max-width: 480px;
+    }
+
+    .nested-inner {
+      margin-top: var(--liteops-space-4);
+    }
+
+    .nested-inner .panel-text {
+      font-size: 13px;
+    }
+
+    /* ── Code Block ── */
+    .code-block {
+      background: var(--liteops-olive-900);
+      color: #E8E6E1;
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-4) var(--liteops-space-6);
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      line-height: 1.8;
+      overflow-x: auto;
+      margin-bottom: var(--liteops-space-6);
+    }
+
+    .code-block .kw { color: #B0D838; }
+    .code-block .val { color: #7AB4D4; }
+    .code-block .cmt { color: #6B7260; }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Light Mode</button>
+
+<div class="page">
+
+  <header class="page-header">
+    <h1 class="page-title">Glass Panel</h1>
+    <p class="page-subtitle">Panneau a effet givre avec backdrop-filter pour surfaces elevees et overlays</p>
+  </header>
+
+  <!-- ── Section A: Exception Note ── -->
+  <section class="section">
+    <span class="section-label">Note</span>
+    <h2 class="section-heading">Exception aux tokens</h2>
+    <hr class="section-divider">
+    <div class="exception-note">
+      Les Glass Panels utilisent des valeurs rgba() codees en dur pour le background et le border.
+      C'est necessaire car backdrop-filter exige un fond semi-transparent pour produire l'effet givre.
+      Cette exception est documentee et ne s'applique qu'a ce composant.
+    </div>
+  </section>
+
+  <!-- ── Section B: Sizes on Gradient ── -->
+  <section class="section">
+    <span class="section-label">Section A</span>
+    <h2 class="section-heading">Tailles sur fond degrade</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Les trois tailles de padding (sm, md, lg) affichees sur le degrade hero pour demontrer l'effet givre.
+    </p>
+
+    <div class="demo-gradient-bg">
+      <div class="demo-row">
+
+        <div class="demo-panel">
+          <span class="size-label">--sm</span>
+          <div class="liteops-GlassPanel liteops-GlassPanel--sm">
+            <div class="panel-kpi">Taux d'adoption</div>
+            <div class="panel-kpi-value">78.4%</div>
+          </div>
+        </div>
+
+        <div class="demo-panel">
+          <span class="size-label">--md (defaut)</span>
+          <div class="liteops-GlassPanel liteops-GlassPanel--md">
+            <div class="panel-title">Initiative en cours</div>
+            <div class="panel-text">Transformation digitale du back-office assurance</div>
+          </div>
+        </div>
+
+        <div class="demo-panel">
+          <span class="size-label">--lg</span>
+          <div class="liteops-GlassPanel liteops-GlassPanel--lg">
+            <div class="panel-title">Diagnostic complet</div>
+            <div class="panel-text">Evaluation des capacites de changement organisationnel sur 8 dimensions</div>
+            <div style="margin-top: var(--liteops-space-3);">
+              <div class="panel-kpi">Friction detectee</div>
+              <div class="panel-kpi-value" style="font-size: 22px;">Moyenne</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Section C: Light Theme Variant ── -->
+  <section class="section">
+    <span class="section-label">Section B</span>
+    <h2 class="section-heading">Variante theme clair</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Sur fond paper, le Glass Panel utilise une transparence plus elevee et une bordure sombre subtile.
+    </p>
+
+    <div class="demo-paper-bg">
+      <div class="demo-row">
+
+        <div class="demo-panel">
+          <div class="liteops-GlassPanel" style="background: rgba(255, 255, 255, 0.65); border: 1px solid rgba(0, 0, 0, 0.06);">
+            <div class="panel-title">KPI mensuel</div>
+            <div class="panel-kpi">Engagement equipes</div>
+            <div class="panel-kpi-value">92%</div>
+          </div>
+        </div>
+
+        <div class="demo-panel">
+          <div class="liteops-GlassPanel" style="background: rgba(255, 255, 255, 0.65); border: 1px solid rgba(0, 0, 0, 0.06);">
+            <div class="panel-title">Suivi projet</div>
+            <div class="panel-text">3 actions en retard sur le plan de mitigation des frictions identifiees</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Section D: Nested Panels ── -->
+  <section class="section">
+    <span class="section-label">Section C</span>
+    <h2 class="section-heading">Imbrication</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Panels imbriques pour des compositions complexes comme les cartes de detail dans un dashboard.
+    </p>
+
+    <div class="demo-dark-solid-bg">
+      <div class="liteops-GlassPanel liteops-GlassPanel--lg nested-outer">
+        <div class="panel-title">Vue consolidee</div>
+        <div class="panel-text">Resultats du diagnostic organisationnel Q3 2024</div>
+
+        <div class="liteops-GlassPanel liteops-GlassPanel--sm nested-inner">
+          <div class="panel-kpi">Score global</div>
+          <div class="panel-kpi-value">7.2 / 10</div>
+          <div class="panel-text" style="margin-top: var(--liteops-space-2); font-size: 13px;">
+            Capacite de changement evaluee sur 842 collaborateurs
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Section E: CSS Reference ── -->
+  <section class="section">
+    <span class="section-label">Section D</span>
+    <h2 class="section-heading">Reference CSS</h2>
+    <hr class="section-divider">
+
+    <div class="code-block">
+      <span class="cmt">/* Base — dark theme (default) */</span><br>
+      <span class="kw">.liteops-GlassPanel</span> {<br>
+      &nbsp;&nbsp;<span class="kw">background</span>: <span class="val">rgba(255, 255, 255, 0.06)</span>;<br>
+      &nbsp;&nbsp;<span class="kw">backdrop-filter</span>: <span class="val">blur(16px)</span>;<br>
+      &nbsp;&nbsp;<span class="kw">-webkit-backdrop-filter</span>: <span class="val">blur(16px)</span>;<br>
+      &nbsp;&nbsp;<span class="kw">border</span>: <span class="val">1px solid rgba(255, 255, 255, 0.1)</span>;<br>
+      &nbsp;&nbsp;<span class="kw">border-radius</span>: <span class="val">var(--liteops-radius-md)</span>;<br>
+      &nbsp;&nbsp;<span class="kw">padding</span>: <span class="val">var(--liteops-space-6)</span>;<br>
+      }<br><br>
+      <span class="cmt">/* Light theme variant */</span><br>
+      <span class="kw">[data-theme="light"] .liteops-GlassPanel</span> {<br>
+      &nbsp;&nbsp;<span class="kw">background</span>: <span class="val">rgba(255, 255, 255, 0.65)</span>;<br>
+      &nbsp;&nbsp;<span class="kw">border</span>: <span class="val">1px solid rgba(0, 0, 0, 0.06)</span>;<br>
+      }<br><br>
+      <span class="cmt">/* Size modifiers */</span><br>
+      <span class="kw">.liteops-GlassPanel--sm</span> { <span class="kw">padding</span>: <span class="val">var(--liteops-space-4)</span>; }<br>
+      <span class="kw">.liteops-GlassPanel--md</span> { <span class="kw">padding</span>: <span class="val">var(--liteops-space-6)</span>; }<br>
+      <span class="kw">.liteops-GlassPanel--lg</span> { <span class="kw">padding</span>: <span class="val">var(--liteops-space-8)</span>; }
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>

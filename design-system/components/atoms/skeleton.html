@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Atom — Skeleton</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header {
+      margin-bottom: var(--liteops-space-16);
+    }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: #1C1D1A;
+      color: #E8E6E1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: background 200ms, color 200ms;
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: #F5F4F0;
+      color: #1C1D1A;
+    }
+
+    /* ── Section ── */
+    .section {
+      margin-bottom: var(--liteops-space-16);
+    }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    .section-note {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-secondary);
+      margin-bottom: var(--liteops-space-6);
+      max-width: 680px;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       SKELETON COMPONENT
+       ═══════════════════════════════════════════════════ */
+
+    @keyframes liteops-skeleton-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .liteops-Skeleton {
+      background: var(--liteops-surface-tertiary);
+      border-radius: var(--liteops-radius-sm);
+      animation: liteops-skeleton-pulse 1.8s var(--liteops-easing-in-out) infinite;
+    }
+
+    .liteops-Skeleton--rect {
+      width: 100%;
+      height: 120px;
+      border-radius: var(--liteops-radius-md);
+    }
+
+    .liteops-Skeleton--circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+    }
+
+    .liteops-Skeleton--text {
+      width: 100%;
+      height: 14px;
+      border-radius: 4px;
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      .liteops-Skeleton {
+        animation: none;
+      }
+    }
+
+    /* ── Demo Helpers ── */
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--liteops-space-6);
+    }
+
+    .demo-card {
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-secondary);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-6);
+    }
+
+    .demo-card-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-4);
+    }
+
+    .demo-row {
+      display: flex;
+      gap: var(--liteops-space-6);
+      flex-wrap: wrap;
+    }
+
+    .text-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--liteops-space-2);
+    }
+
+    .text-group .liteops-Skeleton--text:last-child {
+      width: 60%;
+    }
+
+    /* ── Composed: Skeleton Card ── */
+    .skeleton-card {
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-secondary);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-6);
+      max-width: 360px;
+    }
+
+    .skeleton-card-header {
+      display: flex;
+      align-items: center;
+      gap: var(--liteops-space-4);
+      margin-bottom: var(--liteops-space-5);
+    }
+
+    .skeleton-card-header .text-group {
+      flex: 1;
+    }
+
+    .skeleton-card-header .liteops-Skeleton--text:first-child {
+      width: 60%;
+      height: 16px;
+    }
+
+    .skeleton-card-header .liteops-Skeleton--text:last-child {
+      width: 40%;
+      height: 12px;
+    }
+
+    /* ── Composed: Skeleton Table ── */
+    .skeleton-table {
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-secondary);
+      border-radius: var(--liteops-radius-md);
+      overflow: hidden;
+      max-width: 600px;
+    }
+
+    .skeleton-table-header {
+      display: grid;
+      grid-template-columns: 40px 2fr 1fr 1fr 80px;
+      gap: var(--liteops-space-3);
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      background: var(--liteops-surface-tertiary);
+    }
+
+    .skeleton-table-header .liteops-Skeleton--text {
+      height: 10px;
+      opacity: 0.5;
+    }
+
+    .skeleton-table-row {
+      display: grid;
+      grid-template-columns: 40px 2fr 1fr 1fr 80px;
+      gap: var(--liteops-space-3);
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      border-top: 1px solid var(--liteops-border-secondary);
+      align-items: center;
+    }
+
+    .skeleton-table-row .liteops-Skeleton--circle {
+      width: 28px;
+      height: 28px;
+    }
+
+    .skeleton-table-row .liteops-Skeleton--text {
+      height: 12px;
+    }
+
+    /* ── Dark Panel ── */
+    .demo-dark-panel {
+      background: var(--liteops-olive-900);
+      border-radius: var(--liteops-radius-lg);
+      padding: var(--liteops-space-8);
+    }
+
+    .demo-dark-panel .demo-card {
+      background: var(--liteops-olive-800);
+      border-color: rgba(232, 230, 225, 0.07);
+    }
+
+    .demo-dark-panel .skeleton-card {
+      background: var(--liteops-olive-800);
+      border-color: rgba(232, 230, 225, 0.07);
+    }
+
+    .demo-dark-panel .skeleton-table {
+      background: var(--liteops-olive-800);
+      border-color: rgba(232, 230, 225, 0.07);
+    }
+
+    .demo-dark-panel .skeleton-table-header {
+      background: var(--liteops-olive-950);
+    }
+
+    .demo-dark-panel .skeleton-table-row {
+      border-color: rgba(232, 230, 225, 0.07);
+    }
+
+    /* ── Code Block ── */
+    .code-block {
+      background: var(--liteops-olive-900);
+      color: #E8E6E1;
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-4) var(--liteops-space-6);
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      line-height: 1.8;
+      overflow-x: auto;
+      margin-bottom: var(--liteops-space-6);
+    }
+
+    .code-block .kw { color: #B0D838; }
+    .code-block .val { color: #7AB4D4; }
+    .code-block .cmt { color: #6B7260; }
+
+    @media (max-width: 768px) {
+      .demo-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Light Mode</button>
+
+<div class="page">
+
+  <header class="page-header">
+    <h1 class="page-title">Skeleton</h1>
+    <p class="page-subtitle">Etats de chargement animes pour surfaces, avatars et lignes de texte</p>
+  </header>
+
+  <!-- ── Section A: Base Variants ── -->
+  <section class="section">
+    <span class="section-label">Section A</span>
+    <h2 class="section-heading">Variantes de base</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Trois formes primitives : rectangle (images, cartes), cercle (avatars), et ligne de texte (paragraphes).
+    </p>
+
+    <div class="demo-grid">
+
+      <div class="demo-card">
+        <div class="demo-card-label">--rect (rectangle)</div>
+        <div class="liteops-Skeleton liteops-Skeleton--rect"></div>
+      </div>
+
+      <div class="demo-card">
+        <div class="demo-card-label">--circle (cercle)</div>
+        <div style="display: flex; gap: var(--liteops-space-4); align-items: center;">
+          <div class="liteops-Skeleton liteops-Skeleton--circle"></div>
+          <div class="liteops-Skeleton liteops-Skeleton--circle" style="width: 36px; height: 36px;"></div>
+          <div class="liteops-Skeleton liteops-Skeleton--circle" style="width: 24px; height: 24px;"></div>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="demo-card-label">--text (ligne de texte)</div>
+        <div class="text-group">
+          <div class="liteops-Skeleton liteops-Skeleton--text"></div>
+          <div class="liteops-Skeleton liteops-Skeleton--text"></div>
+          <div class="liteops-Skeleton liteops-Skeleton--text"></div>
+          <div class="liteops-Skeleton liteops-Skeleton--text"></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Section B: Composed Card ── -->
+  <section class="section">
+    <span class="section-label">Section B</span>
+    <h2 class="section-heading">Carte composee</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Composition type : avatar cercle + lignes de texte + rectangle. Simule le chargement d'une fiche collaborateur ou d'une initiative.
+    </p>
+
+    <div class="demo-row">
+
+      <div class="skeleton-card">
+        <div class="skeleton-card-header">
+          <div class="liteops-Skeleton liteops-Skeleton--circle"></div>
+          <div class="text-group">
+            <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 60%; height: 16px;"></div>
+            <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 40%; height: 12px;"></div>
+          </div>
+        </div>
+        <div class="text-group" style="margin-bottom: var(--liteops-space-4);">
+          <div class="liteops-Skeleton liteops-Skeleton--text"></div>
+          <div class="liteops-Skeleton liteops-Skeleton--text"></div>
+          <div class="liteops-Skeleton liteops-Skeleton--text"></div>
+        </div>
+        <div class="liteops-Skeleton liteops-Skeleton--rect" style="height: 80px;"></div>
+      </div>
+
+      <div class="skeleton-card">
+        <div class="skeleton-card-header">
+          <div class="liteops-Skeleton liteops-Skeleton--circle"></div>
+          <div class="text-group">
+            <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 70%; height: 16px;"></div>
+            <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 30%; height: 12px;"></div>
+          </div>
+        </div>
+        <div class="text-group">
+          <div class="liteops-Skeleton liteops-Skeleton--text"></div>
+          <div class="liteops-Skeleton liteops-Skeleton--text"></div>
+          <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 45%;"></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Section C: Table Pattern ── -->
+  <section class="section">
+    <span class="section-label">Section C</span>
+    <h2 class="section-heading">Patron table</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Skeleton applique a une structure de table : en-tete + lignes de donnees. Utile pour les tableaux d'equipes et de suivi.
+    </p>
+
+    <div class="skeleton-table">
+      <div class="skeleton-table-header">
+        <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 24px;"></div>
+        <div class="liteops-Skeleton liteops-Skeleton--text"></div>
+        <div class="liteops-Skeleton liteops-Skeleton--text"></div>
+        <div class="liteops-Skeleton liteops-Skeleton--text"></div>
+        <div class="liteops-Skeleton liteops-Skeleton--text"></div>
+      </div>
+      <div class="skeleton-table-row">
+        <div class="liteops-Skeleton liteops-Skeleton--circle"></div>
+        <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 80%;"></div>
+        <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 60%;"></div>
+        <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 50%;"></div>
+        <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 70%;"></div>
+      </div>
+      <div class="skeleton-table-row">
+        <div class="liteops-Skeleton liteops-Skeleton--circle"></div>
+        <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 65%;"></div>
+        <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 75%;"></div>
+        <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 40%;"></div>
+        <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 55%;"></div>
+      </div>
+      <div class="skeleton-table-row">
+        <div class="liteops-Skeleton liteops-Skeleton--circle"></div>
+        <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 90%;"></div>
+        <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 45%;"></div>
+        <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 65%;"></div>
+        <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 80%;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Section D: Dark Theme Panel ── -->
+  <section class="section">
+    <span class="section-label">Section D</span>
+    <h2 class="section-heading">Panneau theme sombre</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Rendu sur surface olive-900 forcee, simulant un dashboard en theme sombre.
+    </p>
+
+    <div class="demo-dark-panel">
+      <div class="demo-row">
+
+        <div class="skeleton-card" style="flex: 1; max-width: none;">
+          <div class="skeleton-card-header">
+            <div class="liteops-Skeleton liteops-Skeleton--circle"></div>
+            <div class="text-group" style="flex: 1;">
+              <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 50%; height: 16px;"></div>
+              <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 35%; height: 12px;"></div>
+            </div>
+          </div>
+          <div class="liteops-Skeleton liteops-Skeleton--rect" style="height: 100px;"></div>
+        </div>
+
+        <div class="skeleton-table" style="flex: 1.5; max-width: none;">
+          <div class="skeleton-table-header">
+            <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 24px;"></div>
+            <div class="liteops-Skeleton liteops-Skeleton--text"></div>
+            <div class="liteops-Skeleton liteops-Skeleton--text"></div>
+            <div class="liteops-Skeleton liteops-Skeleton--text"></div>
+            <div class="liteops-Skeleton liteops-Skeleton--text"></div>
+          </div>
+          <div class="skeleton-table-row">
+            <div class="liteops-Skeleton liteops-Skeleton--circle"></div>
+            <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 70%;"></div>
+            <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 55%;"></div>
+            <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 60%;"></div>
+            <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 45%;"></div>
+          </div>
+          <div class="skeleton-table-row">
+            <div class="liteops-Skeleton liteops-Skeleton--circle"></div>
+            <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 85%;"></div>
+            <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 40%;"></div>
+            <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 50%;"></div>
+            <div class="liteops-Skeleton liteops-Skeleton--text" style="width: 70%;"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Section E: CSS Reference ── -->
+  <section class="section">
+    <span class="section-label">Section E</span>
+    <h2 class="section-heading">Reference CSS</h2>
+    <hr class="section-divider">
+
+    <div class="code-block">
+      <span class="cmt">/* Keyframes */</span><br>
+      <span class="kw">@keyframes</span> <span class="val">liteops-skeleton-pulse</span> {<br>
+      &nbsp;&nbsp;<span class="val">0%, 100%</span> { <span class="kw">opacity</span>: <span class="val">1</span>; }<br>
+      &nbsp;&nbsp;<span class="val">50%</span> { <span class="kw">opacity</span>: <span class="val">0.4</span>; }<br>
+      }<br><br>
+      <span class="cmt">/* Base */</span><br>
+      <span class="kw">.liteops-Skeleton</span> {<br>
+      &nbsp;&nbsp;<span class="kw">background</span>: <span class="val">var(--liteops-surface-tertiary)</span>;<br>
+      &nbsp;&nbsp;<span class="kw">border-radius</span>: <span class="val">var(--liteops-radius-sm)</span>;<br>
+      &nbsp;&nbsp;<span class="kw">animation</span>: <span class="val">liteops-skeleton-pulse 1.8s ease-in-out infinite</span>;<br>
+      }<br><br>
+      <span class="cmt">/* Variants */</span><br>
+      <span class="kw">.liteops-Skeleton--rect</span> &nbsp;&nbsp;{ <span class="kw">height</span>: <span class="val">120px</span>; <span class="kw">border-radius</span>: <span class="val">var(--liteops-radius-md)</span>; }<br>
+      <span class="kw">.liteops-Skeleton--circle</span> { <span class="kw">width</span>: <span class="val">48px</span>; <span class="kw">height</span>: <span class="val">48px</span>; <span class="kw">border-radius</span>: <span class="val">50%</span>; }<br>
+      <span class="kw">.liteops-Skeleton--text</span> &nbsp;&nbsp;{ <span class="kw">height</span>: <span class="val">14px</span>; <span class="kw">border-radius</span>: <span class="val">4px</span>; }<br><br>
+      <span class="cmt">/* Reduced motion */</span><br>
+      <span class="kw">@media</span> (<span class="val">prefers-reduced-motion: reduce</span>) {<br>
+      &nbsp;&nbsp;<span class="kw">.liteops-Skeleton</span> { <span class="kw">animation</span>: <span class="val">none</span>; }<br>
+      }
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>
