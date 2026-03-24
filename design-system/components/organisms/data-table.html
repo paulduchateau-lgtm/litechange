@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Organism — Data Table</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header { margin-bottom: var(--liteops-space-16); }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--liteops-olive-900);
+      color: var(--liteops-paper-100);
+      box-shadow: var(--liteops-shadow-md);
+      transition: background var(--liteops-duration-normal), color var(--liteops-duration-normal);
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: var(--liteops-paper-100);
+      color: var(--liteops-olive-900);
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: var(--liteops-space-16); }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    /* ── Dark Panel ── */
+    .dark-panel {
+      background: var(--liteops-olive-900);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-8);
+      margin-top: var(--liteops-space-4);
+    }
+
+    .dark-panel-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-paper-600);
+      margin-bottom: var(--liteops-space-4);
+      display: block;
+    }
+
+    /* ── Overflow Demo Container ── */
+    .overflow-container {
+      max-width: 500px;
+      border: 2px dashed var(--liteops-border-primary);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-4);
+    }
+
+    .overflow-hint {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-3);
+    }
+
+    /* ═══════════════════════════════════════════════
+       BADGE COMPONENT (composed from atoms/badge)
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: var(--liteops-radius-pill);
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      line-height: 1.4;
+      white-space: nowrap;
+    }
+
+    .liteops-Badge::before {
+      content: '';
+      display: block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .liteops-Badge--success {
+      background: var(--liteops-status-success-bg);
+      color: var(--liteops-status-success);
+    }
+    .liteops-Badge--success::before { background: var(--liteops-status-success); }
+
+    .liteops-Badge--warning {
+      background: var(--liteops-status-warning-bg);
+      color: var(--liteops-status-warning);
+    }
+    .liteops-Badge--warning::before { background: var(--liteops-status-warning); }
+
+    .liteops-Badge--error {
+      background: var(--liteops-status-error-bg);
+      color: var(--liteops-status-error);
+    }
+    .liteops-Badge--error::before { background: var(--liteops-status-error); }
+
+    .liteops-Badge--info {
+      background: var(--liteops-status-info-bg);
+      color: var(--liteops-status-info);
+    }
+    .liteops-Badge--info::before { background: var(--liteops-status-info); }
+
+    .liteops-Badge--accent {
+      background: var(--liteops-accent-subtle);
+      color: var(--liteops-accent-text);
+    }
+    .liteops-Badge--accent::before { background: var(--liteops-accent-text); }
+
+    /* ═══════════════════════════════════════════════
+       BUTTON COMPONENT (composed from atoms/button)
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--liteops-space-2);
+      font-family: var(--liteops-font-body);
+      font-weight: 500;
+      border: 1px solid transparent;
+      border-radius: var(--liteops-radius-md);
+      cursor: pointer;
+      transition: all var(--liteops-duration-normal) ease;
+      text-decoration: none;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .liteops-Button--sm { padding: 6px 16px; font-size: 13px; }
+    .liteops-Button--md { padding: 10px 24px; font-size: 15px; }
+
+    .liteops-Button--ghost {
+      background: transparent;
+      color: var(--liteops-text-primary);
+    }
+    .liteops-Button--ghost:hover {
+      background: var(--liteops-interactive-ghost-hover);
+    }
+
+    .liteops-Button:focus-visible {
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       DATA TABLE COMPONENT
+       ═══════════════════════════════════════════════ */
+
+    .liteops-DataTable__wrapper {
+      overflow-x: auto;
+      border: 1px solid var(--liteops-border-primary);
+      border-radius: var(--liteops-radius-md);
+    }
+
+    .liteops-DataTable__wrapper:focus-visible {
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+
+    .liteops-DataTable {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    /* ── Header ── */
+    .liteops-DataTable__header {
+      background: var(--liteops-surface-tertiary);
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      text-align: left;
+      white-space: nowrap;
+      user-select: none;
+      position: relative;
+    }
+
+    .liteops-DataTable__header.is-sortable {
+      cursor: pointer;
+    }
+
+    .liteops-DataTable__header.is-sortable:hover {
+      color: var(--liteops-text-secondary);
+    }
+
+    .liteops-DataTable__header.is-sortable:hover .liteops-DataTable__sort-icon {
+      opacity: 0.5;
+    }
+
+    .liteops-DataTable__header--numeric {
+      text-align: right;
+    }
+
+    /* ── Sort Icon ── */
+    .liteops-DataTable__sort-icon {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      margin-left: 4px;
+      vertical-align: middle;
+      opacity: 0;
+      transition: opacity var(--liteops-duration-fast), transform var(--liteops-duration-fast);
+    }
+
+    .liteops-DataTable__header.is-sorted-asc .liteops-DataTable__sort-icon,
+    .liteops-DataTable__header.is-sorted-desc .liteops-DataTable__sort-icon {
+      opacity: 1;
+    }
+
+    .liteops-DataTable__header.is-sorted-desc .liteops-DataTable__sort-icon {
+      transform: rotate(180deg);
+    }
+
+    /* ── Rows ── */
+    .liteops-DataTable__row {
+      border-bottom: 1px solid var(--liteops-border-secondary);
+      transition: background var(--liteops-duration-fast);
+    }
+
+    .liteops-DataTable__row:nth-child(even) {
+      background: color-mix(in srgb, var(--liteops-surface-tertiary) 30%, transparent);
+    }
+
+    .liteops-DataTable__row:hover {
+      background: var(--liteops-accent-subtle);
+    }
+
+    .liteops-DataTable__row.is-selected {
+      background: var(--liteops-accent-subtle);
+    }
+
+    .liteops-DataTable__row:last-child {
+      border-bottom: none;
+    }
+
+    /* ── Cells ── */
+    .liteops-DataTable__cell {
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-primary);
+      vertical-align: middle;
+    }
+
+    .liteops-DataTable__cell--numeric {
+      font-family: var(--liteops-font-mono);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .liteops-DataTable__cell--action {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .liteops-DataTable__cell--checkbox {
+      width: 40px;
+      text-align: center;
+    }
+
+    .liteops-DataTable__cell--checkbox input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--liteops-accent-primary);
+      cursor: pointer;
+    }
+
+    .liteops-DataTable__cell--name {
+      font-weight: 500;
+    }
+
+    .liteops-DataTable__cell--secondary {
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Empty State ── */
+    .liteops-DataTable__empty {
+      padding: var(--liteops-space-12) var(--liteops-space-6);
+      text-align: center;
+    }
+
+    .liteops-DataTable__empty-text {
+      font-family: var(--liteops-font-body);
+      font-size: 15px;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-4);
+    }
+
+    /* ── Action Button (three-dot) ── */
+    .liteops-DataTable__action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: var(--liteops-radius-sm);
+      background: transparent;
+      color: var(--liteops-text-tertiary);
+      cursor: pointer;
+      transition: background var(--liteops-duration-fast), color var(--liteops-duration-fast);
+    }
+
+    .liteops-DataTable__action-btn:hover {
+      background: var(--liteops-interactive-ghost-hover);
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-DataTable__action-btn:focus-visible {
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark Mode</button>
+
+<div class="page">
+
+  <header class="page-header">
+    <h1 class="page-title">Data Table</h1>
+    <p class="page-subtitle">Enterprise data table organism with sortable headers, numeric formatting, badge status cells, zebra striping, and row selection. Composes Badge and Button atoms.</p>
+  </header>
+
+  <!-- ══════════════════════════════════════════
+       Section 1: Default Table
+       ══════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">Default Table</h2>
+    <span class="section-label">Initiatives en cours &mdash; sortable headers, badge status, numeric columns</span>
+    <hr class="section-divider">
+
+    <div class="liteops-DataTable__wrapper" tabindex="0" role="region" aria-label="Tableau des initiatives en cours">
+      <table class="liteops-DataTable">
+        <thead>
+          <tr>
+            <th scope="col" class="liteops-DataTable__header is-sortable is-sorted-asc" aria-sort="ascending">
+              Initiative
+              <svg class="liteops-DataTable__sort-icon" width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><path d="M4 1L7 5H1L4 1Z"/></svg>
+            </th>
+            <th scope="col" class="liteops-DataTable__header is-sortable">
+              Responsable
+              <svg class="liteops-DataTable__sort-icon" width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><path d="M4 1L7 5H1L4 1Z"/></svg>
+            </th>
+            <th scope="col" class="liteops-DataTable__header is-sortable">
+              Statut
+              <svg class="liteops-DataTable__sort-icon" width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><path d="M4 1L7 5H1L4 1Z"/></svg>
+            </th>
+            <th scope="col" class="liteops-DataTable__header liteops-DataTable__header--numeric is-sortable">
+              Avancement
+              <svg class="liteops-DataTable__sort-icon" width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><path d="M4 1L7 5H1L4 1Z"/></svg>
+            </th>
+            <th scope="col" class="liteops-DataTable__header liteops-DataTable__header--numeric is-sortable">
+              Signaux
+              <svg class="liteops-DataTable__sort-icon" width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><path d="M4 1L7 5H1L4 1Z"/></svg>
+            </th>
+            <th scope="col" class="liteops-DataTable__header is-sortable">
+              Date
+              <svg class="liteops-DataTable__sort-icon" width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><path d="M4 1L7 5H1L4 1Z"/></svg>
+            </th>
+            <th scope="col" class="liteops-DataTable__header" aria-label="Actions"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="liteops-DataTable__row">
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Migration SI Finance</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">M. Lefebvre</td>
+            <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--accent">En cours</span></td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">72%</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">14</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">12 mars 2026</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--action">
+              <button class="liteops-DataTable__action-btn" aria-label="Actions pour Migration SI Finance">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="3" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="13" r="1.5"/></svg>
+              </button>
+            </td>
+          </tr>
+          <tr class="liteops-DataTable__row">
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Refonte process RH</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">Mme Dubois</td>
+            <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--accent">En cours</span></td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">45%</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">8</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">3 mars 2026</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--action">
+              <button class="liteops-DataTable__action-btn" aria-label="Actions pour Refonte process RH">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="3" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="13" r="1.5"/></svg>
+              </button>
+            </td>
+          </tr>
+          <tr class="liteops-DataTable__row">
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Transformation digitale agences</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">M. Martin</td>
+            <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--success">Termine</span></td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">100%</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">3</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">28 fev 2026</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--action">
+              <button class="liteops-DataTable__action-btn" aria-label="Actions pour Transformation digitale agences">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="3" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="13" r="1.5"/></svg>
+              </button>
+            </td>
+          </tr>
+          <tr class="liteops-DataTable__row">
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Deploiement CRM unifie</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">Mme Bernard</td>
+            <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--warning">En attente</span></td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">15%</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">22</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">18 mars 2026</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--action">
+              <button class="liteops-DataTable__action-btn" aria-label="Actions pour Deploiement CRM unifie">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="3" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="13" r="1.5"/></svg>
+              </button>
+            </td>
+          </tr>
+          <tr class="liteops-DataTable__row">
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Conduite du changement CPAM</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">M. Moreau</td>
+            <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--error">Bloque</span></td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">33%</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">31</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">5 mars 2026</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--action">
+              <button class="liteops-DataTable__action-btn" aria-label="Actions pour Conduite du changement CPAM">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="3" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="13" r="1.5"/></svg>
+              </button>
+            </td>
+          </tr>
+          <tr class="liteops-DataTable__row">
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Formation managers terrain</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">Mme Laurent</td>
+            <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--accent">En cours</span></td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">58%</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">6</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">10 mars 2026</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--action">
+              <button class="liteops-DataTable__action-btn" aria-label="Actions pour Formation managers terrain">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="3" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="13" r="1.5"/></svg>
+              </button>
+            </td>
+          </tr>
+          <tr class="liteops-DataTable__row">
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Observatoire adoption outils</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">M. Petit</td>
+            <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--success">Termine</span></td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">100%</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">2</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">15 fev 2026</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--action">
+              <button class="liteops-DataTable__action-btn" aria-label="Actions pour Observatoire adoption outils">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="3" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="13" r="1.5"/></svg>
+              </button>
+            </td>
+          </tr>
+          <tr class="liteops-DataTable__row">
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Centralisation donnees mutuelle</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">Mme Garcia</td>
+            <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--warning">En attente</span></td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">8%</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">17</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">20 mars 2026</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--action">
+              <button class="liteops-DataTable__action-btn" aria-label="Actions pour Centralisation donnees mutuelle">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="3" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="13" r="1.5"/></svg>
+              </button>
+            </td>
+          </tr>
+          <tr class="liteops-DataTable__row">
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Pilote IA service client</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">M. Roux</td>
+            <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--accent">En cours</span></td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">27%</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">11</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">14 mars 2026</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--action">
+              <button class="liteops-DataTable__action-btn" aria-label="Actions pour Pilote IA service client">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="3" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="13" r="1.5"/></svg>
+              </button>
+            </td>
+          </tr>
+          <tr class="liteops-DataTable__row">
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Reorganisation back-office</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">Mme Thomas</td>
+            <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--accent">En cours</span></td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">61%</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">9</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">8 mars 2026</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--action">
+              <button class="liteops-DataTable__action-btn" aria-label="Actions pour Reorganisation back-office">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="3" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="13" r="1.5"/></svg>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       Section 2: Dark Theme
+       ══════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">Dark Theme</h2>
+    <span class="section-label">Table on dark background via data-theme="dark"</span>
+    <hr class="section-divider">
+
+    <div class="dark-panel" data-theme="dark">
+      <span class="dark-panel-label">Dark context</span>
+      <div class="liteops-DataTable__wrapper" tabindex="0" role="region" aria-label="Tableau des initiatives (theme sombre)">
+        <table class="liteops-DataTable">
+          <thead>
+            <tr>
+              <th scope="col" class="liteops-DataTable__header is-sortable">
+                Initiative
+                <svg class="liteops-DataTable__sort-icon" width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><path d="M4 1L7 5H1L4 1Z"/></svg>
+              </th>
+              <th scope="col" class="liteops-DataTable__header is-sortable">
+                Responsable
+                <svg class="liteops-DataTable__sort-icon" width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><path d="M4 1L7 5H1L4 1Z"/></svg>
+              </th>
+              <th scope="col" class="liteops-DataTable__header is-sortable">
+                Statut
+                <svg class="liteops-DataTable__sort-icon" width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><path d="M4 1L7 5H1L4 1Z"/></svg>
+              </th>
+              <th scope="col" class="liteops-DataTable__header liteops-DataTable__header--numeric is-sortable is-sorted-desc" aria-sort="descending">
+                Avancement
+                <svg class="liteops-DataTable__sort-icon" width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><path d="M4 1L7 5H1L4 1Z"/></svg>
+              </th>
+              <th scope="col" class="liteops-DataTable__header liteops-DataTable__header--numeric is-sortable">
+                Signaux
+                <svg class="liteops-DataTable__sort-icon" width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><path d="M4 1L7 5H1L4 1Z"/></svg>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="liteops-DataTable__row">
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Migration SI Finance</td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">M. Lefebvre</td>
+              <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--accent">En cours</span></td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">72%</td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">14</td>
+            </tr>
+            <tr class="liteops-DataTable__row">
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Conduite du changement CPAM</td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">M. Moreau</td>
+              <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--error">Bloque</span></td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">33%</td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">31</td>
+            </tr>
+            <tr class="liteops-DataTable__row">
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Deploiement CRM unifie</td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">Mme Bernard</td>
+              <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--warning">En attente</span></td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">15%</td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">22</td>
+            </tr>
+            <tr class="liteops-DataTable__row">
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Transformation digitale agences</td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">M. Martin</td>
+              <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--success">Termine</span></td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">100%</td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">3</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       Section 3: Overflow Behavior
+       ══════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">Overflow Behavior</h2>
+    <span class="section-label">Table inside a 500px container &mdash; horizontal scroll enabled</span>
+    <hr class="section-divider">
+
+    <p class="overflow-hint">The container below is constrained to 500px. Scroll horizontally to see all columns.</p>
+
+    <div class="overflow-container">
+      <div class="liteops-DataTable__wrapper" tabindex="0" role="region" aria-label="Tableau avec defilement horizontal">
+        <table class="liteops-DataTable">
+          <thead>
+            <tr>
+              <th scope="col" class="liteops-DataTable__header is-sortable">Initiative<svg class="liteops-DataTable__sort-icon" width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><path d="M4 1L7 5H1L4 1Z"/></svg></th>
+              <th scope="col" class="liteops-DataTable__header">Responsable</th>
+              <th scope="col" class="liteops-DataTable__header">Statut</th>
+              <th scope="col" class="liteops-DataTable__header liteops-DataTable__header--numeric">Avancement</th>
+              <th scope="col" class="liteops-DataTable__header liteops-DataTable__header--numeric">Signaux</th>
+              <th scope="col" class="liteops-DataTable__header">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="liteops-DataTable__row">
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Migration SI Finance</td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">M. Lefebvre</td>
+              <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--accent">En cours</span></td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">72%</td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">14</td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">12 mars 2026</td>
+            </tr>
+            <tr class="liteops-DataTable__row">
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Refonte process RH</td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">Mme Dubois</td>
+              <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--accent">En cours</span></td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">45%</td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">8</td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">3 mars 2026</td>
+            </tr>
+            <tr class="liteops-DataTable__row">
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Conduite du changement CPAM</td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">M. Moreau</td>
+              <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--error">Bloque</span></td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">33%</td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">31</td>
+              <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">5 mars 2026</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       Section 4: Empty State
+       ══════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">Empty State</h2>
+    <span class="section-label">Table with no data rows</span>
+    <hr class="section-divider">
+
+    <div class="liteops-DataTable__wrapper" tabindex="0" role="region" aria-label="Tableau vide">
+      <table class="liteops-DataTable">
+        <thead>
+          <tr>
+            <th scope="col" class="liteops-DataTable__header">Initiative</th>
+            <th scope="col" class="liteops-DataTable__header">Responsable</th>
+            <th scope="col" class="liteops-DataTable__header">Statut</th>
+            <th scope="col" class="liteops-DataTable__header liteops-DataTable__header--numeric">Avancement</th>
+            <th scope="col" class="liteops-DataTable__header liteops-DataTable__header--numeric">Signaux</th>
+            <th scope="col" class="liteops-DataTable__header">Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="6" class="liteops-DataTable__empty">
+              <p class="liteops-DataTable__empty-text">Aucune initiative trouvee</p>
+              <button class="liteops-Button liteops-Button--ghost liteops-Button--sm">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
+                Creer une initiative
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       Section 5: Row Selection
+       ══════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">Row Selection</h2>
+    <span class="section-label">Checkbox column with selected row state</span>
+    <hr class="section-divider">
+
+    <div class="liteops-DataTable__wrapper" tabindex="0" role="region" aria-label="Tableau avec selection de lignes">
+      <table class="liteops-DataTable">
+        <thead>
+          <tr>
+            <th scope="col" class="liteops-DataTable__header liteops-DataTable__cell--checkbox">
+              <input type="checkbox" aria-label="Tout selectionner">
+            </th>
+            <th scope="col" class="liteops-DataTable__header is-sortable">
+              Initiative
+              <svg class="liteops-DataTable__sort-icon" width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><path d="M4 1L7 5H1L4 1Z"/></svg>
+            </th>
+            <th scope="col" class="liteops-DataTable__header">Responsable</th>
+            <th scope="col" class="liteops-DataTable__header">Statut</th>
+            <th scope="col" class="liteops-DataTable__header liteops-DataTable__header--numeric">Avancement</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="liteops-DataTable__row is-selected">
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--checkbox">
+              <input type="checkbox" checked aria-label="Selectionner Migration SI Finance">
+            </td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Migration SI Finance</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">M. Lefebvre</td>
+            <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--accent">En cours</span></td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">72%</td>
+          </tr>
+          <tr class="liteops-DataTable__row">
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--checkbox">
+              <input type="checkbox" aria-label="Selectionner Refonte process RH">
+            </td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Refonte process RH</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">Mme Dubois</td>
+            <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--accent">En cours</span></td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">45%</td>
+          </tr>
+          <tr class="liteops-DataTable__row is-selected">
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--checkbox">
+              <input type="checkbox" checked aria-label="Selectionner Conduite du changement CPAM">
+            </td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Conduite du changement CPAM</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">M. Moreau</td>
+            <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--error">Bloque</span></td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">33%</td>
+          </tr>
+          <tr class="liteops-DataTable__row">
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--checkbox">
+              <input type="checkbox" aria-label="Selectionner Deploiement CRM unifie">
+            </td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Deploiement CRM unifie</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">Mme Bernard</td>
+            <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--warning">En attente</span></td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">15%</td>
+          </tr>
+          <tr class="liteops-DataTable__row">
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--checkbox">
+              <input type="checkbox" aria-label="Selectionner Formation managers terrain">
+            </td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Formation managers terrain</td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">Mme Laurent</td>
+            <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--accent">En cours</span></td>
+            <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">58%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>
