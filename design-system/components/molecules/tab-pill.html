@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Molecule — Tab / Pill</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header { margin-bottom: var(--liteops-space-16); }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--liteops-olive-900);
+      color: var(--liteops-paper-100);
+      box-shadow: var(--liteops-shadow-md);
+      transition: background var(--liteops-duration-normal), color var(--liteops-duration-normal);
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: var(--liteops-paper-100);
+      color: var(--liteops-olive-900);
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: var(--liteops-space-16); }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    /* ── Dark Panel (inline preview) ── */
+    .dark-panel {
+      background: var(--liteops-olive-900);
+      border-radius: var(--liteops-radius-lg);
+      padding: var(--liteops-space-8);
+      margin-top: var(--liteops-space-6);
+    }
+    .dark-panel-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #8A8880;
+      margin-bottom: var(--liteops-space-4);
+      display: block;
+    }
+
+    /* ── Tab Content Panel ── */
+    .tab-content {
+      padding: var(--liteops-space-5);
+      font-size: 14px;
+      color: var(--liteops-text-secondary);
+      border: 1px solid var(--liteops-border-secondary);
+      border-top: none;
+      border-radius: 0 0 var(--liteops-radius-sm) var(--liteops-radius-sm);
+    }
+    .tab-content-panel { display: none; }
+    .tab-content-panel.is-active { display: block; }
+
+    .dark-panel .tab-content {
+      color: #C0BEB8;
+      border-color: rgba(232, 230, 225, 0.07);
+    }
+
+    /* ═══════════════════════════════════════════════
+       LINE TABS COMPONENT
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Tabs {
+      width: 100%;
+    }
+
+    .liteops-Tabs__list {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--liteops-border-secondary);
+      list-style: none;
+    }
+
+    .liteops-Tabs__tab {
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--liteops-text-secondary);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: color var(--liteops-duration-normal) ease;
+      white-space: nowrap;
+    }
+
+    .liteops-Tabs__tab:hover {
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-Tabs__tab.is-active {
+      color: var(--liteops-accent-text);
+    }
+
+    .liteops-Tabs__tab.is-active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--liteops-accent-primary);
+      border-radius: 1px;
+    }
+
+    .liteops-Tabs__tab:focus-visible {
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: -2px;
+    }
+
+    /* Dark panel overrides for line tabs */
+    .dark-panel .liteops-Tabs__list {
+      border-bottom-color: rgba(232, 230, 225, 0.07);
+    }
+    .dark-panel .liteops-Tabs__tab {
+      color: #C0BEB8;
+    }
+    .dark-panel .liteops-Tabs__tab:hover {
+      color: #E8E6E1;
+    }
+    .dark-panel .liteops-Tabs__tab.is-active {
+      color: var(--liteops-lite-400);
+    }
+    .dark-panel .liteops-Tabs__tab.is-active::after {
+      background: var(--liteops-lite-400);
+    }
+    .dark-panel .liteops-Tabs__tab:focus-visible {
+      outline-color: var(--liteops-lite-400);
+    }
+
+    /* ═══════════════════════════════════════════════
+       PILL TABS COMPONENT
+       ═══════════════════════════════════════════════ */
+
+    .liteops-PillTabs {
+      width: 100%;
+    }
+
+    .liteops-PillTabs__list {
+      display: flex;
+      gap: var(--liteops-space-1);
+      padding: var(--liteops-space-1);
+      background: var(--liteops-surface-tertiary);
+      border-radius: var(--liteops-radius-sm);
+      list-style: none;
+      width: fit-content;
+    }
+
+    .liteops-PillTabs__pill {
+      padding: 6px 16px;
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--liteops-text-secondary);
+      background: transparent;
+      border: none;
+      border-radius: var(--liteops-radius-sm);
+      cursor: pointer;
+      transition: all var(--liteops-duration-normal) ease;
+      white-space: nowrap;
+    }
+
+    .liteops-PillTabs__pill:hover {
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-PillTabs__pill.is-active {
+      background: var(--liteops-surface-elevated);
+      color: var(--liteops-text-primary);
+      box-shadow: var(--liteops-shadow-xs);
+    }
+
+    .liteops-PillTabs__pill:focus-visible {
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: -2px;
+    }
+
+    /* Dark panel overrides for pill tabs */
+    .dark-panel .liteops-PillTabs__list {
+      background: var(--liteops-olive-950);
+    }
+    .dark-panel .liteops-PillTabs__pill {
+      color: #C0BEB8;
+    }
+    .dark-panel .liteops-PillTabs__pill:hover {
+      color: #E8E6E1;
+    }
+    .dark-panel .liteops-PillTabs__pill.is-active {
+      background: var(--liteops-olive-800);
+      color: #E8E6E1;
+      box-shadow: var(--liteops-shadow-xs);
+    }
+    .dark-panel .liteops-PillTabs__pill:focus-visible {
+      outline-color: var(--liteops-lite-400);
+    }
+
+    /* ── Showcase helpers ── */
+    .showcase-row {
+      margin-bottom: var(--liteops-space-8);
+    }
+    .showcase-row:last-child {
+      margin-bottom: 0;
+    }
+    .variant-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-3);
+    }
+    .dark-panel .variant-label {
+      color: #8A8880;
+    }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark Mode</button>
+
+<div class="page">
+
+  <header class="page-header">
+    <h1 class="page-title">Tab / Pill</h1>
+    <p class="page-subtitle">Navigation molecules — Line Tabs with active underline indicator and Pill Tabs with contained active background. Both support keyboard navigation and content switching.</p>
+  </header>
+
+  <!-- ── Line Tabs ── -->
+  <section class="section">
+    <h2 class="section-heading">Line Tabs</h2>
+    <span class="section-label">Underline indicator on active tab</span>
+    <hr class="section-divider">
+
+    <div class="showcase-row">
+      <p class="variant-label">With content switching</p>
+      <nav class="liteops-Tabs" role="tablist" aria-label="Exemple onglets" data-tabs="line-demo">
+        <ul class="liteops-Tabs__list">
+          <li><button class="liteops-Tabs__tab is-active" role="tab" aria-selected="true" aria-controls="line-panel-1" data-tab="line-panel-1">Tableau de bord</button></li>
+          <li><button class="liteops-Tabs__tab" role="tab" aria-selected="false" aria-controls="line-panel-2" data-tab="line-panel-2">Signaux</button></li>
+          <li><button class="liteops-Tabs__tab" role="tab" aria-selected="false" aria-controls="line-panel-3" data-tab="line-panel-3">Historique</button></li>
+        </ul>
+      </nav>
+      <div class="tab-content">
+        <div id="line-panel-1" class="tab-content-panel is-active" role="tabpanel">Vue d'ensemble des indicateurs de changement et metriques d'adoption en temps reel.</div>
+        <div id="line-panel-2" class="tab-content-panel" role="tabpanel">Signaux faibles detectes par l'observatoire de transformation.</div>
+        <div id="line-panel-3" class="tab-content-panel" role="tabpanel">Historique des evenements et points de mesure sur les 12 derniers mois.</div>
+      </div>
+    </div>
+
+    <div class="showcase-row">
+      <p class="variant-label">Tabs only (no content)</p>
+      <nav class="liteops-Tabs" role="tablist" aria-label="Exemple navigation">
+        <ul class="liteops-Tabs__list">
+          <li><button class="liteops-Tabs__tab is-active" role="tab" aria-selected="true">Actif</button></li>
+          <li><button class="liteops-Tabs__tab" role="tab" aria-selected="false">Inactif</button></li>
+          <li><button class="liteops-Tabs__tab" role="tab" aria-selected="false">Inactif</button></li>
+          <li><button class="liteops-Tabs__tab" role="tab" aria-selected="false">Inactif</button></li>
+          <li><button class="liteops-Tabs__tab" role="tab" aria-selected="false">Inactif</button></li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Dark panel preview -->
+    <div class="dark-panel" data-theme="dark">
+      <span class="dark-panel-label">Dark theme preview</span>
+      <nav class="liteops-Tabs" role="tablist" aria-label="Onglets sombre">
+        <ul class="liteops-Tabs__list">
+          <li><button class="liteops-Tabs__tab is-active" role="tab" aria-selected="true">Tableau de bord</button></li>
+          <li><button class="liteops-Tabs__tab" role="tab" aria-selected="false">Signaux</button></li>
+          <li><button class="liteops-Tabs__tab" role="tab" aria-selected="false">Historique</button></li>
+        </ul>
+      </nav>
+    </div>
+  </section>
+
+  <!-- ── Pill Tabs ── -->
+  <section class="section">
+    <h2 class="section-heading">Pill Tabs</h2>
+    <span class="section-label">Contained background on active pill</span>
+    <hr class="section-divider">
+
+    <div class="showcase-row">
+      <p class="variant-label">With content switching</p>
+      <nav class="liteops-PillTabs" role="tablist" aria-label="Exemple pilules" data-tabs="pill-demo">
+        <ul class="liteops-PillTabs__list">
+          <li><button class="liteops-PillTabs__pill is-active" role="tab" aria-selected="true" aria-controls="pill-panel-1" data-tab="pill-panel-1">Semaine</button></li>
+          <li><button class="liteops-PillTabs__pill" role="tab" aria-selected="false" aria-controls="pill-panel-2" data-tab="pill-panel-2">Mois</button></li>
+          <li><button class="liteops-PillTabs__pill" role="tab" aria-selected="false" aria-controls="pill-panel-3" data-tab="pill-panel-3">Trimestre</button></li>
+        </ul>
+      </nav>
+      <div class="tab-content" style="border-top: 1px solid var(--liteops-border-secondary); border-radius: var(--liteops-radius-sm); margin-top: var(--liteops-space-3);">
+        <div id="pill-panel-1" class="tab-content-panel is-active" role="tabpanel">Donnees de la semaine en cours : 147 reponses collectees, taux de participation 68%.</div>
+        <div id="pill-panel-2" class="tab-content-panel" role="tabpanel">Vue mensuelle : tendance haussiere de l'adoption (+12% vs M-1).</div>
+        <div id="pill-panel-3" class="tab-content-panel" role="tabpanel">Bilan trimestriel : 3 initiatives lancees, 2 en phase d'acceleration.</div>
+      </div>
+    </div>
+
+    <div class="showcase-row">
+      <p class="variant-label">Pill variants</p>
+      <nav class="liteops-PillTabs" role="tablist" aria-label="Filtres">
+        <ul class="liteops-PillTabs__list">
+          <li><button class="liteops-PillTabs__pill is-active" role="tab" aria-selected="true">Tous</button></li>
+          <li><button class="liteops-PillTabs__pill" role="tab" aria-selected="false">En cours</button></li>
+          <li><button class="liteops-PillTabs__pill" role="tab" aria-selected="false">Termines</button></li>
+          <li><button class="liteops-PillTabs__pill" role="tab" aria-selected="false">Archives</button></li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Dark panel preview -->
+    <div class="dark-panel" data-theme="dark">
+      <span class="dark-panel-label">Dark theme preview</span>
+      <nav class="liteops-PillTabs" role="tablist" aria-label="Pilules sombre">
+        <ul class="liteops-PillTabs__list">
+          <li><button class="liteops-PillTabs__pill is-active" role="tab" aria-selected="true">Semaine</button></li>
+          <li><button class="liteops-PillTabs__pill" role="tab" aria-selected="false">Mois</button></li>
+          <li><button class="liteops-PillTabs__pill" role="tab" aria-selected="false">Trimestre</button></li>
+        </ul>
+      </nav>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Tab Switching Script ── -->
+<script>
+  // Theme toggle
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+
+  // Tab content switching for line tabs and pill tabs
+  document.querySelectorAll('[data-tabs]').forEach(tabNav => {
+    const tabs = tabNav.querySelectorAll('[role="tab"]');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const panelId = tab.getAttribute('data-tab');
+        if (!panelId) return;
+
+        // Deactivate siblings
+        tabs.forEach(t => {
+          t.classList.remove('is-active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        // Activate clicked
+        tab.classList.add('is-active');
+        tab.setAttribute('aria-selected', 'true');
+
+        // Switch panels
+        const contentWrapper = tabNav.nextElementSibling;
+        if (contentWrapper && contentWrapper.classList.contains('tab-content')) {
+          contentWrapper.querySelectorAll('.tab-content-panel').forEach(p => p.classList.remove('is-active'));
+          const target = document.getElementById(panelId);
+          if (target) target.classList.add('is-active');
+        }
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
