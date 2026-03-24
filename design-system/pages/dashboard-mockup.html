@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps — Tableau de bord</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: var(--liteops-font-body);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+      display: flex;
+    }
+
+    /* ═══════════════════════════════════════════════
+       SIDEBAR (from sidebar.html organism)
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Sidebar {
+      width: 240px;
+      min-height: 100vh;
+      background: var(--liteops-olive-900);
+      border-right: 1px solid rgba(232, 230, 225, 0.07);
+      display: flex;
+      flex-direction: column;
+      padding: var(--liteops-space-8) var(--liteops-space-6) var(--liteops-space-6);
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+
+    .liteops-Sidebar__header {
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    .liteops-Sidebar__logo {
+      font-family: var(--liteops-font-display);
+      font-size: 20px;
+      line-height: 1;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .liteops-Sidebar__logo-lite {
+      font-style: italic;
+      font-weight: 300;
+      color: #C8FF3C;
+    }
+
+    .liteops-Sidebar__logo-ops {
+      font-weight: 400;
+      color: #E8E6E1;
+    }
+
+    .liteops-Sidebar__nav {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .liteops-Sidebar__footer {
+      margin-top: auto;
+      padding-top: var(--liteops-space-6);
+      border-top: 1px solid rgba(232, 230, 225, 0.07);
+      display: flex;
+      align-items: center;
+      gap: var(--liteops-space-3);
+    }
+
+    .liteops-Sidebar__avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--liteops-olive-700);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--liteops-font-body);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--liteops-paper-200);
+      flex-shrink: 0;
+    }
+
+    .liteops-Sidebar__user-info {
+      overflow: hidden;
+    }
+
+    .liteops-Sidebar__user-name {
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+      color: var(--liteops-paper-200);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .liteops-Sidebar__user-role {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      color: #8A8880;
+    }
+
+    /* ── Nav Items ── */
+    .liteops-NavGroup__label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-olive-500);
+      padding: var(--liteops-space-2) var(--liteops-space-3);
+      margin-top: var(--liteops-space-4);
+      margin-bottom: var(--liteops-space-1);
+    }
+
+    .liteops-NavGroup__label:first-child {
+      margin-top: 0;
+    }
+
+    .liteops-NavItem {
+      display: flex;
+      align-items: center;
+      gap: var(--liteops-space-3);
+      padding: var(--liteops-space-2) var(--liteops-space-3);
+      border-radius: var(--liteops-radius-sm);
+      text-decoration: none;
+      color: var(--liteops-text-secondary);
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+      transition: all var(--liteops-duration-normal) ease;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+    }
+
+    .liteops-NavItem:hover {
+      background: rgba(255,255,255,0.04);
+      color: var(--liteops-paper-200);
+    }
+
+    .liteops-NavItem.is-active {
+      background: var(--liteops-accent-subtle);
+      color: var(--liteops-accent-text);
+    }
+
+    .liteops-NavItem__icon {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+      border-radius: 3px;
+      background: currentColor;
+      opacity: 0.4;
+    }
+
+    .liteops-NavItem.is-active .liteops-NavItem__icon {
+      opacity: 0.7;
+    }
+
+    /* ═══════════════════════════════════════════════
+       TOPBAR (from topbar.html organism)
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+      padding: 0 var(--liteops-space-6);
+      background: var(--liteops-surface-secondary);
+      border-bottom: 1px solid var(--liteops-border-secondary);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      flex-shrink: 0;
+    }
+
+    .liteops-Topbar__left {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .liteops-Topbar__breadcrumb {
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+      color: var(--liteops-text-tertiary);
+      margin-right: var(--liteops-space-2);
+    }
+
+    .liteops-Topbar__breadcrumb-sep {
+      color: var(--liteops-text-disabled);
+      margin: 0 var(--liteops-space-2);
+      font-size: 11px;
+    }
+
+    .liteops-Topbar__title {
+      font-family: var(--liteops-font-body);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-Topbar__right {
+      display: flex;
+      align-items: center;
+      gap: var(--liteops-space-3);
+    }
+
+    .liteops-Topbar__theme-toggle {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--liteops-radius-sm);
+      border: 1px solid var(--liteops-border-secondary);
+      background: transparent;
+      color: var(--liteops-text-tertiary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .liteops-Topbar__avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--liteops-olive-700);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--liteops-font-body);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--liteops-paper-200);
+    }
+
+    /* ═══════════════════════════════════════════════
+       MAIN LAYOUT
+       ═══════════════════════════════════════════════ */
+
+    .main-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--liteops-space-8) var(--liteops-space-8);
+      background: var(--liteops-surface-primary);
+    }
+
+    /* ═══════════════════════════════════════════════
+       KPI CARDS (from kpi-card.html molecule)
+       ═══════════════════════════════════════════════ */
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--liteops-space-5);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    .liteops-KpiCard {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background: var(--liteops-surface-elevated);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-5) var(--liteops-space-6);
+      box-shadow: var(--liteops-shadow-sm);
+      border: 1px solid var(--liteops-border-secondary);
+    }
+
+    .liteops-KpiCard__label {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .liteops-KpiCard__value {
+      font-family: var(--liteops-font-body);
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--liteops-text-primary);
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .liteops-KpiCard__trend {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      margin-top: var(--liteops-space-1);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .liteops-KpiCard__trend--up {
+      color: var(--liteops-status-success);
+    }
+
+    .liteops-KpiCard__trend--down {
+      color: var(--liteops-status-error);
+    }
+
+    .liteops-KpiCard__trend--neutral {
+      color: var(--liteops-text-tertiary);
+    }
+
+    /* ═══════════════════════════════════════════════
+       PILL TABS (from tab-pill.html molecule)
+       ═══════════════════════════════════════════════ */
+
+    .liteops-PillTabs {
+      margin-bottom: var(--liteops-space-6);
+    }
+
+    .liteops-PillTabs__list {
+      display: flex;
+      gap: var(--liteops-space-1);
+      padding: var(--liteops-space-1);
+      background: var(--liteops-surface-tertiary);
+      border-radius: var(--liteops-radius-sm);
+      list-style: none;
+      width: fit-content;
+    }
+
+    .liteops-PillTabs__pill {
+      padding: 6px 16px;
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--liteops-text-secondary);
+      background: transparent;
+      border: none;
+      border-radius: var(--liteops-radius-sm);
+      cursor: pointer;
+      transition: all var(--liteops-duration-normal) ease;
+      white-space: nowrap;
+    }
+
+    .liteops-PillTabs__pill:hover {
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-PillTabs__pill.is-active {
+      background: var(--liteops-surface-elevated);
+      color: var(--liteops-text-primary);
+      box-shadow: var(--liteops-shadow-xs);
+    }
+
+    /* ═══════════════════════════════════════════════
+       DATA TABLE (from data-table.html organism)
+       ═══════════════════════════════════════════════ */
+
+    .liteops-DataTable__wrapper {
+      overflow-x: auto;
+      border: 1px solid var(--liteops-border-primary);
+      border-radius: var(--liteops-radius-md);
+    }
+
+    .liteops-DataTable {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .liteops-DataTable__header {
+      background: var(--liteops-surface-tertiary);
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      text-align: left;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .liteops-DataTable__header--numeric {
+      text-align: right;
+    }
+
+    .liteops-DataTable__row {
+      border-bottom: 1px solid var(--liteops-border-secondary);
+      transition: background var(--liteops-duration-fast);
+    }
+
+    .liteops-DataTable__row:nth-child(even) {
+      background: color-mix(in srgb, var(--liteops-surface-tertiary) 30%, transparent);
+    }
+
+    .liteops-DataTable__row:hover {
+      background: var(--liteops-accent-subtle);
+    }
+
+    .liteops-DataTable__row:last-child {
+      border-bottom: none;
+    }
+
+    .liteops-DataTable__cell {
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-primary);
+      vertical-align: middle;
+    }
+
+    .liteops-DataTable__cell--numeric {
+      font-family: var(--liteops-font-mono);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .liteops-DataTable__cell--name {
+      font-weight: 500;
+    }
+
+    .liteops-DataTable__cell--secondary {
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ═══════════════════════════════════════════════
+       BADGE (from badge.html atom)
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: var(--liteops-radius-pill);
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      line-height: 1.4;
+      white-space: nowrap;
+    }
+
+    .liteops-Badge::before {
+      content: '';
+      display: block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .liteops-Badge--success {
+      background: var(--liteops-status-success-bg);
+      color: var(--liteops-status-success);
+    }
+    .liteops-Badge--success::before { background: var(--liteops-status-success); }
+
+    .liteops-Badge--warning {
+      background: var(--liteops-status-warning-bg);
+      color: var(--liteops-status-warning);
+    }
+    .liteops-Badge--warning::before { background: var(--liteops-status-warning); }
+
+    .liteops-Badge--error {
+      background: var(--liteops-status-error-bg);
+      color: var(--liteops-status-error);
+    }
+    .liteops-Badge--error::before { background: var(--liteops-status-error); }
+
+    /* ═══════════════════════════════════════════════
+       CHART PLACEHOLDER
+       ═══════════════════════════════════════════════ */
+
+    .chart-card {
+      background: var(--liteops-surface-elevated);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-6);
+      box-shadow: var(--liteops-shadow-sm);
+      border: 1px solid var(--liteops-border-secondary);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chart-card__title {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-6);
+    }
+
+    .chart-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 200px;
+    }
+
+    .chart-bars {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      gap: var(--liteops-space-3);
+      padding-bottom: var(--liteops-space-2);
+      position: relative;
+    }
+
+    /* Subtle grid lines */
+    .chart-bars::before,
+    .chart-bars::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--liteops-chart-grid);
+    }
+    .chart-bars::before { top: 25%; }
+    .chart-bars::after { top: 50%; }
+
+    .chart-grid-line-75 {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 75%;
+      height: 1px;
+      background: var(--liteops-chart-grid);
+    }
+
+    .chart-bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      justify-content: flex-end;
+    }
+
+    .chart-bar {
+      width: 100%;
+      max-width: 40px;
+      background: var(--liteops-chart-primary);
+      border-radius: 3px 3px 0 0;
+      transition: opacity var(--liteops-duration-normal);
+    }
+
+    .chart-bar:hover {
+      opacity: 0.85;
+    }
+
+    .chart-labels {
+      display: flex;
+      gap: var(--liteops-space-3);
+      padding-top: var(--liteops-space-2);
+      border-top: 1px solid var(--liteops-chart-grid);
+    }
+
+    .chart-label {
+      flex: 1;
+      text-align: center;
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      color: var(--liteops-text-tertiary);
+      text-transform: uppercase;
+    }
+
+    /* ═══════════════════════════════════════════════
+       SPLIT LAYOUT
+       ═══════════════════════════════════════════════ */
+
+    .split-layout {
+      display: grid;
+      grid-template-columns: 60% 40%;
+      gap: var(--liteops-space-6);
+    }
+
+    @media (max-width: 1024px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .split-layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════
+       SIDEBAR
+       ═══════════════════════════════════════════════ -->
+
+  <aside class="liteops-Sidebar" data-theme="dark">
+    <div class="liteops-Sidebar__header">
+      <a class="liteops-Sidebar__logo" href="#">
+        <span class="liteops-Sidebar__logo-lite">lite</span><span class="liteops-Sidebar__logo-ops">Ops</span>
+      </a>
+    </div>
+
+    <nav class="liteops-Sidebar__nav" aria-label="Navigation principale">
+
+      <!-- Home -->
+      <a class="liteops-NavItem is-active" href="#">
+        <span class="liteops-NavItem__icon" aria-hidden="true"></span>
+        <span class="liteops-NavItem__label">Accueil</span>
+      </a>
+
+      <!-- CADRER -->
+      <div class="liteops-NavGroup__label">Cadrer</div>
+      <a class="liteops-NavItem" href="#">
+        <span class="liteops-NavItem__icon" aria-hidden="true"></span>
+        <span class="liteops-NavItem__label">Initiatives</span>
+      </a>
+      <a class="liteops-NavItem" href="#">
+        <span class="liteops-NavItem__icon" aria-hidden="true"></span>
+        <span class="liteops-NavItem__label">Diagnostic</span>
+      </a>
+
+      <!-- OBSERVER -->
+      <div class="liteops-NavGroup__label">Observer</div>
+      <a class="liteops-NavItem" href="#">
+        <span class="liteops-NavItem__icon" aria-hidden="true"></span>
+        <span class="liteops-NavItem__label">Tableau de bord</span>
+      </a>
+      <a class="liteops-NavItem" href="#">
+        <span class="liteops-NavItem__icon" aria-hidden="true"></span>
+        <span class="liteops-NavItem__label">Enquetes</span>
+      </a>
+      <a class="liteops-NavItem" href="#">
+        <span class="liteops-NavItem__icon" aria-hidden="true"></span>
+        <span class="liteops-NavItem__label">Signaux</span>
+      </a>
+
+      <!-- AGIR -->
+      <div class="liteops-NavGroup__label">Agir</div>
+      <a class="liteops-NavItem" href="#">
+        <span class="liteops-NavItem__icon" aria-hidden="true"></span>
+        <span class="liteops-NavItem__label">Plan d'action</span>
+      </a>
+      <a class="liteops-NavItem" href="#">
+        <span class="liteops-NavItem__icon" aria-hidden="true"></span>
+        <span class="liteops-NavItem__label">Suivi projet</span>
+      </a>
+
+      <!-- ACTEURS -->
+      <div class="liteops-NavGroup__label">Acteurs</div>
+      <a class="liteops-NavItem" href="#">
+        <span class="liteops-NavItem__icon" aria-hidden="true"></span>
+        <span class="liteops-NavItem__label">Equipes</span>
+      </a>
+
+      <!-- RENDRE COMPTE -->
+      <div class="liteops-NavGroup__label">Rendre compte</div>
+      <a class="liteops-NavItem" href="#">
+        <span class="liteops-NavItem__icon" aria-hidden="true"></span>
+        <span class="liteops-NavItem__label">Vue COMEX</span>
+      </a>
+
+    </nav>
+
+    <div class="liteops-Sidebar__footer">
+      <div class="liteops-Sidebar__avatar">PD</div>
+      <div class="liteops-Sidebar__user-info">
+        <div class="liteops-Sidebar__user-name">Paul Duchateau</div>
+        <div class="liteops-Sidebar__user-role">Consultant Change</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════════════════
+       MAIN AREA
+       ═══════════════════════════════════════════════ -->
+
+  <div class="main-area">
+
+    <!-- Topbar -->
+    <header class="liteops-Topbar">
+      <div class="liteops-Topbar__left">
+        <span class="liteops-Topbar__breadcrumb">Accueil</span>
+        <span class="liteops-Topbar__breadcrumb-sep">/</span>
+        <span class="liteops-Topbar__title">Tableau de bord</span>
+      </div>
+      <div class="liteops-Topbar__right">
+        <button class="liteops-Topbar__theme-toggle" aria-label="Changer le theme">&#9788;</button>
+        <div class="liteops-Topbar__avatar">PD</div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="content">
+
+      <!-- Row 1: KPI Cards -->
+      <div class="kpi-grid">
+        <div class="liteops-KpiCard">
+          <span class="liteops-KpiCard__label">Taux d'adoption</span>
+          <span class="liteops-KpiCard__value">74%</span>
+          <span class="liteops-KpiCard__trend liteops-KpiCard__trend--up">&uarr; +3.2%</span>
+        </div>
+        <div class="liteops-KpiCard">
+          <span class="liteops-KpiCard__label">Score de readiness</span>
+          <span class="liteops-KpiCard__value">6.8/10</span>
+          <span class="liteops-KpiCard__trend liteops-KpiCard__trend--up">&uarr; +0.4</span>
+        </div>
+        <div class="liteops-KpiCard">
+          <span class="liteops-KpiCard__label">Signaux detectes</span>
+          <span class="liteops-KpiCard__value">23</span>
+          <span class="liteops-KpiCard__trend liteops-KpiCard__trend--up">&darr; -2</span>
+        </div>
+        <div class="liteops-KpiCard">
+          <span class="liteops-KpiCard__label">Enquetes actives</span>
+          <span class="liteops-KpiCard__value">5</span>
+          <span class="liteops-KpiCard__trend liteops-KpiCard__trend--neutral">&mdash; stable</span>
+        </div>
+      </div>
+
+      <!-- Row 2: Tab Navigation -->
+      <nav class="liteops-PillTabs" aria-label="Vues du tableau de bord">
+        <ul class="liteops-PillTabs__list" role="tablist">
+          <li><button class="liteops-PillTabs__pill is-active" role="tab" aria-selected="true">Vue globale</button></li>
+          <li><button class="liteops-PillTabs__pill" role="tab" aria-selected="false">Par equipe</button></li>
+          <li><button class="liteops-PillTabs__pill" role="tab" aria-selected="false">Par dimension</button></li>
+        </ul>
+      </nav>
+
+      <!-- Row 3: Split Layout -->
+      <div class="split-layout">
+
+        <!-- Left: Data Table -->
+        <div class="liteops-DataTable__wrapper" tabindex="0" role="region" aria-label="Suivi par equipe">
+          <table class="liteops-DataTable">
+            <thead>
+              <tr>
+                <th class="liteops-DataTable__header" scope="col">Equipe</th>
+                <th class="liteops-DataTable__header liteops-DataTable__header--numeric" scope="col">Adoption</th>
+                <th class="liteops-DataTable__header liteops-DataTable__header--numeric" scope="col">Friction</th>
+                <th class="liteops-DataTable__header" scope="col">Derniere enquete</th>
+                <th class="liteops-DataTable__header" scope="col">Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="liteops-DataTable__row">
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Direction Generale</td>
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">89%</td>
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">3</td>
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">12 mars 2026</td>
+                <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--success">En cours</span></td>
+              </tr>
+              <tr class="liteops-DataTable__row">
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--name">DSI</td>
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">82%</td>
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">5</td>
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">10 mars 2026</td>
+                <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--success">En cours</span></td>
+              </tr>
+              <tr class="liteops-DataTable__row">
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--name">RH</td>
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">71%</td>
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">7</td>
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">8 mars 2026</td>
+                <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--warning">En attente</span></td>
+              </tr>
+              <tr class="liteops-DataTable__row">
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Operations</td>
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">65%</td>
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">12</td>
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">5 mars 2026</td>
+                <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--error">Bloque</span></td>
+              </tr>
+              <tr class="liteops-DataTable__row">
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Marketing</td>
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">78%</td>
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">4</td>
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">14 mars 2026</td>
+                <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--success">En cours</span></td>
+              </tr>
+              <tr class="liteops-DataTable__row">
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--name">Finance</td>
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">58%</td>
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--numeric">9</td>
+                <td class="liteops-DataTable__cell liteops-DataTable__cell--secondary">1 mars 2026</td>
+                <td class="liteops-DataTable__cell"><span class="liteops-Badge liteops-Badge--warning">En attente</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Right: Chart Placeholder -->
+        <div class="chart-card">
+          <h3 class="chart-card__title">Evolution de l'adoption</h3>
+          <div class="chart-area">
+            <div class="chart-bars">
+              <span class="chart-grid-line-75"></span>
+              <div class="chart-bar-col"><div class="chart-bar" style="height: 35%"></div></div>
+              <div class="chart-bar-col"><div class="chart-bar" style="height: 48%"></div></div>
+              <div class="chart-bar-col"><div class="chart-bar" style="height: 55%"></div></div>
+              <div class="chart-bar-col"><div class="chart-bar" style="height: 62%"></div></div>
+              <div class="chart-bar-col"><div class="chart-bar" style="height: 70%"></div></div>
+              <div class="chart-bar-col"><div class="chart-bar" style="height: 74%"></div></div>
+              <div class="chart-bar-col"><div class="chart-bar" style="height: 88%"></div></div>
+            </div>
+            <div class="chart-labels">
+              <span class="chart-label">Jan</span>
+              <span class="chart-label">Fev</span>
+              <span class="chart-label">Mar</span>
+              <span class="chart-label">Avr</span>
+              <span class="chart-label">Mai</span>
+              <span class="chart-label">Jun</span>
+              <span class="chart-label">Jul</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+</body>
+</html>
