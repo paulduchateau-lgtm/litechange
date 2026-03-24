@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Molecule — Breadcrumb</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header { margin-bottom: var(--liteops-space-16); }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--liteops-olive-900);
+      color: var(--liteops-paper-100);
+      box-shadow: var(--liteops-shadow-md);
+      transition: background var(--liteops-duration-normal), color var(--liteops-duration-normal);
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: var(--liteops-paper-100);
+      color: var(--liteops-olive-900);
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: var(--liteops-space-16); }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    /* ── Breadcrumb Stack ── */
+    .breadcrumb-stack {
+      display: flex;
+      flex-direction: column;
+      gap: var(--liteops-space-6);
+    }
+
+    /* ── Dark Panel ── */
+    .dark-panel {
+      background: var(--liteops-olive-900);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-8);
+      margin-top: var(--liteops-space-4);
+    }
+
+    .dark-panel-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-paper-600);
+      margin-bottom: var(--liteops-space-4);
+      display: block;
+    }
+
+    .variant-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    /* ═══════════════════════════════════════════════
+       BREADCRUMB MOLECULE
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Breadcrumb {
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+    }
+
+    .liteops-Breadcrumb__list {
+      display: flex;
+      align-items: center;
+      gap: var(--liteops-space-2);
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .liteops-Breadcrumb__item {
+      display: flex;
+      align-items: center;
+      gap: var(--liteops-space-2);
+    }
+
+    .liteops-Breadcrumb__link {
+      color: var(--liteops-text-tertiary);
+      text-decoration: none;
+      transition: color var(--liteops-duration-normal) ease;
+    }
+
+    .liteops-Breadcrumb__link:hover {
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-Breadcrumb__link:focus-visible {
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+
+    .liteops-Breadcrumb__separator {
+      color: var(--liteops-text-disabled);
+      font-size: 11px;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .liteops-Breadcrumb__current {
+      color: var(--liteops-text-primary);
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark Mode</button>
+
+<div class="page">
+
+  <header class="page-header">
+    <h1 class="page-title">Breadcrumb</h1>
+    <p class="page-subtitle">Breadcrumb navigation molecule — chevron separators, current-page indicator, accessible markup with aria-label and aria-current.</p>
+  </header>
+
+  <!-- ── Depth Variants ── -->
+  <section class="section">
+    <h2 class="section-heading">Depth Variants</h2>
+    <span class="section-label">2-level and 3-level breadcrumbs</span>
+    <hr class="section-divider">
+
+    <div class="breadcrumb-stack">
+      <!-- 2-level -->
+      <div>
+        <p class="variant-label">2-level</p>
+        <nav class="liteops-Breadcrumb" aria-label="Fil d'Ariane">
+          <ol class="liteops-Breadcrumb__list">
+            <li class="liteops-Breadcrumb__item">
+              <a href="#" class="liteops-Breadcrumb__link">Accueil</a>
+              <span class="liteops-Breadcrumb__separator" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L7 5.5L4 8.5"/></svg>
+              </span>
+            </li>
+            <li class="liteops-Breadcrumb__item">
+              <span class="liteops-Breadcrumb__current" aria-current="page">Tableau de bord</span>
+            </li>
+          </ol>
+        </nav>
+      </div>
+
+      <!-- 3-level -->
+      <div>
+        <p class="variant-label">3-level</p>
+        <nav class="liteops-Breadcrumb" aria-label="Fil d'Ariane">
+          <ol class="liteops-Breadcrumb__list">
+            <li class="liteops-Breadcrumb__item">
+              <a href="#" class="liteops-Breadcrumb__link">Initiatives</a>
+              <span class="liteops-Breadcrumb__separator" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L7 5.5L4 8.5"/></svg>
+              </span>
+            </li>
+            <li class="liteops-Breadcrumb__item">
+              <a href="#" class="liteops-Breadcrumb__link">Diagnostic RH</a>
+              <span class="liteops-Breadcrumb__separator" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L7 5.5L4 8.5"/></svg>
+              </span>
+            </li>
+            <li class="liteops-Breadcrumb__item">
+              <span class="liteops-Breadcrumb__current" aria-current="page">Detail</span>
+            </li>
+          </ol>
+        </nav>
+      </div>
+
+      <!-- 4-level -->
+      <div>
+        <p class="variant-label">4-level</p>
+        <nav class="liteops-Breadcrumb" aria-label="Fil d'Ariane">
+          <ol class="liteops-Breadcrumb__list">
+            <li class="liteops-Breadcrumb__item">
+              <a href="#" class="liteops-Breadcrumb__link">Accueil</a>
+              <span class="liteops-Breadcrumb__separator" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L7 5.5L4 8.5"/></svg>
+              </span>
+            </li>
+            <li class="liteops-Breadcrumb__item">
+              <a href="#" class="liteops-Breadcrumb__link">Observer</a>
+              <span class="liteops-Breadcrumb__separator" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L7 5.5L4 8.5"/></svg>
+              </span>
+            </li>
+            <li class="liteops-Breadcrumb__item">
+              <a href="#" class="liteops-Breadcrumb__link">Enquetes</a>
+              <span class="liteops-Breadcrumb__separator" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L7 5.5L4 8.5"/></svg>
+              </span>
+            </li>
+            <li class="liteops-Breadcrumb__item">
+              <span class="liteops-Breadcrumb__current" aria-current="page">Satisfaction Q1 2025</span>
+            </li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Dark Theme Preview ── -->
+  <section class="section">
+    <h2 class="section-heading">Dark Theme Preview</h2>
+    <span class="section-label">Inline dark panel using data-theme</span>
+    <hr class="section-divider">
+
+    <div class="dark-panel" data-theme="dark">
+      <span class="dark-panel-label">Dark context</span>
+      <div class="breadcrumb-stack">
+        <nav class="liteops-Breadcrumb" aria-label="Fil d'Ariane">
+          <ol class="liteops-Breadcrumb__list">
+            <li class="liteops-Breadcrumb__item">
+              <a href="#" class="liteops-Breadcrumb__link">Accueil</a>
+              <span class="liteops-Breadcrumb__separator" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L7 5.5L4 8.5"/></svg>
+              </span>
+            </li>
+            <li class="liteops-Breadcrumb__item">
+              <span class="liteops-Breadcrumb__current" aria-current="page">Tableau de bord</span>
+            </li>
+          </ol>
+        </nav>
+
+        <nav class="liteops-Breadcrumb" aria-label="Fil d'Ariane">
+          <ol class="liteops-Breadcrumb__list">
+            <li class="liteops-Breadcrumb__item">
+              <a href="#" class="liteops-Breadcrumb__link">Initiatives</a>
+              <span class="liteops-Breadcrumb__separator" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L7 5.5L4 8.5"/></svg>
+              </span>
+            </li>
+            <li class="liteops-Breadcrumb__item">
+              <a href="#" class="liteops-Breadcrumb__link">Diagnostic RH</a>
+              <span class="liteops-Breadcrumb__separator" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L7 5.5L4 8.5"/></svg>
+              </span>
+            </li>
+            <li class="liteops-Breadcrumb__item">
+              <span class="liteops-Breadcrumb__current" aria-current="page">Detail</span>
+            </li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>
