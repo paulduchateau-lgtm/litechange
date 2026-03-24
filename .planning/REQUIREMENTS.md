@@ -48,10 +48,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Organisms
 
-- [ ] **ORGN-01**: Sidebar navigation — dark background, lifecycle-phase groups, IBM Plex Mono group labels, role-based filtering documentation
+- [x] **ORGN-01**: Sidebar navigation — dark background, lifecycle-phase groups, IBM Plex Mono group labels, role-based filtering documentation
 - [x] **ORGN-02**: Data table — sortable column headers (IBM Plex Mono uppercase), numeric right-alignment, zebra rows, row hover, overflow wrapper
 - [x] **ORGN-03**: Modal/dialog — overlay backdrop, centered content, close button, action bar
-- [ ] **ORGN-04**: Topbar navigation — logo, breadcrumb area, user menu, theme toggle
+- [x] **ORGN-04**: Topbar navigation — logo, breadcrumb area, user menu, theme toggle
 - [x] **ORGN-05**: Hero section with gradient background (green-to-olive), bold Source Serif 4 heading, CTA buttons, enterprise imagery area
 - [x] **ORGN-06**: Agent card component — agent name, status indicator, log preview, action buttons
 - [x] **ORGN-07**: Pipeline visualization — connected node diagram showing workflow steps with status colors
@@ -142,10 +142,10 @@ Deferred to future release. Tracked but not in current roadmap.
 | MOLC-07 | Phase 2 | Pending |
 | MOLC-08 | Phase 2 | Pending |
 | MOLC-09 | Phase 2 | Pending |
-| ORGN-01 | Phase 3 | Pending |
+| ORGN-01 | Phase 3 | Complete |
 | ORGN-02 | Phase 3 | Complete |
 | ORGN-03 | Phase 3 | Complete |
-| ORGN-04 | Phase 3 | Pending |
+| ORGN-04 | Phase 3 | Complete |
 | ORGN-05 | Phase 3 | Complete |
 | ORGN-06 | Phase 3 | Complete |
 | ORGN-07 | Phase 3 | Complete |
