@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Design System — Typographie</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header {
+      margin-bottom: var(--liteops-space-16);
+    }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: #1C1D1A;
+      color: #E8E6E1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: background 200ms, color 200ms;
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: #F5F4F0;
+      color: #1C1D1A;
+    }
+
+    /* ── Section ── */
+    .section {
+      margin-bottom: var(--liteops-space-16);
+    }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    .section-note {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-secondary);
+      margin-bottom: var(--liteops-space-6);
+      max-width: 680px;
+    }
+
+    .font-token {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      color: var(--liteops-accent-text);
+      background: var(--liteops-accent-subtle);
+      padding: 2px 8px;
+      border-radius: var(--liteops-radius-sm);
+      display: inline-block;
+      margin-bottom: var(--liteops-space-4);
+    }
+
+    /* ── Type Sample Card ── */
+    .type-card {
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-secondary);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-5) var(--liteops-space-6);
+      margin-bottom: var(--liteops-space-3);
+    }
+
+    .type-card-meta {
+      display: flex;
+      gap: var(--liteops-space-4);
+      align-items: baseline;
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .type-card-weight {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      min-width: 100px;
+    }
+
+    .type-card-size {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      color: var(--liteops-text-tertiary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Wordmark Treatment ── */
+    .wordmark-demo {
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-secondary);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-8);
+      text-align: center;
+      margin-bottom: var(--liteops-space-6);
+    }
+
+    .wordmark {
+      font-family: var(--liteops-font-display);
+      font-size: 48px;
+    }
+
+    .wordmark-lite {
+      font-weight: 300;
+      font-style: italic;
+      color: var(--liteops-accent-text);
+    }
+
+    .wordmark-change {
+      font-weight: 400;
+      color: var(--liteops-text-primary);
+    }
+
+    .wordmark-note {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      margin-top: var(--liteops-space-3);
+    }
+
+    /* ── Use Case Table ── */
+    .use-case-table-wrap {
+      overflow-x: auto;
+    }
+
+    .use-case-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+    }
+
+    .use-case-table th {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      text-align: left;
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      background: var(--liteops-surface-tertiary);
+      color: var(--liteops-text-tertiary);
+      border-bottom: 1px solid var(--liteops-border-secondary);
+    }
+
+    .use-case-table td {
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      border-bottom: 1px solid var(--liteops-border-secondary);
+      vertical-align: middle;
+    }
+
+    .use-case-table tr:hover td {
+      background: var(--liteops-accent-subtle);
+    }
+
+    .use-case-spec {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      color: var(--liteops-text-tertiary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .size-row-group {
+      margin-bottom: var(--liteops-space-4);
+    }
+
+    .size-row-group:last-child {
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark Mode</button>
+
+<div class="page">
+
+  <header class="page-header">
+    <h1 class="page-title">Typographie</h1>
+    <p class="page-subtitle">Trois familles typographiques pour un registre institutionnel : editorial, interface et donnees</p>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 1: SOURCE SERIF 4 (DISPLAY)
+       ══════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section A — Display</span>
+    <h2 class="section-heading">Source Serif 4</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Police editoriale pour les titres, citations et contenus de prestige. Confere la gravite institutionnelle attendue par nos clients.
+    </p>
+    <div class="font-token">--liteops-font-display: 'Source Serif 4'</div>
+
+    <!-- Weight 300 Light -->
+    <div class="size-row-group">
+      <div class="type-card">
+        <div class="type-card-meta">
+          <span class="type-card-weight">Light 300</span>
+          <span class="type-card-size">64px</span>
+        </div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 300; font-size: 64px; line-height: 1.1;">Observer, eclairer, diagnostiquer</div>
+      </div>
+      <div class="type-card">
+        <div class="type-card-meta">
+          <span class="type-card-weight">Light 300</span>
+          <span class="type-card-size">48px</span>
+        </div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 300; font-size: 48px; line-height: 1.15;">Observer, eclairer, diagnostiquer</div>
+      </div>
+      <div class="type-card">
+        <div class="type-card-meta">
+          <span class="type-card-weight">Light 300</span>
+          <span class="type-card-size">32px</span>
+        </div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 300; font-size: 32px; line-height: 1.2;">Observer, eclairer, diagnostiquer</div>
+      </div>
+      <div class="type-card">
+        <div class="type-card-meta">
+          <span class="type-card-weight">Light 300</span>
+          <span class="type-card-size">24px</span>
+        </div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 300; font-size: 24px; line-height: 1.3;">Observer, eclairer, diagnostiquer</div>
+      </div>
+      <div class="type-card">
+        <div class="type-card-meta">
+          <span class="type-card-weight">Light 300</span>
+          <span class="type-card-size">18px / 14px</span>
+        </div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 300; font-size: 18px; line-height: 1.4; margin-bottom: var(--liteops-space-2);">Observer, eclairer, diagnostiquer</div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 300; font-size: 14px; line-height: 1.5;">Observer, eclairer, diagnostiquer</div>
+      </div>
+    </div>
+
+    <!-- Weight 300 Light Italic -->
+    <div class="size-row-group">
+      <div class="type-card">
+        <div class="type-card-meta">
+          <span class="type-card-weight">Light 300 Italic</span>
+          <span class="type-card-size">48px / 32px / 24px</span>
+        </div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 300; font-style: italic; font-size: 48px; line-height: 1.15; margin-bottom: var(--liteops-space-2);">Observer, eclairer, diagnostiquer</div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 300; font-style: italic; font-size: 32px; line-height: 1.2; margin-bottom: var(--liteops-space-2);">Observer, eclairer, diagnostiquer</div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 300; font-style: italic; font-size: 24px; line-height: 1.3;">Observer, eclairer, diagnostiquer</div>
+      </div>
+    </div>
+
+    <!-- Weight 400 Regular -->
+    <div class="size-row-group">
+      <div class="type-card">
+        <div class="type-card-meta">
+          <span class="type-card-weight">Regular 400</span>
+          <span class="type-card-size">48px / 32px / 24px / 18px / 14px</span>
+        </div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 400; font-size: 48px; line-height: 1.15; margin-bottom: var(--liteops-space-2);">Observer, eclairer, diagnostiquer</div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 400; font-size: 32px; line-height: 1.2; margin-bottom: var(--liteops-space-2);">Observer, eclairer, diagnostiquer</div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 400; font-size: 24px; line-height: 1.3; margin-bottom: var(--liteops-space-2);">Observer, eclairer, diagnostiquer</div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 400; font-size: 18px; line-height: 1.4; margin-bottom: var(--liteops-space-2);">Observer, eclairer, diagnostiquer</div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 400; font-size: 14px; line-height: 1.5;">Observer, eclairer, diagnostiquer</div>
+      </div>
+    </div>
+
+    <!-- Weight 400 Regular Italic -->
+    <div class="size-row-group">
+      <div class="type-card">
+        <div class="type-card-meta">
+          <span class="type-card-weight">Regular 400 Italic</span>
+          <span class="type-card-size">32px / 24px / 18px</span>
+        </div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 400; font-style: italic; font-size: 32px; line-height: 1.2; margin-bottom: var(--liteops-space-2);">Observer, eclairer, diagnostiquer</div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 400; font-style: italic; font-size: 24px; line-height: 1.3; margin-bottom: var(--liteops-space-2);">Observer, eclairer, diagnostiquer</div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 400; font-style: italic; font-size: 18px; line-height: 1.4;">Observer, eclairer, diagnostiquer</div>
+      </div>
+    </div>
+
+    <!-- Weight 500 Medium -->
+    <div class="size-row-group">
+      <div class="type-card">
+        <div class="type-card-meta">
+          <span class="type-card-weight">Medium 500</span>
+          <span class="type-card-size">40px / 32px / 24px / 18px</span>
+        </div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 500; font-size: 40px; line-height: 1.15; margin-bottom: var(--liteops-space-2);">Observer, eclairer, diagnostiquer</div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 500; font-size: 32px; line-height: 1.2; margin-bottom: var(--liteops-space-2);">Observer, eclairer, diagnostiquer</div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 500; font-size: 24px; line-height: 1.3; margin-bottom: var(--liteops-space-2);">Observer, eclairer, diagnostiquer</div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 500; font-size: 18px; line-height: 1.4;">Observer, eclairer, diagnostiquer</div>
+      </div>
+    </div>
+
+    <!-- Weight 600 SemiBold -->
+    <div class="size-row-group">
+      <div class="type-card">
+        <div class="type-card-meta">
+          <span class="type-card-weight">SemiBold 600</span>
+          <span class="type-card-size">64px / 48px / 40px / 32px / 24px / 18px / 14px</span>
+        </div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 600; font-size: 64px; line-height: 1.1; margin-bottom: var(--liteops-space-2);">Observer, eclairer</div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 600; font-size: 48px; line-height: 1.15; margin-bottom: var(--liteops-space-2);">Observer, eclairer, diagnostiquer</div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 600; font-size: 40px; line-height: 1.15; margin-bottom: var(--liteops-space-2);">Observer, eclairer, diagnostiquer</div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 600; font-size: 32px; line-height: 1.2; margin-bottom: var(--liteops-space-2);">Observer, eclairer, diagnostiquer</div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 600; font-size: 24px; line-height: 1.3; margin-bottom: var(--liteops-space-2);">Observer, eclairer, diagnostiquer</div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 600; font-size: 18px; line-height: 1.4; margin-bottom: var(--liteops-space-2);">Observer, eclairer, diagnostiquer</div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 600; font-size: 14px; line-height: 1.5;">Observer, eclairer, diagnostiquer</div>
+      </div>
+    </div>
+
+    <!-- Weight 700 Bold -->
+    <div class="size-row-group">
+      <div class="type-card">
+        <div class="type-card-meta">
+          <span class="type-card-weight">Bold 700</span>
+          <span class="type-card-size">48px / 32px / 24px</span>
+        </div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 700; font-size: 48px; line-height: 1.15; margin-bottom: var(--liteops-space-2);">Observer, eclairer, diagnostiquer</div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 700; font-size: 32px; line-height: 1.2; margin-bottom: var(--liteops-space-2);">Observer, eclairer, diagnostiquer</div>
+        <div style="font-family: var(--liteops-font-display); font-weight: 700; font-size: 24px; line-height: 1.3;">Observer, eclairer, diagnostiquer</div>
+      </div>
+    </div>
+
+    <!-- Wordmark treatment -->
+    <div class="wordmark-demo">
+      <div class="wordmark">
+        <span class="wordmark-lite">lite</span><span class="wordmark-change">Change</span>
+      </div>
+      <div class="wordmark-note">Source Serif 4 — "lite" italic Light 300, accent color / "Change" Regular 400</div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 2: DM SANS (BODY)
+       ══════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section B — Body</span>
+    <h2 class="section-heading">DM Sans</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Police d'interface pour le texte courant, les labels, boutons et elements de navigation. Lisibilite optimale a toutes les tailles.
+    </p>
+    <div class="font-token">--liteops-font-body: 'DM Sans'</div>
+
+    <!-- Weight 300 Light -->
+    <div class="size-row-group">
+      <div class="type-card">
+        <div class="type-card-meta">
+          <span class="type-card-weight">Light 300</span>
+          <span class="type-card-size">20px / 18px / 16px / 15px / 14px / 13px / 12px</span>
+        </div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 300; font-size: 20px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 300; font-size: 18px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 300; font-size: 16px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 300; font-size: 15px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 300; font-size: 14px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 300; font-size: 13px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 300; font-size: 12px; line-height: 1.5;">Chaque indicateur eclaire une decision</div>
+      </div>
+    </div>
+
+    <!-- Weight 400 Regular -->
+    <div class="size-row-group">
+      <div class="type-card">
+        <div class="type-card-meta">
+          <span class="type-card-weight">Regular 400</span>
+          <span class="type-card-size">20px / 18px / 16px / 15px / 14px / 13px / 12px</span>
+        </div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 400; font-size: 20px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 400; font-size: 18px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 400; font-size: 16px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 400; font-size: 15px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 400; font-size: 14px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 400; font-size: 13px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 400; font-size: 12px; line-height: 1.5;">Chaque indicateur eclaire une decision</div>
+      </div>
+    </div>
+
+    <!-- Weight 400 Regular Italic -->
+    <div class="size-row-group">
+      <div class="type-card">
+        <div class="type-card-meta">
+          <span class="type-card-weight">Regular 400 Italic</span>
+          <span class="type-card-size">16px / 15px / 14px</span>
+        </div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 400; font-style: italic; font-size: 16px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 400; font-style: italic; font-size: 15px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 400; font-style: italic; font-size: 14px; line-height: 1.5;">Chaque indicateur eclaire une decision</div>
+      </div>
+    </div>
+
+    <!-- Weight 500 Medium -->
+    <div class="size-row-group">
+      <div class="type-card">
+        <div class="type-card-meta">
+          <span class="type-card-weight">Medium 500</span>
+          <span class="type-card-size">20px / 18px / 16px / 15px / 14px / 13px / 12px</span>
+        </div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 500; font-size: 20px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 500; font-size: 18px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 500; font-size: 16px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 500; font-size: 15px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 500; font-size: 14px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 500; font-size: 13px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 500; font-size: 12px; line-height: 1.5;">Chaque indicateur eclaire une decision</div>
+      </div>
+    </div>
+
+    <!-- Weight 600 SemiBold -->
+    <div class="size-row-group">
+      <div class="type-card">
+        <div class="type-card-meta">
+          <span class="type-card-weight">SemiBold 600</span>
+          <span class="type-card-size">20px / 16px / 15px / 14px / 13px</span>
+        </div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 600; font-size: 20px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 600; font-size: 16px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 600; font-size: 15px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 600; font-size: 14px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 600; font-size: 13px; line-height: 1.5;">Chaque indicateur eclaire une decision</div>
+      </div>
+    </div>
+
+    <!-- Weight 700 Bold -->
+    <div class="size-row-group">
+      <div class="type-card">
+        <div class="type-card-meta">
+          <span class="type-card-weight">Bold 700</span>
+          <span class="type-card-size">28px / 20px / 16px / 15px / 14px</span>
+        </div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 700; font-size: 28px; line-height: 1.3; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 700; font-size: 20px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 700; font-size: 16px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 700; font-size: 15px; line-height: 1.5; margin-bottom: var(--liteops-space-1);">Chaque indicateur eclaire une decision</div>
+        <div style="font-family: var(--liteops-font-body); font-weight: 700; font-size: 14px; line-height: 1.5;">Chaque indicateur eclaire une decision</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 3: IBM PLEX MONO (DATA)
+       ══════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section C — Data</span>
+    <h2 class="section-heading">IBM Plex Mono</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Police a chasse fixe pour les KPI, labels de donnees, badges et elements metriques. Toujours en UPPERCASE avec espacement elargi.
+    </p>
+    <div class="font-token">--liteops-font-mono: 'IBM Plex Mono'</div>
+
+    <!-- Weight 400 Regular -->
+    <div class="size-row-group">
+      <div class="type-card">
+        <div class="type-card-meta">
+          <span class="type-card-weight">Regular 400</span>
+          <span class="type-card-size">14px / 12px / 11px / 10px / 9px</span>
+        </div>
+        <div style="font-family: var(--liteops-font-mono); font-weight: 400; font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; line-height: 1.6; margin-bottom: var(--liteops-space-1);">TAUX D'ADOPTION 78.4%</div>
+        <div style="font-family: var(--liteops-font-mono); font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; line-height: 1.6; margin-bottom: var(--liteops-space-1);">FRICTION DETECTEE</div>
+        <div style="font-family: var(--liteops-font-mono); font-weight: 400; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; line-height: 1.6; margin-bottom: var(--liteops-space-1);">KPI-2024-Q3</div>
+        <div style="font-family: var(--liteops-font-mono); font-weight: 400; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; line-height: 1.6; margin-bottom: var(--liteops-space-1);">TAUX D'ADOPTION 78.4%</div>
+        <div style="font-family: var(--liteops-font-mono); font-weight: 400; font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; line-height: 1.6;">FRICTION DETECTEE</div>
+      </div>
+    </div>
+
+    <!-- Weight 500 Medium -->
+    <div class="size-row-group">
+      <div class="type-card">
+        <div class="type-card-meta">
+          <span class="type-card-weight">Medium 500</span>
+          <span class="type-card-size">14px / 12px / 11px / 10px / 9px</span>
+        </div>
+        <div style="font-family: var(--liteops-font-mono); font-weight: 500; font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; line-height: 1.6; margin-bottom: var(--liteops-space-1);">TAUX D'ADOPTION 78.4%</div>
+        <div style="font-family: var(--liteops-font-mono); font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; line-height: 1.6; margin-bottom: var(--liteops-space-1);">FRICTION DETECTEE</div>
+        <div style="font-family: var(--liteops-font-mono); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; line-height: 1.6; margin-bottom: var(--liteops-space-1);">KPI-2024-Q3</div>
+        <div style="font-family: var(--liteops-font-mono); font-weight: 500; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; line-height: 1.6; margin-bottom: var(--liteops-space-1);">TAUX D'ADOPTION 78.4%</div>
+        <div style="font-family: var(--liteops-font-mono); font-weight: 500; font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; line-height: 1.6;">FRICTION DETECTEE</div>
+      </div>
+    </div>
+
+    <!-- Weight 600 SemiBold -->
+    <div class="size-row-group">
+      <div class="type-card">
+        <div class="type-card-meta">
+          <span class="type-card-weight">SemiBold 600</span>
+          <span class="type-card-size">14px / 12px / 11px / 10px / 9px</span>
+        </div>
+        <div style="font-family: var(--liteops-font-mono); font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; line-height: 1.6; margin-bottom: var(--liteops-space-1);">TAUX D'ADOPTION 78.4%</div>
+        <div style="font-family: var(--liteops-font-mono); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; line-height: 1.6; margin-bottom: var(--liteops-space-1);">FRICTION DETECTEE</div>
+        <div style="font-family: var(--liteops-font-mono); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; line-height: 1.6; margin-bottom: var(--liteops-space-1);">KPI-2024-Q3</div>
+        <div style="font-family: var(--liteops-font-mono); font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; line-height: 1.6; margin-bottom: var(--liteops-space-1);">TAUX D'ADOPTION 78.4%</div>
+        <div style="font-family: var(--liteops-font-mono); font-weight: 600; font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; line-height: 1.6;">FRICTION DETECTEE</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 4: USE CASES
+       ══════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section D — Cas d'usage</span>
+    <h2 class="section-heading">Combinaisons typographiques</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Reference des combinaisons police / graisse / taille pour chaque role dans l'interface. Chaque ligne est rendue dans le style decrit.
+    </p>
+
+    <div class="use-case-table-wrap">
+      <table class="use-case-table" scope="col">
+        <thead>
+          <tr>
+            <th scope="col">Role</th>
+            <th scope="col">Police</th>
+            <th scope="col">Spec</th>
+            <th scope="col">Rendu</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Titre de page</td>
+            <td class="use-case-spec">Source Serif 4</td>
+            <td class="use-case-spec">600 / 32px</td>
+            <td><span style="font-family: var(--liteops-font-display); font-weight: 600; font-size: 32px; line-height: 1.2;">Tableau de bord</span></td>
+          </tr>
+          <tr>
+            <td>Titre de section</td>
+            <td class="use-case-spec">Source Serif 4</td>
+            <td class="use-case-spec">600 / 24px</td>
+            <td><span style="font-family: var(--liteops-font-display); font-weight: 600; font-size: 24px; line-height: 1.3;">Indicateurs cles</span></td>
+          </tr>
+          <tr>
+            <td>Texte courant</td>
+            <td class="use-case-spec">DM Sans</td>
+            <td class="use-case-spec">400 / 15px</td>
+            <td><span style="font-family: var(--liteops-font-body); font-weight: 400; font-size: 15px;">L'enquete revele un taux d'adoption en progression constante sur le trimestre.</span></td>
+          </tr>
+          <tr>
+            <td>Texte bouton</td>
+            <td class="use-case-spec">DM Sans</td>
+            <td class="use-case-spec">500 / 15px</td>
+            <td><span style="font-family: var(--liteops-font-body); font-weight: 500; font-size: 15px;">Lancer le diagnostic</span></td>
+          </tr>
+          <tr>
+            <td>Label de donnees</td>
+            <td class="use-case-spec">IBM Plex Mono</td>
+            <td class="use-case-spec">500 / 10px UPPERCASE</td>
+            <td><span style="font-family: var(--liteops-font-mono); font-weight: 500; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;">TAUX D'ADOPTION</span></td>
+          </tr>
+          <tr>
+            <td>Valeur KPI</td>
+            <td class="use-case-spec">DM Sans</td>
+            <td class="use-case-spec">700 / 28px</td>
+            <td><span style="font-family: var(--liteops-font-body); font-weight: 700; font-size: 28px; font-variant-numeric: tabular-nums;">78.4%</span></td>
+          </tr>
+          <tr>
+            <td>Texte badge</td>
+            <td class="use-case-spec">IBM Plex Mono</td>
+            <td class="use-case-spec">500 / 10px UPPERCASE</td>
+            <td><span style="font-family: var(--liteops-font-mono); font-weight: 500; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; background: var(--liteops-accent-subtle); color: var(--liteops-accent-text); padding: 2px 8px; border-radius: 9999px;">EN COURS</span></td>
+          </tr>
+          <tr>
+            <td>Label de groupe nav</td>
+            <td class="use-case-spec">IBM Plex Mono</td>
+            <td class="use-case-spec">500 / 9px UPPERCASE 0.12em</td>
+            <td><span style="font-family: var(--liteops-font-mono); font-weight: 500; font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--liteops-text-tertiary);">OBSERVER</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>

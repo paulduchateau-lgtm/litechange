@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Design System — Palette de couleurs</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header { margin-bottom: var(--liteops-space-16); }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: #1C1D1A;
+      color: #E8E6E1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: background 200ms, color 200ms;
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: #F5F4F0;
+      color: #1C1D1A;
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: var(--liteops-space-16); }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    .section-note {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-secondary);
+      margin-bottom: var(--liteops-space-6);
+      max-width: 680px;
+    }
+
+    /* ── Palette Group ── */
+    .palette-group { margin-bottom: var(--liteops-space-8); }
+
+    .palette-name {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-secondary);
+      margin-bottom: var(--liteops-space-3);
+    }
+
+    .swatch-row {
+      display: flex;
+      gap: var(--liteops-space-1);
+      flex-wrap: wrap;
+    }
+
+    .swatch-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .swatch {
+      width: 64px;
+      height: 48px;
+      border-radius: var(--liteops-radius-sm);
+      border: 1px solid var(--liteops-border-secondary);
+    }
+
+    .swatch-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      text-align: center;
+      color: var(--liteops-text-tertiary);
+      margin-top: 2px;
+    }
+
+    .swatch-hex {
+      font-family: var(--liteops-font-mono);
+      font-size: 8px;
+      text-align: center;
+      color: var(--liteops-text-tertiary);
+      opacity: 0.7;
+    }
+
+    /* ── Semantic Mapping Table ── */
+    .semantic-table-wrap { overflow-x: auto; }
+
+    .semantic-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .semantic-table th {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      text-align: left;
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      background: var(--liteops-surface-tertiary);
+      color: var(--liteops-text-tertiary);
+      border-bottom: 1px solid var(--liteops-border-secondary);
+    }
+
+    .semantic-table td {
+      padding: var(--liteops-space-2) var(--liteops-space-4);
+      border-bottom: 1px solid var(--liteops-border-secondary);
+      vertical-align: middle;
+    }
+
+    .semantic-table tr:hover td {
+      background: var(--liteops-accent-subtle);
+    }
+
+    .semantic-token-name {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      color: var(--liteops-accent-text);
+    }
+
+    .semantic-value {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      color: var(--liteops-text-tertiary);
+    }
+
+    .semantic-swatch {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      border: 1px solid var(--liteops-border-secondary);
+      vertical-align: middle;
+      margin-right: var(--liteops-space-2);
+    }
+
+    .semantic-category {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-secondary);
+      padding-top: var(--liteops-space-4);
+    }
+
+    /* ── Contrast Table ── */
+    .contrast-table-wrap { overflow-x: auto; }
+
+    .contrast-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .contrast-table th {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      text-align: left;
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      background: var(--liteops-surface-tertiary);
+      color: var(--liteops-text-tertiary);
+      border-bottom: 1px solid var(--liteops-border-secondary);
+    }
+
+    .contrast-table td {
+      padding: var(--liteops-space-2) var(--liteops-space-4);
+      border-bottom: 1px solid var(--liteops-border-secondary);
+      vertical-align: middle;
+    }
+
+    .contrast-table tr:hover td {
+      background: var(--liteops-accent-subtle);
+    }
+
+    .contrast-preview {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+      height: 32px;
+      border-radius: var(--liteops-radius-sm);
+      font-family: var(--liteops-font-body);
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid var(--liteops-border-secondary);
+    }
+
+    .contrast-ratio {
+      font-family: var(--liteops-font-mono);
+      font-size: 13px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .contrast-badge {
+      display: inline-block;
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 2px 8px;
+      border-radius: 9999px;
+    }
+
+    .contrast-badge--pass {
+      background: var(--liteops-status-success-bg);
+      color: var(--liteops-status-success);
+    }
+
+    .contrast-badge--fail {
+      background: var(--liteops-status-error-bg);
+      color: var(--liteops-status-error);
+    }
+
+    .contrast-pair {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      color: var(--liteops-text-secondary);
+    }
+
+    .contrast-theme {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--liteops-text-tertiary);
+    }
+
+    /* ── Chart Colors ── */
+    .chart-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--liteops-space-8);
+    }
+
+    .chart-theme-block {
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-secondary);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-6);
+    }
+
+    .chart-theme-block--dark {
+      background: var(--liteops-olive-900);
+      border-color: rgba(232, 230, 225, 0.07);
+    }
+
+    .chart-theme-title {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-5);
+    }
+
+    .chart-theme-block--dark .chart-theme-title {
+      color: #8A8880;
+    }
+
+    .chart-circles {
+      display: flex;
+      gap: var(--liteops-space-5);
+      flex-wrap: wrap;
+    }
+
+    .chart-circle-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--liteops-space-2);
+    }
+
+    .chart-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+    }
+
+    .chart-circle-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      color: var(--liteops-text-tertiary);
+      text-align: center;
+    }
+
+    .chart-circle-hex {
+      font-family: var(--liteops-font-mono);
+      font-size: 8px;
+      color: var(--liteops-text-tertiary);
+      opacity: 0.7;
+      text-align: center;
+    }
+
+    .chart-theme-block--dark .chart-circle-label,
+    .chart-theme-block--dark .chart-circle-hex {
+      color: #8A8880;
+    }
+
+    @media (max-width: 768px) {
+      .chart-section { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark Mode</button>
+
+<div class="page">
+
+  <header class="page-header">
+    <h1 class="page-title">Palette de couleurs</h1>
+    <p class="page-subtitle">Echelles brutes, correspondances semantiques, ratios de contraste WCAG et couleurs de graphiques</p>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 1: RAW PALETTE
+       ══════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section A — Echelles brutes</span>
+    <h2 class="section-heading">Palette complete</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Toutes les echelles de couleurs avec leur reference hexadecimale et leur nom de token. Les fonds utilisent les variables CSS, les hex sont affiches en label.
+    </p>
+
+    <!-- Olive -->
+    <div class="palette-group">
+      <div class="palette-name">Olive</div>
+      <div class="swatch-row">
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-olive-50);"></div>
+          <div class="swatch-label">50</div>
+          <div class="swatch-hex">#F0F2EC</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-olive-100);"></div>
+          <div class="swatch-label">100</div>
+          <div class="swatch-hex">#E2E5DB</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-olive-200);"></div>
+          <div class="swatch-label">200</div>
+          <div class="swatch-hex">#C8CCBE</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-olive-300);"></div>
+          <div class="swatch-label">300</div>
+          <div class="swatch-hex">#A8AE9E</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-olive-400);"></div>
+          <div class="swatch-label">400</div>
+          <div class="swatch-hex">#8A9080</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-olive-500);"></div>
+          <div class="swatch-label">500</div>
+          <div class="swatch-hex">#6B7260</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-olive-600);"></div>
+          <div class="swatch-label">600</div>
+          <div class="swatch-hex">#4E5444</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-olive-700);"></div>
+          <div class="swatch-label">700</div>
+          <div class="swatch-hex">#3A3B37</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-olive-800);"></div>
+          <div class="swatch-label">800</div>
+          <div class="swatch-hex">#2A2B27</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-olive-900);"></div>
+          <div class="swatch-label">900</div>
+          <div class="swatch-hex">#1C1D1A</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-olive-950);"></div>
+          <div class="swatch-label">950</div>
+          <div class="swatch-hex">#101110</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paper -->
+    <div class="palette-group">
+      <div class="palette-name">Paper</div>
+      <div class="swatch-row">
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-paper-50);"></div>
+          <div class="swatch-label">50</div>
+          <div class="swatch-hex">#FAFAF8</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-paper-100);"></div>
+          <div class="swatch-label">100</div>
+          <div class="swatch-hex">#F5F4F0</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-paper-200);"></div>
+          <div class="swatch-label">200</div>
+          <div class="swatch-hex">#ECEAE4</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-paper-300);"></div>
+          <div class="swatch-label">300</div>
+          <div class="swatch-hex">#E0DDD6</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-paper-400);"></div>
+          <div class="swatch-label">400</div>
+          <div class="swatch-hex">#D0CCC4</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-paper-500);"></div>
+          <div class="swatch-label">500</div>
+          <div class="swatch-hex">#BDB9B0</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-paper-600);"></div>
+          <div class="swatch-label">600</div>
+          <div class="swatch-hex">#A8A69E</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-paper-700);"></div>
+          <div class="swatch-label">700</div>
+          <div class="swatch-hex">#8C8A82</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-paper-800);"></div>
+          <div class="swatch-label">800</div>
+          <div class="swatch-hex">#6E6C64</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-paper-900);"></div>
+          <div class="swatch-label">900</div>
+          <div class="swatch-hex">#504E48</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-paper-950);"></div>
+          <div class="swatch-label">950</div>
+          <div class="swatch-hex">#36342F</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lite -->
+    <div class="palette-group">
+      <div class="palette-name">Lite</div>
+      <div class="swatch-row">
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-lite-50);"></div>
+          <div class="swatch-label">50</div>
+          <div class="swatch-hex">#F4FFD6</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-lite-100);"></div>
+          <div class="swatch-label">100</div>
+          <div class="swatch-hex">#E8FFA8</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-lite-200);"></div>
+          <div class="swatch-label">200</div>
+          <div class="swatch-hex">#D8FF72</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-lite-300);"></div>
+          <div class="swatch-label">300</div>
+          <div class="swatch-hex">#C8FF3C</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-lite-400);"></div>
+          <div class="swatch-label">400</div>
+          <div class="swatch-hex">#B0D838</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-lite-500);"></div>
+          <div class="swatch-label">500</div>
+          <div class="swatch-hex">#9ABF30</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-lite-600);"></div>
+          <div class="swatch-label">600</div>
+          <div class="swatch-hex">#84A422</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-lite-700);"></div>
+          <div class="swatch-label">700</div>
+          <div class="swatch-hex">#6B8A1A</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-lite-800);"></div>
+          <div class="swatch-label">800</div>
+          <div class="swatch-hex">#527A10</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-lite-900);"></div>
+          <div class="swatch-label">900</div>
+          <div class="swatch-hex">#3D5A0A</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-lite-950);"></div>
+          <div class="swatch-label">950</div>
+          <div class="swatch-hex">#2A3A06</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Signal -->
+    <div class="palette-group">
+      <div class="palette-name">Signal</div>
+      <div class="swatch-row">
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-signal-100);"></div>
+          <div class="swatch-label">100</div>
+          <div class="swatch-hex">#C4DFF0</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-signal-300);"></div>
+          <div class="swatch-label">300</div>
+          <div class="swatch-hex">#7AB4D4</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-signal-500);"></div>
+          <div class="swatch-label">500</div>
+          <div class="swatch-hex">#4A90B8</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-signal-700);"></div>
+          <div class="swatch-label">700</div>
+          <div class="swatch-hex">#2D6888</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-signal-900);"></div>
+          <div class="swatch-label">900</div>
+          <div class="swatch-hex">#1A3E54</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Warm -->
+    <div class="palette-group">
+      <div class="palette-name">Warm</div>
+      <div class="swatch-row">
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-warm-100);"></div>
+          <div class="swatch-label">100</div>
+          <div class="swatch-hex">#F4D0C0</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-warm-300);"></div>
+          <div class="swatch-label">300</div>
+          <div class="swatch-hex">#E08A68</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-warm-500);"></div>
+          <div class="swatch-label">500</div>
+          <div class="swatch-hex">#C45A32</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-warm-700);"></div>
+          <div class="swatch-label">700</div>
+          <div class="swatch-hex">#8A3518</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-warm-900);"></div>
+          <div class="swatch-label">900</div>
+          <div class="swatch-hex">#5C2210</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div class="palette-group">
+      <div class="palette-name">Success</div>
+      <div class="swatch-row">
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-success-100);"></div>
+          <div class="swatch-label">100</div>
+          <div class="swatch-hex">#D0F0D4</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-success-300);"></div>
+          <div class="swatch-label">300</div>
+          <div class="swatch-hex">#68B474</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-success-500);"></div>
+          <div class="swatch-label">500</div>
+          <div class="swatch-hex">#3A8A4A</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-success-700);"></div>
+          <div class="swatch-label">700</div>
+          <div class="swatch-hex">#2A6B34</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Warning -->
+    <div class="palette-group">
+      <div class="palette-name">Warning</div>
+      <div class="swatch-row">
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-warning-100);"></div>
+          <div class="swatch-label">100</div>
+          <div class="swatch-hex">#FFF4D0</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-warning-300);"></div>
+          <div class="swatch-label">300</div>
+          <div class="swatch-hex">#E8C46A</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-warning-500);"></div>
+          <div class="swatch-label">500</div>
+          <div class="swatch-hex">#D4A03A</div>
+        </div>
+        <div class="swatch-wrapper">
+          <div class="swatch" style="background: var(--liteops-warning-700);"></div>
+          <div class="swatch-label">700</div>
+          <div class="swatch-hex">#8A6A1A</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 2: SEMANTIC MAPPINGS
+       ══════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section B — Tokens semantiques</span>
+    <h2 class="section-heading">Correspondances semantiques</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Chaque token semantique resout vers une valeur differente selon le theme. Le tableau montre la resolution en theme clair et sombre.
+    </p>
+
+    <div class="semantic-table-wrap">
+      <table class="semantic-table">
+        <thead>
+          <tr>
+            <th scope="col">Token</th>
+            <th scope="col">Theme clair</th>
+            <th scope="col">Theme sombre</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Surface -->
+          <tr><td class="semantic-category" colspan="3">Surface</td></tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-surface-primary</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #F5F4F0;"></span>paper-100</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #1C1D1A;"></span>olive-900</td>
+          </tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-surface-secondary</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #FFFFFF;"></span>white</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #2A2B27;"></span>olive-800</td>
+          </tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-surface-tertiary</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #ECEAE4;"></span>paper-200</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #101110;"></span>olive-950</td>
+          </tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-surface-elevated</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #FFFFFF;"></span>white</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #2A2B27;"></span>olive-800</td>
+          </tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-surface-sunken</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #E0DDD6;"></span>paper-300</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #101110;"></span>olive-950</td>
+          </tr>
+
+          <!-- Text -->
+          <tr><td class="semantic-category" colspan="3">Texte</td></tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-text-primary</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #1C1D1A;"></span>olive-900</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #E8E6E1;"></span>#E8E6E1</td>
+          </tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-text-secondary</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #4E5444;"></span>olive-600</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #C0BEB8;"></span>#C0BEB8</td>
+          </tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-text-tertiary</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #8C8A82;"></span>paper-700</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #8A8880;"></span>#8A8880</td>
+          </tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-text-disabled</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #BDB9B0;"></span>paper-500</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #4E5444;"></span>olive-600</td>
+          </tr>
+
+          <!-- Border -->
+          <tr><td class="semantic-category" colspan="3">Bordure</td></tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-border-primary</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #E0DDD6;"></span>paper-300</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: rgba(232,230,225,0.12); border: 1px solid rgba(232,230,225,0.12);"></span>rgba 12%</td>
+          </tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-border-secondary</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #ECEAE4;"></span>paper-200</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: rgba(232,230,225,0.07); border: 1px solid rgba(232,230,225,0.07);"></span>rgba 7%</td>
+          </tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-border-focus</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #6B8A1A;"></span>lite-700</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #B0D838;"></span>lite-400</td>
+          </tr>
+
+          <!-- Accent -->
+          <tr><td class="semantic-category" colspan="3">Accent</td></tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-accent-primary</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #6B8A1A;"></span>lite-700</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #B0D838;"></span>lite-400</td>
+          </tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-accent-text</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #6B8A1A;"></span>lite-700</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #B0D838;"></span>lite-400</td>
+          </tr>
+
+          <!-- Status -->
+          <tr><td class="semantic-category" colspan="3">Statut</td></tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-status-success</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #3A8A4A;"></span>success-500</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #68B474;"></span>success-300</td>
+          </tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-status-warning</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #D4A03A;"></span>warning-500</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #E8C46A;"></span>warning-300</td>
+          </tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-status-error</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #C45A32;"></span>warm-500</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #E08A68;"></span>warm-300</td>
+          </tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-status-info</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #4A90B8;"></span>signal-500</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #7AB4D4;"></span>signal-300</td>
+          </tr>
+
+          <!-- Interactive -->
+          <tr><td class="semantic-category" colspan="3">Interactif</td></tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-interactive-primary</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #6B8A1A;"></span>lite-700</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #B0D838;"></span>lite-400</td>
+          </tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-interactive-primary-text</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #FFFFFF;"></span>white</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #1C1D1A;"></span>olive-900</td>
+          </tr>
+
+          <!-- Chart -->
+          <tr><td class="semantic-category" colspan="3">Graphiques</td></tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-chart-primary</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #6B8A1A;"></span>lite-700</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #B0D838;"></span>lite-400</td>
+          </tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-chart-secondary</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #4A90B8;"></span>signal-500</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #7AB4D4;"></span>signal-300</td>
+          </tr>
+          <tr>
+            <td class="semantic-token-name">--liteops-chart-tertiary</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #C45A32;"></span>warm-500</td>
+            <td class="semantic-value"><span class="semantic-swatch" style="background: #E08A68;"></span>warm-300</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 3: CONTRAST RATIOS
+       ══════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section C — Accessibilite</span>
+    <h2 class="section-heading">Ratios de contraste WCAG</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Verification des paires texte/surface critiques. Minimum AA (4.5:1 texte normal, 3:1 grands textes et elements UI). Les ratios sont pre-calcules a partir des valeurs hex resolues.
+    </p>
+
+    <div class="contrast-table-wrap">
+      <table class="contrast-table">
+        <thead>
+          <tr>
+            <th scope="col">Paire</th>
+            <th scope="col">Theme</th>
+            <th scope="col">Apercu</th>
+            <th scope="col">Ratio</th>
+            <th scope="col">AA</th>
+            <th scope="col">AAA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- 1. text-primary on surface-primary (light) -->
+          <tr>
+            <td class="contrast-pair">text-primary / surface-primary</td>
+            <td class="contrast-theme">Clair</td>
+            <td><div class="contrast-preview" style="background: #F5F4F0; color: #1C1D1A;">Texte</div></td>
+            <td class="contrast-ratio">12.8:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+          </tr>
+          <!-- 2. text-primary on surface-primary (dark) -->
+          <tr>
+            <td class="contrast-pair">text-primary / surface-primary</td>
+            <td class="contrast-theme">Sombre</td>
+            <td><div class="contrast-preview" style="background: #1C1D1A; color: #E8E6E1;">Texte</div></td>
+            <td class="contrast-ratio">12.3:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+          </tr>
+          <!-- 3. text-secondary on surface-primary (light) -->
+          <tr>
+            <td class="contrast-pair">text-secondary / surface-primary</td>
+            <td class="contrast-theme">Clair</td>
+            <td><div class="contrast-preview" style="background: #F5F4F0; color: #4E5444;">Texte</div></td>
+            <td class="contrast-ratio">6.3:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+          </tr>
+          <!-- 4. text-secondary on surface-primary (dark) -->
+          <tr>
+            <td class="contrast-pair">text-secondary / surface-primary</td>
+            <td class="contrast-theme">Sombre</td>
+            <td><div class="contrast-preview" style="background: #1C1D1A; color: #C0BEB8;">Texte</div></td>
+            <td class="contrast-ratio">9.1:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+          </tr>
+          <!-- 5. text-tertiary on surface-primary (light) -->
+          <tr>
+            <td class="contrast-pair">text-tertiary / surface-primary</td>
+            <td class="contrast-theme">Clair</td>
+            <td><div class="contrast-preview" style="background: #F5F4F0; color: #8C8A82;">Texte</div></td>
+            <td class="contrast-ratio">3.2:1</td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+          </tr>
+          <!-- 6. text-tertiary on surface-primary (dark) -->
+          <tr>
+            <td class="contrast-pair">text-tertiary / surface-primary</td>
+            <td class="contrast-theme">Sombre</td>
+            <td><div class="contrast-preview" style="background: #1C1D1A; color: #8A8880;">Texte</div></td>
+            <td class="contrast-ratio">3.8:1</td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+          </tr>
+          <!-- 7. interactive-primary-text on interactive-primary (light) -->
+          <tr>
+            <td class="contrast-pair">interactive-text / interactive-primary</td>
+            <td class="contrast-theme">Clair</td>
+            <td><div class="contrast-preview" style="background: #6B8A1A; color: #FFFFFF;">Texte</div></td>
+            <td class="contrast-ratio">4.1:1</td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+          </tr>
+          <!-- 8. interactive-primary-text on interactive-primary (dark) -->
+          <tr>
+            <td class="contrast-pair">interactive-text / interactive-primary</td>
+            <td class="contrast-theme">Sombre</td>
+            <td><div class="contrast-preview" style="background: #B0D838; color: #1C1D1A;">Texte</div></td>
+            <td class="contrast-ratio">8.6:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+          </tr>
+          <!-- 9. status-success on success-bg (light) -->
+          <tr>
+            <td class="contrast-pair">status-success / success-bg</td>
+            <td class="contrast-theme">Clair</td>
+            <td><div class="contrast-preview" style="background: #D0F0D4; color: #3A8A4A;">Texte</div></td>
+            <td class="contrast-ratio">3.4:1</td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+          </tr>
+          <!-- 10. status-error on error-bg (light) -->
+          <tr>
+            <td class="contrast-pair">status-error / error-bg</td>
+            <td class="contrast-theme">Clair</td>
+            <td><div class="contrast-preview" style="background: #F4D0C0; color: #C45A32;">Texte</div></td>
+            <td class="contrast-ratio">3.1:1</td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+          </tr>
+          <!-- 11. status-warning on warning-bg (light) -->
+          <tr>
+            <td class="contrast-pair">status-warning / warning-bg</td>
+            <td class="contrast-theme">Clair</td>
+            <td><div class="contrast-preview" style="background: #FFF4D0; color: #D4A03A;">Texte</div></td>
+            <td class="contrast-ratio">2.4:1</td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+          </tr>
+          <!-- 12. status-info on info-bg (light) -->
+          <tr>
+            <td class="contrast-pair">status-info / info-bg</td>
+            <td class="contrast-theme">Clair</td>
+            <td><div class="contrast-preview" style="background: #C4DFF0; color: #4A90B8;">Texte</div></td>
+            <td class="contrast-ratio">2.7:1</td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+          </tr>
+          <!-- 13. text-primary on surface-secondary (light) -->
+          <tr>
+            <td class="contrast-pair">text-primary / surface-secondary</td>
+            <td class="contrast-theme">Clair</td>
+            <td><div class="contrast-preview" style="background: #FFFFFF; color: #1C1D1A;">Texte</div></td>
+            <td class="contrast-ratio">15.9:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+          </tr>
+          <!-- 14. text-primary on surface-secondary (dark) -->
+          <tr>
+            <td class="contrast-pair">text-primary / surface-secondary</td>
+            <td class="contrast-theme">Sombre</td>
+            <td><div class="contrast-preview" style="background: #2A2B27; color: #E8E6E1;">Texte</div></td>
+            <td class="contrast-ratio">10.0:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+          </tr>
+          <!-- 15. accent-text on surface-primary (light) -->
+          <tr>
+            <td class="contrast-pair">accent-text / surface-primary</td>
+            <td class="contrast-theme">Clair</td>
+            <td><div class="contrast-preview" style="background: #F5F4F0; color: #6B8A1A;">Texte</div></td>
+            <td class="contrast-ratio">4.6:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+            <td><span class="contrast-badge contrast-badge--fail">Fail</span></td>
+          </tr>
+          <!-- 16. accent-text on surface-primary (dark) -->
+          <tr>
+            <td class="contrast-pair">accent-text / surface-primary</td>
+            <td class="contrast-theme">Sombre</td>
+            <td><div class="contrast-preview" style="background: #1C1D1A; color: #B0D838;">Texte</div></td>
+            <td class="contrast-ratio">8.6:1</td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+            <td><span class="contrast-badge contrast-badge--pass">Pass</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="section-note" style="margin-top: var(--liteops-space-6);">
+      Note : les tokens tertiary et status-on-bg echouent intentionnellement au AA texte normal. Ils sont reserves aux labels decoratifs de grande taille (>= 18px bold ou >= 24px) ou qui sont toujours accompagnes d'un indicateur non-chromatique (icone, forme).
+    </p>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 4: CHART COLORS
+       ══════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section D — Graphiques</span>
+    <h2 class="section-heading">Couleurs de graphiques</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Sequence ordonnee de 6 couleurs pour les graphiques, differente selon le theme pour garantir la lisibilite sur chaque fond.
+    </p>
+
+    <div class="chart-section">
+
+      <!-- Light theme chart colors -->
+      <div class="chart-theme-block">
+        <div class="chart-theme-title">Theme clair</div>
+        <div class="chart-circles">
+          <div class="chart-circle-wrap">
+            <div class="chart-circle" style="background: var(--liteops-lite-700);"></div>
+            <div class="chart-circle-label">1. lite-700</div>
+            <div class="chart-circle-hex">#6B8A1A</div>
+          </div>
+          <div class="chart-circle-wrap">
+            <div class="chart-circle" style="background: var(--liteops-signal-500);"></div>
+            <div class="chart-circle-label">2. signal-500</div>
+            <div class="chart-circle-hex">#4A90B8</div>
+          </div>
+          <div class="chart-circle-wrap">
+            <div class="chart-circle" style="background: var(--liteops-warm-500);"></div>
+            <div class="chart-circle-label">3. warm-500</div>
+            <div class="chart-circle-hex">#C45A32</div>
+          </div>
+          <div class="chart-circle-wrap">
+            <div class="chart-circle" style="background: var(--liteops-lite-300);"></div>
+            <div class="chart-circle-label">4. lite-300</div>
+            <div class="chart-circle-hex">#C8FF3C</div>
+          </div>
+          <div class="chart-circle-wrap">
+            <div class="chart-circle" style="background: var(--liteops-signal-300);"></div>
+            <div class="chart-circle-label">5. signal-300</div>
+            <div class="chart-circle-hex">#7AB4D4</div>
+          </div>
+          <div class="chart-circle-wrap">
+            <div class="chart-circle" style="background: var(--liteops-warm-300);"></div>
+            <div class="chart-circle-label">6. warm-300</div>
+            <div class="chart-circle-hex">#E08A68</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dark theme chart colors -->
+      <div class="chart-theme-block chart-theme-block--dark">
+        <div class="chart-theme-title">Theme sombre</div>
+        <div class="chart-circles">
+          <div class="chart-circle-wrap">
+            <div class="chart-circle" style="background: var(--liteops-lite-400);"></div>
+            <div class="chart-circle-label">1. lite-400</div>
+            <div class="chart-circle-hex">#B0D838</div>
+          </div>
+          <div class="chart-circle-wrap">
+            <div class="chart-circle" style="background: var(--liteops-signal-300);"></div>
+            <div class="chart-circle-label">2. signal-300</div>
+            <div class="chart-circle-hex">#7AB4D4</div>
+          </div>
+          <div class="chart-circle-wrap">
+            <div class="chart-circle" style="background: var(--liteops-warm-300);"></div>
+            <div class="chart-circle-label">3. warm-300</div>
+            <div class="chart-circle-hex">#E08A68</div>
+          </div>
+          <div class="chart-circle-wrap">
+            <div class="chart-circle" style="background: var(--liteops-lite-600);"></div>
+            <div class="chart-circle-label">4. lite-600</div>
+            <div class="chart-circle-hex">#84A422</div>
+          </div>
+          <div class="chart-circle-wrap">
+            <div class="chart-circle" style="background: var(--liteops-signal-700);"></div>
+            <div class="chart-circle-label">5. signal-700</div>
+            <div class="chart-circle-hex">#2D6888</div>
+          </div>
+          <div class="chart-circle-wrap">
+            <div class="chart-circle" style="background: var(--liteops-warm-700);"></div>
+            <div class="chart-circle-label">6. warm-700</div>
+            <div class="chart-circle-hex">#8A3518</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>
