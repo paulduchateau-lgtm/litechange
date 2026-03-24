@@ -81,11 +81,13 @@ Plans:
   3. Dashboard page mockup shows a complete working surface (sidebar, topbar, KPI cards, data table, chart area) using only design system components
   4. Before/after comparison page shows simulateur-lite-ops current vs upgraded design side by side
   5. Naming convention documentation, spacing/sizing visualization, and WCAG accessibility checklist are complete and published
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
+- [ ] 04-01-PLAN.md — Documentation: spacing/sizing visualization, accessibility checklist, naming conventions
+- [ ] 04-02-PLAN.md — Landing page mockup with French institutional copy
+- [ ] 04-03-PLAN.md — Dashboard mockup and before/after comparison page
+- [ ] 04-04-PLAN.md — Component showcase master page (all atoms, molecules, organisms)
 
 ## Progress
 
@@ -97,4 +99,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | 1. Token Foundation | 0/2 | Not started | - |
 | 2. Atoms and Molecules | 0/5 | Not started | - |
 | 3. Organisms | 4/4 | Complete   | 2026-03-24 |
-| 4. Pages and Documentation | 0/2 | Not started | - |
+| 4. Pages and Documentation | 0/4 | Not started | - |
