@@ -29,11 +29,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Existing apps using lc- prefixed tokens continue to render correctly via the backward compatibility shim
   4. Elevation, gradient, and motion tokens are available as named custom properties and visually demonstrable on a test page
   5. JSON source files follow DTCG format and are structured for future Figma token import
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md — DTCG JSON source, Style Dictionary v5 pipeline, CSS/Tailwind/JSON output, backward compat shim
+- [ ] 01-02-PLAN.md — 6-level elevation, gradient tokens, motion tokens, visual test page
 
 ### Phase 2: Atoms and Molecules
 **Goal**: A complete library of 21 foundational and composed components, each built with liteops- tokens, working in both themes, showcased as standalone HTML
