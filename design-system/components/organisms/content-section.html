@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Organism — Content Section</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Showcase Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header { margin-bottom: var(--liteops-space-16); }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    .section { margin-bottom: var(--liteops-space-16); }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    /* ── Dark Panel ── */
+    .dark-panel {
+      background: var(--liteops-olive-900);
+      border-radius: var(--liteops-radius-lg);
+      padding: var(--liteops-space-8);
+      margin-top: var(--liteops-space-4);
+    }
+
+    /* ═══════════════════════════════════════════════
+       BUTTON COMPONENT (composed from atoms/button)
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--liteops-space-2);
+      font-family: var(--liteops-font-body);
+      font-weight: 500;
+      border: 1px solid transparent;
+      border-radius: var(--liteops-radius-md);
+      cursor: pointer;
+      transition: all var(--liteops-duration-normal) ease;
+      text-decoration: none;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .liteops-Button--sm { padding: 6px 16px; font-size: 13px; }
+    .liteops-Button--md { padding: 10px 24px; font-size: 15px; }
+    .liteops-Button--lg { padding: 14px 32px; font-size: 17px; }
+
+    .liteops-Button--primary {
+      background: var(--liteops-interactive-primary);
+      color: var(--liteops-interactive-primary-text);
+    }
+    .liteops-Button--primary:hover {
+      background: var(--liteops-interactive-primary-hover);
+    }
+
+    .liteops-Button:focus-visible {
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       CONTENT SECTION ORGANISM
+       ═══════════════════════════════════════════════ */
+
+    .liteops-ContentSection {
+      width: 100%;
+      padding: var(--liteops-space-24) 0;
+    }
+
+    .liteops-ContentSection__container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 var(--liteops-space-6);
+    }
+
+    /* ── Heading ── */
+    .liteops-ContentSection__heading {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-4);
+    }
+
+    /* ── Body ── */
+    .liteops-ContentSection__body {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--liteops-text-secondary);
+      max-width: 680px;
+    }
+
+    /* ── CTA ── */
+    .liteops-ContentSection__cta {
+      margin-top: var(--liteops-space-6);
+    }
+
+    /* ── Visual placeholder ── */
+    .liteops-ContentSection__visual {
+      background: var(--liteops-surface-tertiary);
+      border: 1px solid var(--liteops-border-secondary);
+      border-radius: var(--liteops-radius-md);
+      min-height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .liteops-ContentSection__visual-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+    }
+
+    /* ── Centered variant ── */
+    .liteops-ContentSection--centered .liteops-ContentSection__container {
+      text-align: center;
+    }
+
+    .liteops-ContentSection--centered .liteops-ContentSection__body {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ── Split-left variant (text left, visual right) ── */
+    .liteops-ContentSection--split-left .liteops-ContentSection__container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--liteops-space-16);
+      align-items: center;
+    }
+
+    /* ── Split-right variant (visual left, text right) ── */
+    .liteops-ContentSection--split-right .liteops-ContentSection__container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--liteops-space-16);
+      align-items: center;
+    }
+
+    .liteops-ContentSection--split-right .liteops-ContentSection__visual {
+      order: -1;
+    }
+
+    /* ── Dark theme overrides ── */
+    [data-theme="dark"] .liteops-ContentSection__heading,
+    .dark-panel .liteops-ContentSection__heading {
+      color: #E8E6E1;
+    }
+
+    [data-theme="dark"] .liteops-ContentSection__body,
+    .dark-panel .liteops-ContentSection__body {
+      color: #C0BEB8;
+    }
+
+    .dark-panel .liteops-ContentSection__visual {
+      background: var(--liteops-olive-800);
+      border-color: rgba(232, 230, 225, 0.07);
+    }
+
+    .dark-panel .liteops-ContentSection__visual-label {
+      color: #8A8880;
+    }
+
+    .dark-panel .liteops-Button--primary {
+      background: var(--liteops-lite-400);
+      color: var(--liteops-olive-900);
+    }
+    .dark-panel .liteops-Button--primary:hover {
+      background: var(--liteops-lite-300);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .liteops-ContentSection--split-left .liteops-ContentSection__container,
+      .liteops-ContentSection--split-right .liteops-ContentSection__container {
+        grid-template-columns: 1fr;
+        gap: var(--liteops-space-8);
+      }
+      .liteops-ContentSection--split-right .liteops-ContentSection__visual {
+        order: 0;
+      }
+      .liteops-ContentSection__heading {
+        font-size: 28px;
+      }
+    }
+
+    /* ── Animations ── */
+    @media (prefers-reduced-motion: no-preference) {
+      .liteops-ContentSection__text {
+        animation: contentFadeUp 500ms var(--liteops-easing-out) both;
+      }
+      .liteops-ContentSection__visual {
+        animation: contentFadeUp 500ms var(--liteops-easing-out) 100ms both;
+      }
+      @keyframes contentFadeUp {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    }
+
+    /* ── Stacked spacing helper ── */
+    .stacked-demo .liteops-ContentSection {
+      padding: var(--liteops-space-16) 0;
+    }
+    .stacked-demo .liteops-ContentSection + .liteops-ContentSection {
+      border-top: 1px solid var(--liteops-border-secondary);
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+  <header class="page-header">
+    <h1 class="page-title">Content Section</h1>
+    <p class="page-subtitle">Repeatable text + CTA + visual organism for landing pages. Three layout variants: centered, split-left, split-right.</p>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════
+       1. Centered Layout
+       ═══════════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">Centered Layout</h2>
+    <span class="section-label">liteops-ContentSection--centered</span>
+    <hr class="section-divider">
+  </section>
+</div>
+
+<div class="liteops-ContentSection liteops-ContentSection--centered">
+  <div class="liteops-ContentSection__container">
+    <div class="liteops-ContentSection__text">
+      <h2 class="liteops-ContentSection__heading">Observabilite du changement</h2>
+      <p class="liteops-ContentSection__body">Mesurez l'adoption reelle de vos transformations grace a des indicateurs fondes sur la recherche academique. LiteOps agrege les signaux faibles, les enquetes terrain et les donnees operationnelles pour eclairer chaque decision.</p>
+      <div class="liteops-ContentSection__cta">
+        <button class="liteops-Button liteops-Button--primary liteops-Button--md">En savoir plus</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ═══════════════════════════════════════════════
+       2. Split Left (text-left, visual-right)
+       ═══════════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">Split Left (text-left, visual-right)</h2>
+    <span class="section-label">liteops-ContentSection--split-left</span>
+    <hr class="section-divider">
+  </section>
+</div>
+
+<div class="liteops-ContentSection liteops-ContentSection--split-left">
+  <div class="liteops-ContentSection__container">
+    <div class="liteops-ContentSection__text">
+      <h2 class="liteops-ContentSection__heading">Diagnostic intelligent</h2>
+      <p class="liteops-ContentSection__body">Notre moteur d'analyse identifie automatiquement les zones de friction dans vos projets de transformation. Fonde sur une taxonomie de 42 facteurs de resistance au changement, le diagnostic fournit des recommandations actionnables.</p>
+      <div class="liteops-ContentSection__cta">
+        <button class="liteops-Button liteops-Button--primary liteops-Button--md">Decouvrir le diagnostic</button>
+      </div>
+    </div>
+    <div class="liteops-ContentSection__visual">
+      <span class="liteops-ContentSection__visual-label">Illustration / Screenshot</span>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ═══════════════════════════════════════════════
+       3. Split Right (visual-left, text-right)
+       ═══════════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">Split Right (visual-left, text-right)</h2>
+    <span class="section-label">liteops-ContentSection--split-right</span>
+    <hr class="section-divider">
+  </section>
+</div>
+
+<div class="liteops-ContentSection liteops-ContentSection--split-right">
+  <div class="liteops-ContentSection__container">
+    <div class="liteops-ContentSection__text">
+      <h2 class="liteops-ContentSection__heading">Enquetes adaptatives</h2>
+      <p class="liteops-ContentSection__body">Des enquetes courtes et contextualisees qui s'adaptent en temps reel au profil du repondant. Le taux de completion moyen atteint 78%, contre 35% pour les enquetes classiques de conduite du changement.</p>
+      <div class="liteops-ContentSection__cta">
+        <button class="liteops-Button liteops-Button--primary liteops-Button--md">Voir les enquetes</button>
+      </div>
+    </div>
+    <div class="liteops-ContentSection__visual">
+      <span class="liteops-ContentSection__visual-label">Illustration / Screenshot</span>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ═══════════════════════════════════════════════
+       4. Dark Theme
+       ═══════════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">Dark Theme</h2>
+    <span class="section-label">Centered variant in dark panel</span>
+    <hr class="section-divider">
+
+    <div class="dark-panel" data-theme="dark">
+      <div class="liteops-ContentSection liteops-ContentSection--centered" style="padding: var(--liteops-space-12) 0;">
+        <div class="liteops-ContentSection__container">
+          <div class="liteops-ContentSection__text">
+            <h2 class="liteops-ContentSection__heading">Piloter avec precision</h2>
+            <p class="liteops-ContentSection__body">Le tableau de bord temps reel centralise les metriques d'adoption, les signaux de friction et les plans d'action. Chaque indicateur est trace jusqu'a sa source academique.</p>
+            <div class="liteops-ContentSection__cta">
+              <button class="liteops-Button liteops-Button--primary liteops-Button--md">Explorer le tableau de bord</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       5. Stacked Sections
+       ═══════════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">Stacked Sections</h2>
+    <span class="section-label">Two sections stacked showing page rhythm</span>
+    <hr class="section-divider">
+
+    <div class="stacked-demo" style="border: 1px solid var(--liteops-border-secondary); border-radius: var(--liteops-radius-md); overflow: hidden;">
+      <div class="liteops-ContentSection liteops-ContentSection--split-left">
+        <div class="liteops-ContentSection__container">
+          <div class="liteops-ContentSection__text">
+            <h2 class="liteops-ContentSection__heading">Mesurer l'adoption</h2>
+            <p class="liteops-ContentSection__body">Des indicateurs granulaires par equipe, par projet et par phase de transformation. Identifiez les ecarts entre adoption declaree et adoption reelle.</p>
+          </div>
+          <div class="liteops-ContentSection__visual">
+            <span class="liteops-ContentSection__visual-label">Graphique adoption</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="liteops-ContentSection liteops-ContentSection--split-right">
+        <div class="liteops-ContentSection__container">
+          <div class="liteops-ContentSection__text">
+            <h2 class="liteops-ContentSection__heading">Agir sur les frictions</h2>
+            <p class="liteops-ContentSection__body">Transformez chaque signal de friction en action concrete. Le plan d'action automatise priorise les interventions selon leur impact attendu sur l'adoption.</p>
+          </div>
+          <div class="liteops-ContentSection__visual">
+            <span class="liteops-ContentSection__visual-label">Plan d'action</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+</body>
+</html>

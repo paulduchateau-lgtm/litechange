@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Organism — Card Grid</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Showcase Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header { margin-bottom: var(--liteops-space-16); }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    .section { margin-bottom: var(--liteops-space-16); }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    /* ── Dark Panel ── */
+    .dark-panel {
+      background: var(--liteops-olive-900);
+      border-radius: var(--liteops-radius-lg);
+      padding: var(--liteops-space-8);
+      margin-top: var(--liteops-space-4);
+    }
+
+    /* ═══════════════════════════════════════════════
+       CARD GRID ORGANISM
+       ═══════════════════════════════════════════════ */
+
+    .liteops-CardGrid {
+      display: grid;
+      gap: var(--liteops-space-6);
+    }
+
+    /* ── Column Variants ── */
+    .liteops-CardGrid--cols-1 {
+      grid-template-columns: 1fr;
+    }
+
+    .liteops-CardGrid--cols-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .liteops-CardGrid--cols-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .liteops-CardGrid--cols-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    /* ── Responsive Breakpoints ── */
+    @media (max-width: 1024px) {
+      .liteops-CardGrid--cols-4 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .liteops-CardGrid--cols-3 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .liteops-CardGrid--cols-2,
+      .liteops-CardGrid--cols-3,
+      .liteops-CardGrid--cols-4 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ═══════════════════════════════════════════════
+       GENERIC CARD COMPONENT
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Card {
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-secondary);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-6);
+      box-shadow: var(--liteops-shadow-sm);
+      transition: box-shadow var(--liteops-duration-normal), transform var(--liteops-duration-normal);
+      display: flex;
+      flex-direction: column;
+      gap: var(--liteops-space-3);
+    }
+
+    .liteops-Card:hover {
+      box-shadow: var(--liteops-shadow-md);
+      transform: translateY(-2px);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .liteops-Card:hover {
+        transform: none;
+      }
+    }
+
+    .liteops-Card__icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--liteops-accent-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .liteops-Card__icon svg {
+      width: 20px;
+      height: 20px;
+      color: var(--liteops-accent-text);
+    }
+
+    .liteops-Card__title {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-Card__description {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--liteops-text-secondary);
+    }
+
+    .liteops-Card__link {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--liteops-accent-text);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: auto;
+      padding-top: var(--liteops-space-2);
+    }
+
+    .liteops-Card__link:hover {
+      text-decoration: underline;
+    }
+
+    .liteops-Card__link::after {
+      content: "\2192";
+    }
+
+    /* ── Dark theme card overrides ── */
+    [data-theme="dark"] .liteops-Card,
+    .dark-panel .liteops-Card {
+      background: var(--liteops-olive-800);
+      border-color: rgba(232, 230, 225, 0.07);
+    }
+
+    [data-theme="dark"] .liteops-Card__title,
+    .dark-panel .liteops-Card__title {
+      color: #E8E6E1;
+    }
+
+    [data-theme="dark"] .liteops-Card__description,
+    .dark-panel .liteops-Card__description {
+      color: #C0BEB8;
+    }
+
+    [data-theme="dark"] .liteops-Card__icon,
+    .dark-panel .liteops-Card__icon {
+      background: rgba(176, 216, 56, 0.08);
+    }
+
+    [data-theme="dark"] .liteops-Card__icon svg,
+    .dark-panel .liteops-Card__icon svg {
+      color: var(--liteops-lite-400);
+    }
+
+    [data-theme="dark"] .liteops-Card__link,
+    .dark-panel .liteops-Card__link {
+      color: var(--liteops-lite-400);
+    }
+
+    /* ═══════════════════════════════════════════════
+       KPI CARD (composed from molecules/kpi-card)
+       ═══════════════════════════════════════════════ */
+
+    .liteops-KpiCard {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background: var(--liteops-surface-elevated);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-5) var(--liteops-space-6);
+      box-shadow: var(--liteops-shadow-sm);
+      border: 1px solid var(--liteops-border-secondary);
+    }
+
+    .liteops-KpiCard__label {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .liteops-KpiCard__value {
+      font-family: var(--liteops-font-body);
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--liteops-text-primary);
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .liteops-KpiCard__trend {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      margin-top: var(--liteops-space-1);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .liteops-KpiCard__trend--up {
+      color: var(--liteops-status-success);
+    }
+
+    .liteops-KpiCard__trend--down {
+      color: var(--liteops-status-error);
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+  <header class="page-header">
+    <h1 class="page-title">Card Grid</h1>
+    <p class="page-subtitle">Responsive card grid organism with 1-4 column variants. Contains generic card and KPI card children.</p>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════
+       1. 4-Column Grid
+       ═══════════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">4-Column Grid</h2>
+    <span class="section-label">liteops-CardGrid--cols-4</span>
+    <hr class="section-divider">
+
+    <div class="liteops-CardGrid liteops-CardGrid--cols-4">
+      <div class="liteops-CardGrid__item">
+        <div class="liteops-Card">
+          <div class="liteops-Card__icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"/><path d="M10 7v3l2 2"/></svg>
+          </div>
+          <span class="liteops-Card__title">Enquetes intelligentes</span>
+          <span class="liteops-Card__description">Enquetes adaptatives courtes qui s'ajustent au profil du repondant en temps reel.</span>
+          <a href="#" class="liteops-Card__link">En savoir plus</a>
+        </div>
+      </div>
+      <div class="liteops-CardGrid__item">
+        <div class="liteops-Card">
+          <div class="liteops-Card__icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M3 8h14"/><path d="M8 3v14"/></svg>
+          </div>
+          <span class="liteops-Card__title">Tableau de bord temps reel</span>
+          <span class="liteops-Card__description">Metriques d'adoption centralisees avec signaux de friction et plans d'action.</span>
+          <a href="#" class="liteops-Card__link">Explorer</a>
+        </div>
+      </div>
+      <div class="liteops-CardGrid__item">
+        <div class="liteops-Card">
+          <div class="liteops-Card__icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16l4-4 3 3 5-7"/><rect x="2" y="2" width="16" height="16" rx="2"/></svg>
+          </div>
+          <span class="liteops-Card__title">Diagnostic IA</span>
+          <span class="liteops-Card__description">Identification automatique des zones de friction basee sur 42 facteurs de resistance.</span>
+          <a href="#" class="liteops-Card__link">Decouvrir</a>
+        </div>
+      </div>
+      <div class="liteops-CardGrid__item">
+        <div class="liteops-Card">
+          <div class="liteops-Card__icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2l2.5 5 5.5 1-4 4 1 5.5L10 15l-5 2.5 1-5.5-4-4 5.5-1z"/></svg>
+          </div>
+          <span class="liteops-Card__title">Plan d'action automatise</span>
+          <span class="liteops-Card__description">Actions priorisees selon leur impact attendu sur l'adoption du changement.</span>
+          <a href="#" class="liteops-Card__link">Voir le plan</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       2. 3-Column Grid
+       ═══════════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">3-Column Grid</h2>
+    <span class="section-label">liteops-CardGrid--cols-3</span>
+    <hr class="section-divider">
+
+    <div class="liteops-CardGrid liteops-CardGrid--cols-3">
+      <div class="liteops-CardGrid__item">
+        <div class="liteops-Card">
+          <div class="liteops-Card__icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h2l3-7 4 14 3-7h2"/></svg>
+          </div>
+          <span class="liteops-Card__title">Signaux faibles</span>
+          <span class="liteops-Card__description">Detection proactive des micro-signaux d'adoption ou de resistance avant qu'ils ne deviennent des blocages. Le moteur analyse les donnees operationnelles, les retours terrain et les enquetes pour alerter en temps reel.</span>
+          <a href="#" class="liteops-Card__link">Voir les signaux</a>
+        </div>
+      </div>
+      <div class="liteops-CardGrid__item">
+        <div class="liteops-Card">
+          <div class="liteops-Card__icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="8"/><path d="M10 6v4l3 3"/></svg>
+          </div>
+          <span class="liteops-Card__title">Suivi longitudinal</span>
+          <span class="liteops-Card__description">Tracez l'evolution de chaque indicateur dans le temps. Comparez les phases de votre transformation et identifiez les points d'inflexion. Chaque metrique est historisee et exportable.</span>
+          <a href="#" class="liteops-Card__link">Explorer l'historique</a>
+        </div>
+      </div>
+      <div class="liteops-CardGrid__item">
+        <div class="liteops-Card">
+          <div class="liteops-Card__icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4H4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2z"/><path d="M2 8h16"/></svg>
+          </div>
+          <span class="liteops-Card__title">Vue COMEX</span>
+          <span class="liteops-Card__description">Synthese executive conçue pour les comites de direction. Indicateurs cles, tendances macro et recommandations strategiques dans un format adapte aux decideurs.</span>
+          <a href="#" class="liteops-Card__link">Voir la vue COMEX</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       3. 2-Column Grid
+       ═══════════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">2-Column Grid</h2>
+    <span class="section-label">liteops-CardGrid--cols-2</span>
+    <hr class="section-divider">
+
+    <div class="liteops-CardGrid liteops-CardGrid--cols-2">
+      <div class="liteops-CardGrid__item">
+        <div class="liteops-Card">
+          <div class="liteops-Card__icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12v12H4z"/><path d="M4 10h12"/><path d="M10 4v12"/></svg>
+          </div>
+          <span class="liteops-Card__title">Connecteurs et integrations</span>
+          <span class="liteops-Card__description">Connectez LiteOps a vos outils existants : SIRH, outils de gestion de projet, plateformes collaboratives. Les donnees circulent automatiquement pour enrichir vos indicateurs d'adoption sans saisie manuelle.</span>
+          <a href="#" class="liteops-Card__link">Voir les connecteurs</a>
+        </div>
+      </div>
+      <div class="liteops-CardGrid__item">
+        <div class="liteops-Card">
+          <div class="liteops-Card__icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="7" r="4"/><path d="M3 18v-2a4 4 0 014-4h6a4 4 0 014 4v2"/></svg>
+          </div>
+          <span class="liteops-Card__title">Gestion des equipes</span>
+          <span class="liteops-Card__description">Organisez vos acteurs du changement par role, perimetre et niveau d'implication. Attribuez les responsabilites, suivez les contributions et pilotez la mobilisation a chaque echelon de l'organisation.</span>
+          <a href="#" class="liteops-Card__link">Gerer les equipes</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       4. KPI Card Grid
+       ═══════════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">KPI Card Grid</h2>
+    <span class="section-label">liteops-CardGrid--cols-4 with KpiCard molecules</span>
+    <hr class="section-divider">
+
+    <div class="liteops-CardGrid liteops-CardGrid--cols-4">
+      <div class="liteops-CardGrid__item">
+        <div class="liteops-KpiCard">
+          <span class="liteops-KpiCard__label">Taux d'adoption</span>
+          <span class="liteops-KpiCard__value">78.4%</span>
+          <span class="liteops-KpiCard__trend liteops-KpiCard__trend--up">&uarr; 12.4%</span>
+        </div>
+      </div>
+      <div class="liteops-CardGrid__item">
+        <div class="liteops-KpiCard">
+          <span class="liteops-KpiCard__label">Friction detectee</span>
+          <span class="liteops-KpiCard__value">23</span>
+          <span class="liteops-KpiCard__trend liteops-KpiCard__trend--up">&uarr; 5</span>
+        </div>
+      </div>
+      <div class="liteops-CardGrid__item">
+        <div class="liteops-KpiCard">
+          <span class="liteops-KpiCard__label">Signaux actifs</span>
+          <span class="liteops-KpiCard__value">12</span>
+          <span class="liteops-KpiCard__trend liteops-KpiCard__trend--down">&darr; 3</span>
+        </div>
+      </div>
+      <div class="liteops-CardGrid__item">
+        <div class="liteops-KpiCard">
+          <span class="liteops-KpiCard__label">Enquetes completees</span>
+          <span class="liteops-KpiCard__value">156</span>
+          <span class="liteops-KpiCard__trend liteops-KpiCard__trend--up">&uarr; 24</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       5. Dark Theme
+       ═══════════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">Dark Theme</h2>
+    <span class="section-label">3-column grid in dark panel</span>
+    <hr class="section-divider">
+
+    <div class="dark-panel" data-theme="dark">
+      <div class="liteops-CardGrid liteops-CardGrid--cols-3">
+        <div class="liteops-CardGrid__item">
+          <div class="liteops-Card">
+            <div class="liteops-Card__icon">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"/><path d="M10 7v3l2 2"/></svg>
+            </div>
+            <span class="liteops-Card__title">Enquetes intelligentes</span>
+            <span class="liteops-Card__description">Enquetes adaptatives courtes qui s'ajustent au profil du repondant.</span>
+            <a href="#" class="liteops-Card__link">En savoir plus</a>
+          </div>
+        </div>
+        <div class="liteops-CardGrid__item">
+          <div class="liteops-Card">
+            <div class="liteops-Card__icon">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M3 8h14"/><path d="M8 3v14"/></svg>
+            </div>
+            <span class="liteops-Card__title">Tableau de bord</span>
+            <span class="liteops-Card__description">Metriques d'adoption centralisees avec signaux de friction.</span>
+            <a href="#" class="liteops-Card__link">Explorer</a>
+          </div>
+        </div>
+        <div class="liteops-CardGrid__item">
+          <div class="liteops-Card">
+            <div class="liteops-Card__icon">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16l4-4 3 3 5-7"/><rect x="2" y="2" width="16" height="16" rx="2"/></svg>
+            </div>
+            <span class="liteops-Card__title">Diagnostic IA</span>
+            <span class="liteops-Card__description">Identification automatique des zones de friction et resistance.</span>
+            <a href="#" class="liteops-Card__link">Decouvrir</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+</body>
+</html>
