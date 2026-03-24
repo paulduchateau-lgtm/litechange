@@ -63,11 +63,13 @@ Plans:
   2. Data table displays with sortable headers (IBM Plex Mono uppercase), right-aligned numeric columns (tabular-nums), zebra rows, and horizontal overflow handling
   3. Hero section renders with gradient background (green-to-olive), bold Source Serif 4 heading, and CTA buttons -- gradient rule applies only here, not in dashboard organisms
   4. Modal, topbar, agent card, pipeline visualization, card grid, content section, and multi-select dropdown all render correctly in their intended theme context
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
+- [ ] 03-01-PLAN.md — App chrome organisms: Sidebar navigation, Topbar
+- [ ] 03-02-PLAN.md — Data interaction organisms: Data Table, Modal dialog
+- [ ] 03-03-PLAN.md — Landing page organisms: Hero section, Content section, Card grid
+- [ ] 03-04-PLAN.md — Domain and utility organisms: Agent card, Pipeline visualization, Multi-select dropdown
 
 ### Phase 4: Pages and Documentation
 **Goal**: Full-page mockups and documentation that prove the design system works end-to-end and provide everything needed to adopt it
@@ -94,5 +96,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 |-------|----------------|--------|-----------|
 | 1. Token Foundation | 0/2 | Not started | - |
 | 2. Atoms and Molecules | 0/5 | Not started | - |
-| 3. Organisms | 0/2 | Not started | - |
+| 3. Organisms | 0/4 | Not started | - |
 | 4. Pages and Documentation | 0/2 | Not started | - |
