@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Design Tokens v2 — Visual Test</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../tokens/liteops-tokens.css">
+  <link rel="stylesheet" href="../tokens/lc-compat.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header {
+      margin-bottom: var(--liteops-space-16);
+    }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      /* Hardcoded colors for guaranteed visibility in both themes */
+      background: #1C1D1A;
+      color: #E8E6E1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: background 200ms, color 200ms;
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: #F5F4F0;
+      color: #1C1D1A;
+    }
+
+    /* ── Section ── */
+    .section {
+      margin-bottom: var(--liteops-space-16);
+    }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    /* ── Swatch Row ── */
+    .palette-group {
+      margin-bottom: var(--liteops-space-6);
+    }
+
+    .palette-name {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-secondary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .swatch-row {
+      display: flex;
+      gap: var(--liteops-space-1);
+      flex-wrap: wrap;
+    }
+
+    .swatch {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--liteops-radius-sm);
+      border: 1px solid var(--liteops-border-secondary);
+      position: relative;
+    }
+
+    .swatch-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      text-align: center;
+      color: var(--liteops-text-tertiary);
+      margin-top: 2px;
+    }
+
+    .swatch-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── Semantic Grid ── */
+    .semantic-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: var(--liteops-space-3);
+    }
+
+    .semantic-card {
+      border: 1px solid var(--liteops-border-secondary);
+      border-radius: var(--liteops-radius-sm);
+      padding: var(--liteops-space-3);
+      background: var(--liteops-surface-secondary);
+    }
+
+    .semantic-card-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .semantic-sample {
+      height: 32px;
+      border-radius: var(--liteops-radius-sm);
+    }
+
+    .semantic-text-sample {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* ── Typography ── */
+    .type-sample {
+      margin-bottom: var(--liteops-space-6);
+      padding: var(--liteops-space-4);
+      background: var(--liteops-surface-secondary);
+      border-radius: var(--liteops-radius-md);
+      border: 1px solid var(--liteops-border-secondary);
+    }
+
+    .type-sample-name {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .type-display {
+      font-family: var(--liteops-font-display);
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+    }
+
+    .type-body {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-primary);
+      max-width: 680px;
+    }
+
+    .type-mono {
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-primary);
+    }
+
+    /* ── Spacing Scale ── */
+    .spacing-row {
+      display: flex;
+      align-items: center;
+      gap: var(--liteops-space-3);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .spacing-bar {
+      height: 24px;
+      background: var(--liteops-accent-primary);
+      border-radius: 3px;
+    }
+
+    .spacing-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      color: var(--liteops-text-tertiary);
+      min-width: 48px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Elevation Cards ── */
+    .elevation-row {
+      display: flex;
+      gap: var(--liteops-space-6);
+      flex-wrap: wrap;
+    }
+
+    .elevation-card {
+      width: 120px;
+      height: 120px;
+      background: var(--liteops-surface-elevated);
+      border-radius: var(--liteops-radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: box-shadow var(--liteops-duration-normal) var(--liteops-easing-default);
+    }
+
+    .elevation-card-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Gradient Rectangles ── */
+    .gradient-row {
+      display: flex;
+      gap: var(--liteops-space-6);
+      flex-wrap: wrap;
+    }
+
+    .gradient-rect {
+      width: 300px;
+      height: 150px;
+      border-radius: var(--liteops-radius-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--liteops-space-4);
+    }
+
+    .gradient-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .gradient-note {
+      font-family: var(--liteops-font-body);
+      font-size: 11px;
+      margin-top: var(--liteops-space-2);
+      opacity: 0.8;
+    }
+
+    /* ── Motion Reference Table ── */
+    .motion-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    .motion-table th {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      text-align: left;
+      padding: var(--liteops-space-2) var(--liteops-space-3);
+      background: var(--liteops-surface-tertiary);
+      color: var(--liteops-text-tertiary);
+      border-bottom: 1px solid var(--liteops-border-primary);
+    }
+
+    .motion-table td {
+      font-family: var(--liteops-font-mono);
+      font-size: 13px;
+      padding: var(--liteops-space-2) var(--liteops-space-3);
+      border-bottom: 1px solid var(--liteops-border-secondary);
+      color: var(--liteops-text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .motion-table td:first-child {
+      font-family: var(--liteops-font-body);
+      font-weight: 500;
+    }
+
+    /* ── Motion Demo Boxes ── */
+    .motion-demos {
+      display: flex;
+      gap: var(--liteops-space-6);
+      flex-wrap: wrap;
+    }
+
+    .motion-demo {
+      width: 120px;
+      text-align: center;
+    }
+
+    .motion-demo-box {
+      width: 80px;
+      height: 80px;
+      background: var(--liteops-accent-primary);
+      border-radius: var(--liteops-radius-sm);
+      margin: 0 auto var(--liteops-space-2);
+    }
+
+    .motion-demo-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+    }
+
+    /* Demo 1: Fade-up on hover */
+    .demo-fade-up {
+      opacity: 0.5;
+      transform: translateY(8px);
+      transition-property: opacity, transform;
+      transition-duration: var(--liteops-duration-normal);
+      transition-timing-function: var(--liteops-easing-out);
+    }
+    .demo-fade-up:hover {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Demo 2: Scale on hover */
+    .demo-scale {
+      transition-property: transform;
+      transition-duration: var(--liteops-duration-fast);
+      transition-timing-function: var(--liteops-easing-spring);
+    }
+    .demo-scale:hover {
+      transform: scale(1.02);
+    }
+
+    /* Demo 3: Pulse glow (continuous) */
+    @keyframes pulse-glow-demo {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+    .demo-pulse {
+      animation: pulse-glow-demo var(--liteops-loop-pulse-glow) var(--liteops-easing-in-out) infinite;
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .demo-pulse {
+        animation: none;
+      }
+      .demo-fade-up,
+      .demo-scale {
+        transition-duration: 0ms;
+      }
+    }
+
+    /* ── Backward Compat Section ── */
+    .compat-card {
+      padding: var(--lc-space-4, 16px);
+      background: var(--lc-surface-secondary);
+      color: var(--lc-text-primary);
+      border: 1px solid var(--lc-border-primary);
+      border-radius: 10px;
+      max-width: 480px;
+    }
+
+    .compat-card-title {
+      font-family: var(--lc-font-display, 'Source Serif 4', serif);
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .compat-card-body {
+      font-family: var(--lc-font-body, 'DM Sans', sans-serif);
+      font-size: 14px;
+      color: var(--lc-text-secondary);
+    }
+
+    .compat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--lc-font-mono, 'IBM Plex Mono', monospace);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      background: var(--lc-status-success-bg);
+      color: var(--lc-status-success);
+      margin-top: 12px;
+    }
+
+    .compat-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--lc-status-success);
+    }
+
+    .compat-note {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      color: var(--liteops-text-tertiary);
+      margin-top: var(--liteops-space-3);
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Toggle Theme</button>
+
+<div class="page">
+
+  <!-- ── Header ── -->
+  <header class="page-header">
+    <h1 class="page-title">LiteOps Design Tokens v2</h1>
+    <p class="page-subtitle">Generated from DTCG JSON source via Style Dictionary v5</p>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION A: Color Palette
+       ══════════════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section A</span>
+    <h2 class="section-heading">Color Palette</h2>
+    <hr class="section-divider">
+
+    <!-- Olive -->
+    <div class="palette-group">
+      <div class="palette-name">Olive</div>
+      <div class="swatch-row">
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-olive-50);"></div><span class="swatch-label">50</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-olive-100);"></div><span class="swatch-label">100</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-olive-200);"></div><span class="swatch-label">200</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-olive-300);"></div><span class="swatch-label">300</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-olive-400);"></div><span class="swatch-label">400</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-olive-500);"></div><span class="swatch-label">500</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-olive-600);"></div><span class="swatch-label">600</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-olive-700);"></div><span class="swatch-label">700</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-olive-800);"></div><span class="swatch-label">800</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-olive-900);"></div><span class="swatch-label">900</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-olive-950);"></div><span class="swatch-label">950</span></div>
+      </div>
+    </div>
+
+    <!-- Paper -->
+    <div class="palette-group">
+      <div class="palette-name">Paper</div>
+      <div class="swatch-row">
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-paper-50);"></div><span class="swatch-label">50</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-paper-100);"></div><span class="swatch-label">100</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-paper-200);"></div><span class="swatch-label">200</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-paper-300);"></div><span class="swatch-label">300</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-paper-400);"></div><span class="swatch-label">400</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-paper-500);"></div><span class="swatch-label">500</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-paper-600);"></div><span class="swatch-label">600</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-paper-700);"></div><span class="swatch-label">700</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-paper-800);"></div><span class="swatch-label">800</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-paper-900);"></div><span class="swatch-label">900</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-paper-950);"></div><span class="swatch-label">950</span></div>
+      </div>
+    </div>
+
+    <!-- Lite Green -->
+    <div class="palette-group">
+      <div class="palette-name">Lite Green</div>
+      <div class="swatch-row">
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-lite-50);"></div><span class="swatch-label">50</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-lite-100);"></div><span class="swatch-label">100</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-lite-200);"></div><span class="swatch-label">200</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-lite-300);"></div><span class="swatch-label">300</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-lite-400);"></div><span class="swatch-label">400</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-lite-500);"></div><span class="swatch-label">500</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-lite-600);"></div><span class="swatch-label">600</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-lite-700);"></div><span class="swatch-label">700</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-lite-800);"></div><span class="swatch-label">800</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-lite-900);"></div><span class="swatch-label">900</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-lite-950);"></div><span class="swatch-label">950</span></div>
+      </div>
+    </div>
+
+    <!-- Signal Blue -->
+    <div class="palette-group">
+      <div class="palette-name">Signal Blue</div>
+      <div class="swatch-row">
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-signal-100);"></div><span class="swatch-label">100</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-signal-300);"></div><span class="swatch-label">300</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-signal-500);"></div><span class="swatch-label">500</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-signal-700);"></div><span class="swatch-label">700</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-signal-900);"></div><span class="swatch-label">900</span></div>
+      </div>
+    </div>
+
+    <!-- Warm Orange -->
+    <div class="palette-group">
+      <div class="palette-name">Warm Orange</div>
+      <div class="swatch-row">
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-warm-100);"></div><span class="swatch-label">100</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-warm-300);"></div><span class="swatch-label">300</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-warm-500);"></div><span class="swatch-label">500</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-warm-700);"></div><span class="swatch-label">700</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-warm-900);"></div><span class="swatch-label">900</span></div>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div class="palette-group">
+      <div class="palette-name">Success</div>
+      <div class="swatch-row">
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-success-100);"></div><span class="swatch-label">100</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-success-300);"></div><span class="swatch-label">300</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-success-500);"></div><span class="swatch-label">500</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-success-700);"></div><span class="swatch-label">700</span></div>
+      </div>
+    </div>
+
+    <!-- Warning -->
+    <div class="palette-group">
+      <div class="palette-name">Warning</div>
+      <div class="swatch-row">
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-warning-100);"></div><span class="swatch-label">100</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-warning-300);"></div><span class="swatch-label">300</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-warning-500);"></div><span class="swatch-label">500</span></div>
+        <div class="swatch-wrapper"><div class="swatch" style="background: var(--liteops-warning-700);"></div><span class="swatch-label">700</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION B: Semantic Tokens
+       ══════════════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section B</span>
+    <h2 class="section-heading">Semantic Tokens</h2>
+    <hr class="section-divider">
+
+    <div class="semantic-grid">
+      <!-- Surfaces -->
+      <div class="semantic-card">
+        <div class="semantic-card-label">Surface / Primary</div>
+        <div class="semantic-sample" style="background: var(--liteops-surface-primary); border: 1px solid var(--liteops-border-secondary);"></div>
+      </div>
+      <div class="semantic-card">
+        <div class="semantic-card-label">Surface / Secondary</div>
+        <div class="semantic-sample" style="background: var(--liteops-surface-secondary); border: 1px solid var(--liteops-border-secondary);"></div>
+      </div>
+      <div class="semantic-card">
+        <div class="semantic-card-label">Surface / Tertiary</div>
+        <div class="semantic-sample" style="background: var(--liteops-surface-tertiary);"></div>
+      </div>
+      <div class="semantic-card">
+        <div class="semantic-card-label">Surface / Elevated</div>
+        <div class="semantic-sample" style="background: var(--liteops-surface-elevated); box-shadow: var(--liteops-shadow-md);"></div>
+      </div>
+      <div class="semantic-card">
+        <div class="semantic-card-label">Surface / Sunken</div>
+        <div class="semantic-sample" style="background: var(--liteops-surface-sunken);"></div>
+      </div>
+
+      <!-- Text -->
+      <div class="semantic-card">
+        <div class="semantic-card-label">Text / Primary</div>
+        <div class="semantic-text-sample" style="color: var(--liteops-text-primary);">Texte principal</div>
+      </div>
+      <div class="semantic-card">
+        <div class="semantic-card-label">Text / Secondary</div>
+        <div class="semantic-text-sample" style="color: var(--liteops-text-secondary);">Texte secondaire</div>
+      </div>
+      <div class="semantic-card">
+        <div class="semantic-card-label">Text / Tertiary</div>
+        <div class="semantic-text-sample" style="color: var(--liteops-text-tertiary);">Texte tertiaire</div>
+      </div>
+      <div class="semantic-card">
+        <div class="semantic-card-label">Text / Disabled</div>
+        <div class="semantic-text-sample" style="color: var(--liteops-text-disabled);">Texte desactive</div>
+      </div>
+
+      <!-- Borders -->
+      <div class="semantic-card">
+        <div class="semantic-card-label">Border / Primary</div>
+        <div class="semantic-sample" style="border: 2px solid var(--liteops-border-primary);"></div>
+      </div>
+      <div class="semantic-card">
+        <div class="semantic-card-label">Border / Focus</div>
+        <div class="semantic-sample" style="border: 2px solid var(--liteops-border-focus);"></div>
+      </div>
+      <div class="semantic-card">
+        <div class="semantic-card-label">Border / Error</div>
+        <div class="semantic-sample" style="border: 2px solid var(--liteops-border-error);"></div>
+      </div>
+
+      <!-- Accent -->
+      <div class="semantic-card">
+        <div class="semantic-card-label">Accent / Primary</div>
+        <div class="semantic-sample" style="background: var(--liteops-accent-primary);"></div>
+      </div>
+      <div class="semantic-card">
+        <div class="semantic-card-label">Accent / Subtle</div>
+        <div class="semantic-sample" style="background: var(--liteops-accent-subtle);"></div>
+      </div>
+      <div class="semantic-card">
+        <div class="semantic-card-label">Accent / Text</div>
+        <div class="semantic-text-sample" style="color: var(--liteops-accent-text);">Texte accent</div>
+      </div>
+
+      <!-- Status -->
+      <div class="semantic-card">
+        <div class="semantic-card-label">Status / Success</div>
+        <div class="semantic-sample" style="background: var(--liteops-status-success-bg); border-left: 3px solid var(--liteops-status-success);"></div>
+      </div>
+      <div class="semantic-card">
+        <div class="semantic-card-label">Status / Warning</div>
+        <div class="semantic-sample" style="background: var(--liteops-status-warning-bg); border-left: 3px solid var(--liteops-status-warning);"></div>
+      </div>
+      <div class="semantic-card">
+        <div class="semantic-card-label">Status / Error</div>
+        <div class="semantic-sample" style="background: var(--liteops-status-error-bg); border-left: 3px solid var(--liteops-status-error);"></div>
+      </div>
+      <div class="semantic-card">
+        <div class="semantic-card-label">Status / Info</div>
+        <div class="semantic-sample" style="background: var(--liteops-status-info-bg); border-left: 3px solid var(--liteops-status-info);"></div>
+      </div>
+
+      <!-- Interactive -->
+      <div class="semantic-card">
+        <div class="semantic-card-label">Interactive / Primary</div>
+        <div class="semantic-sample" style="background: var(--liteops-interactive-primary); color: var(--liteops-interactive-primary-text); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500;">Bouton</div>
+      </div>
+
+      <!-- Chart -->
+      <div class="semantic-card">
+        <div class="semantic-card-label">Chart Colors</div>
+        <div style="display: flex; gap: 4px; height: 32px;">
+          <div style="flex: 1; background: var(--liteops-chart-primary); border-radius: 3px;"></div>
+          <div style="flex: 1; background: var(--liteops-chart-secondary); border-radius: 3px;"></div>
+          <div style="flex: 1; background: var(--liteops-chart-tertiary); border-radius: 3px;"></div>
+          <div style="flex: 1; background: var(--liteops-chart-quaternary); border-radius: 3px;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION C: Typography
+       ══════════════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section C</span>
+    <h2 class="section-heading">Typography</h2>
+    <hr class="section-divider">
+
+    <div class="type-sample">
+      <div class="type-sample-name">Source Serif 4 -- Display</div>
+      <div class="type-display">Observer, eclairer, agir</div>
+    </div>
+
+    <div class="type-sample">
+      <div class="type-sample-name">DM Sans -- Body</div>
+      <div class="type-body">LiteOps accompagne les grandes institutions dans leurs transformations organisationnelles. Chaque indicateur mesure une friction reelle, chaque signal eclaire une decision a prendre. L'observabilite au service du changement, avec la rigueur academique de la recherche et la pragmatisme du terrain.</div>
+    </div>
+
+    <div class="type-sample">
+      <div class="type-sample-name">IBM Plex Mono -- Data Labels</div>
+      <div class="type-mono">TAUX D'ADOPTION &middot; INDICE DE FRICTION &middot; NPS INTERNE &middot; SCORE MITIGATION &middot; 87.4% &middot; +12.3</div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION D: Spacing Scale
+       ══════════════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section D</span>
+    <h2 class="section-heading">Spacing Scale</h2>
+    <hr class="section-divider">
+
+    <div class="spacing-row"><span class="spacing-label">4px</span><div class="spacing-bar" style="width: var(--liteops-space-1);"></div></div>
+    <div class="spacing-row"><span class="spacing-label">8px</span><div class="spacing-bar" style="width: var(--liteops-space-2);"></div></div>
+    <div class="spacing-row"><span class="spacing-label">12px</span><div class="spacing-bar" style="width: var(--liteops-space-3);"></div></div>
+    <div class="spacing-row"><span class="spacing-label">16px</span><div class="spacing-bar" style="width: var(--liteops-space-4);"></div></div>
+    <div class="spacing-row"><span class="spacing-label">20px</span><div class="spacing-bar" style="width: var(--liteops-space-5);"></div></div>
+    <div class="spacing-row"><span class="spacing-label">24px</span><div class="spacing-bar" style="width: var(--liteops-space-6);"></div></div>
+    <div class="spacing-row"><span class="spacing-label">32px</span><div class="spacing-bar" style="width: var(--liteops-space-8);"></div></div>
+    <div class="spacing-row"><span class="spacing-label">40px</span><div class="spacing-bar" style="width: var(--liteops-space-10);"></div></div>
+    <div class="spacing-row"><span class="spacing-label">48px</span><div class="spacing-bar" style="width: var(--liteops-space-12);"></div></div>
+    <div class="spacing-row"><span class="spacing-label">64px</span><div class="spacing-bar" style="width: var(--liteops-space-16);"></div></div>
+    <div class="spacing-row"><span class="spacing-label">80px</span><div class="spacing-bar" style="width: var(--liteops-space-20);"></div></div>
+    <div class="spacing-row"><span class="spacing-label">96px</span><div class="spacing-bar" style="width: var(--liteops-space-24);"></div></div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION E: Elevation (6 levels)
+       ══════════════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section E</span>
+    <h2 class="section-heading">Elevation</h2>
+    <hr class="section-divider">
+
+    <div class="elevation-row">
+      <div class="elevation-card" style="box-shadow: var(--liteops-shadow-xs);"><span class="elevation-card-label">XS</span></div>
+      <div class="elevation-card" style="box-shadow: var(--liteops-shadow-sm);"><span class="elevation-card-label">SM</span></div>
+      <div class="elevation-card" style="box-shadow: var(--liteops-shadow-md);"><span class="elevation-card-label">MD</span></div>
+      <div class="elevation-card" style="box-shadow: var(--liteops-shadow-lg);"><span class="elevation-card-label">LG</span></div>
+      <div class="elevation-card" style="box-shadow: var(--liteops-shadow-xl);"><span class="elevation-card-label">XL</span></div>
+      <div class="elevation-card" style="box-shadow: var(--liteops-shadow-2xl);"><span class="elevation-card-label">2XL</span></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION F: Gradients
+       ══════════════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section F</span>
+    <h2 class="section-heading">Gradients</h2>
+    <hr class="section-divider">
+
+    <div class="gradient-row">
+      <div class="gradient-rect" style="background: var(--liteops-gradient-hero-green-olive);">
+        <span class="gradient-label" style="color: var(--liteops-paper-100);">hero-green-olive</span>
+        <span class="gradient-note" style="color: var(--liteops-paper-300);">Marketing surfaces only</span>
+      </div>
+      <div class="gradient-rect" style="background: var(--liteops-gradient-hero-green-black);">
+        <span class="gradient-label" style="color: var(--liteops-paper-100);">hero-green-black</span>
+        <span class="gradient-note" style="color: var(--liteops-paper-300);">Use dark text on green gradients for AA compliance</span>
+      </div>
+      <div class="gradient-rect" style="background: var(--liteops-gradient-hero-subtle); border: 1px solid var(--liteops-border-secondary);">
+        <span class="gradient-label" style="color: var(--liteops-text-primary);">hero-subtle</span>
+        <span class="gradient-note" style="color: var(--liteops-text-secondary);">Section background wash</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION G: Motion
+       ══════════════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section G</span>
+    <h2 class="section-heading">Motion</h2>
+    <hr class="section-divider">
+
+    <table class="motion-table">
+      <thead>
+        <tr>
+          <th scope="col">Token</th>
+          <th scope="col">Category</th>
+          <th scope="col">Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>duration-instant</td><td>Duration</td><td>0ms</td></tr>
+        <tr><td>duration-fast</td><td>Duration</td><td>120ms</td></tr>
+        <tr><td>duration-normal</td><td>Duration</td><td>200ms</td></tr>
+        <tr><td>duration-slow</td><td>Duration</td><td>350ms</td></tr>
+        <tr><td>duration-slower</td><td>Duration</td><td>500ms</td></tr>
+        <tr><td>duration-slowest</td><td>Duration</td><td>800ms</td></tr>
+        <tr><td>easing-default</td><td>Easing</td><td>cubic-bezier(0.4, 0, 0.2, 1)</td></tr>
+        <tr><td>easing-in</td><td>Easing</td><td>cubic-bezier(0.4, 0, 1, 1)</td></tr>
+        <tr><td>easing-out</td><td>Easing</td><td>cubic-bezier(0, 0, 0.2, 1)</td></tr>
+        <tr><td>easing-in-out</td><td>Easing</td><td>cubic-bezier(0.4, 0, 0.2, 1)</td></tr>
+        <tr><td>easing-spring</td><td>Easing</td><td>cubic-bezier(0.175, 0.885, 0.32, 1.275)</td></tr>
+        <tr><td>stagger-item</td><td>Stagger</td><td>100ms</td></tr>
+        <tr><td>stagger-section</td><td>Stagger</td><td>150ms</td></tr>
+        <tr><td>loop-pulse-glow</td><td>Loop</td><td>4s</td></tr>
+        <tr><td>loop-blob-drift</td><td>Loop</td><td>10s</td></tr>
+      </tbody>
+    </table>
+
+    <div class="motion-demos">
+      <div class="motion-demo">
+        <div class="motion-demo-box demo-fade-up"></div>
+        <span class="motion-demo-label">Fade Up<br>duration-normal + easing-out</span>
+      </div>
+      <div class="motion-demo">
+        <div class="motion-demo-box demo-scale"></div>
+        <span class="motion-demo-label">Scale<br>duration-fast + easing-spring</span>
+      </div>
+      <div class="motion-demo">
+        <div class="motion-demo-box demo-pulse"></div>
+        <span class="motion-demo-label">Pulse Glow<br>loop-pulse-glow (4s cycle)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION H: Backward Compatibility
+       ══════════════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section H</span>
+    <h2 class="section-heading">Backward Compatibility</h2>
+    <hr class="section-divider">
+    <p style="font-size: 14px; color: var(--liteops-text-secondary); margin-bottom: var(--liteops-space-4);">
+      Backward Compatibility Test -- these elements use legacy <code style="font-family: var(--liteops-font-mono); font-size: 12px;">--lc-*</code> tokens via shim
+    </p>
+
+    <div class="compat-card">
+      <div class="compat-card-title">Initiative: Transformation Digitale</div>
+      <div class="compat-card-body">Cette carte utilise exclusivement les anciens tokens <code style="font-family: var(--liteops-font-mono); font-size: 11px;">--lc-*</code> via le shim de compatibilite. Si les couleurs s'affichent correctement, le shim fonctionne.</div>
+      <div class="compat-badge">Shim actif</div>
+    </div>
+    <p class="compat-note">lc-compat.css maps 102 legacy --lc-* variables to --liteops-* equivalents via var() references.</p>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>
