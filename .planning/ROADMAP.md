@@ -45,12 +45,14 @@ Plans:
   3. Every molecule (KPI card, alert, form group, nav item, breadcrumb, tab/pill, progress bar, toast, chart colors) composes atoms using only token references
   4. Each component has a standalone HTML page showing all variants, states (hover, focus, disabled, error), and sizes with visible code snippets
   5. Chart color system documentation shows the 6-color ordered sequence per theme with contrast verification
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
-- [ ] 02-03: TBD
+- [ ] 02-01-PLAN.md — Core interactive atoms: Button, Badge, Input, Select
+- [ ] 02-02-PLAN.md — Form control atoms: Textarea, Switch, Checkbox/Radio, Slider
+- [ ] 02-03-PLAN.md — Visual atoms + documentation: Glass Panel, Skeleton, Typography page, Color Palette page
+- [ ] 02-04-PLAN.md — Core molecules: KPI Card, Alert, Form Group, Nav Item, Breadcrumb
+- [ ] 02-05-PLAN.md — Remaining molecules: Tab/Pill, Progress Bar, Toast, Chart Colors documentation
 
 ### Phase 3: Organisms
 **Goal**: All complex interface regions are built, proving the token and component layers compose into real app surfaces for both landing pages and dashboards
@@ -91,6 +93,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Token Foundation | 0/2 | Not started | - |
-| 2. Atoms and Molecules | 0/3 | Not started | - |
+| 2. Atoms and Molecules | 0/5 | Not started | - |
 | 3. Organisms | 0/2 | Not started | - |
 | 4. Pages and Documentation | 0/2 | Not started | - |
