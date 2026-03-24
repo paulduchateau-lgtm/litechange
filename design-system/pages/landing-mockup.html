@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps — Observabilite du changement pour les institutions</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ═══════════════════════════════════════════════
+       BUTTON COMPONENT (from atoms/button)
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--liteops-space-2);
+      font-family: var(--liteops-font-body);
+      font-weight: 500;
+      border: 1px solid transparent;
+      border-radius: var(--liteops-radius-md);
+      cursor: pointer;
+      transition: all var(--liteops-duration-normal) ease;
+      text-decoration: none;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .liteops-Button--sm { padding: 6px 16px; font-size: 13px; }
+    .liteops-Button--md { padding: 10px 24px; font-size: 15px; }
+    .liteops-Button--lg { padding: 14px 32px; font-size: 17px; }
+
+    .liteops-Button--primary {
+      background: var(--liteops-interactive-primary);
+      color: var(--liteops-interactive-primary-text);
+    }
+    .liteops-Button--primary:hover {
+      background: var(--liteops-interactive-primary-hover);
+    }
+
+    .liteops-Button--secondary {
+      background: var(--liteops-interactive-secondary);
+      border-color: var(--liteops-border-primary);
+      color: var(--liteops-interactive-secondary-text);
+    }
+    .liteops-Button--secondary:hover {
+      background: var(--liteops-interactive-secondary-hover);
+    }
+
+    .liteops-Button:focus-visible {
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       1. NAVIGATION BAR
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--liteops-paper-50);
+      border-bottom: 1px solid var(--liteops-border-secondary);
+    }
+
+    .liteops-Navbar__container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 var(--liteops-space-6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .liteops-Navbar__logo {
+      font-family: var(--liteops-font-display);
+      font-size: 22px;
+      text-decoration: none;
+      display: flex;
+      align-items: baseline;
+      gap: 0;
+    }
+
+    .liteops-Navbar__logo-lite {
+      font-style: italic;
+      font-weight: 300;
+      color: var(--liteops-lite-700);
+    }
+
+    .liteops-Navbar__logo-ops {
+      font-weight: 400;
+      color: var(--liteops-olive-900);
+    }
+
+    .liteops-Navbar__links {
+      display: flex;
+      align-items: center;
+      gap: var(--liteops-space-8);
+      list-style: none;
+    }
+
+    .liteops-Navbar__link {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--liteops-text-secondary);
+      text-decoration: none;
+      transition: color var(--liteops-duration-normal) ease;
+    }
+
+    .liteops-Navbar__link:hover {
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-Navbar__actions {
+      display: flex;
+      align-items: center;
+      gap: var(--liteops-space-3);
+    }
+
+    /* ═══════════════════════════════════════════════
+       2. HERO SECTION (from organisms/hero-section)
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Hero {
+      width: 100%;
+      min-height: 500px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .liteops-Hero--gradient-green-olive {
+      background: var(--liteops-gradient-hero-green-olive);
+    }
+
+    .liteops-Hero__container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-24) var(--liteops-space-6);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--liteops-space-16);
+      align-items: center;
+      width: 100%;
+    }
+
+    .liteops-Hero__content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .liteops-Hero--gradient-green-olive .liteops-Hero__heading {
+      font-family: var(--liteops-font-display);
+      font-size: 56px;
+      font-weight: 700;
+      line-height: 1.1;
+      color: #E8E6E1;
+    }
+
+    .liteops-Hero--gradient-green-olive .liteops-Hero__subheading {
+      font-family: var(--liteops-font-body);
+      font-size: 18px;
+      line-height: 1.6;
+      color: #C0BEB8;
+      margin-top: var(--liteops-space-6);
+      max-width: 520px;
+    }
+
+    .liteops-Hero__actions {
+      display: flex;
+      flex-direction: row;
+      gap: var(--liteops-space-4);
+      margin-top: var(--liteops-space-8);
+    }
+
+    /* Hero dark gradient button overrides */
+    .liteops-Hero--gradient-green-olive .liteops-Button--primary {
+      background: var(--liteops-lite-400);
+      color: var(--liteops-olive-900);
+    }
+    .liteops-Hero--gradient-green-olive .liteops-Button--primary:hover {
+      background: var(--liteops-lite-300);
+    }
+
+    .liteops-Hero--gradient-green-olive .liteops-Button--secondary {
+      border-color: rgba(232, 230, 225, 0.3);
+      color: #E8E6E1;
+      background: transparent;
+    }
+    .liteops-Hero--gradient-green-olive .liteops-Button--secondary:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    /* Hero visual placeholder */
+    .liteops-Hero__visual {
+      position: relative;
+    }
+
+    .liteops-Hero__visual-frame {
+      background: var(--liteops-olive-800);
+      border: 1px solid rgba(232, 230, 225, 0.1);
+      border-radius: var(--liteops-radius-lg);
+      padding: var(--liteops-space-6);
+      min-height: 340px;
+      box-shadow: 0 0 80px rgba(176, 216, 56, 0.15);
+      display: flex;
+      flex-direction: column;
+      gap: var(--liteops-space-4);
+    }
+
+    /* Mini dashboard sketch */
+    .hero-sketch__topbar {
+      display: flex;
+      gap: var(--liteops-space-2);
+      align-items: center;
+      padding-bottom: var(--liteops-space-3);
+      border-bottom: 1px solid rgba(232, 230, 225, 0.08);
+    }
+
+    .hero-sketch__dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(232, 230, 225, 0.15);
+    }
+    .hero-sketch__dot--accent {
+      background: var(--liteops-lite-400);
+      box-shadow: 0 0 6px rgba(176, 216, 56, 0.4);
+    }
+
+    .hero-sketch__bar {
+      flex: 1;
+      height: 8px;
+      border-radius: 4px;
+      background: rgba(232, 230, 225, 0.06);
+    }
+
+    .hero-sketch__kpis {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--liteops-space-3);
+    }
+
+    .hero-sketch__kpi {
+      background: rgba(232, 230, 225, 0.04);
+      border: 1px solid rgba(232, 230, 225, 0.06);
+      border-radius: var(--liteops-radius-sm);
+      padding: var(--liteops-space-3);
+      display: flex;
+      flex-direction: column;
+      gap: var(--liteops-space-1);
+    }
+
+    .hero-sketch__kpi-label {
+      width: 60%;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(232, 230, 225, 0.1);
+    }
+
+    .hero-sketch__kpi-value {
+      width: 40%;
+      height: 14px;
+      border-radius: 3px;
+      background: rgba(232, 230, 225, 0.12);
+    }
+
+    .hero-sketch__chart {
+      flex: 1;
+      background: rgba(232, 230, 225, 0.03);
+      border: 1px solid rgba(232, 230, 225, 0.06);
+      border-radius: var(--liteops-radius-sm);
+      padding: var(--liteops-space-3);
+      display: flex;
+      align-items: flex-end;
+      gap: var(--liteops-space-2);
+      min-height: 100px;
+    }
+
+    .hero-sketch__chart-bar {
+      flex: 1;
+      border-radius: 3px 3px 0 0;
+      background: var(--liteops-lite-400);
+      opacity: 0.3;
+    }
+    .hero-sketch__chart-bar:nth-child(2) { opacity: 0.45; }
+    .hero-sketch__chart-bar:nth-child(3) { opacity: 0.6; }
+    .hero-sketch__chart-bar:nth-child(4) { opacity: 0.5; }
+    .hero-sketch__chart-bar:nth-child(5) { opacity: 0.75; }
+    .hero-sketch__chart-bar:nth-child(6) { opacity: 0.65; }
+    .hero-sketch__chart-bar:nth-child(7) { opacity: 0.85; }
+
+    /* ═══════════════════════════════════════════════
+       3. CONTENT SECTION (from organisms/content-section)
+       ═══════════════════════════════════════════════ */
+
+    .liteops-ContentSection {
+      width: 100%;
+      padding: var(--liteops-space-24) 0;
+    }
+
+    .liteops-ContentSection__container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 var(--liteops-space-6);
+    }
+
+    .liteops-ContentSection__label {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-4);
+      display: block;
+    }
+
+    .liteops-ContentSection__heading {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-4);
+    }
+
+    .liteops-ContentSection__body {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--liteops-text-secondary);
+      max-width: 680px;
+    }
+
+    .liteops-ContentSection--centered .liteops-ContentSection__container {
+      text-align: center;
+    }
+
+    .liteops-ContentSection--centered .liteops-ContentSection__body {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .liteops-ContentSection--centered .liteops-ContentSection__label {
+      text-align: center;
+    }
+
+    .liteops-ContentSection__cta {
+      margin-top: var(--liteops-space-8);
+      display: flex;
+      gap: var(--liteops-space-4);
+    }
+
+    .liteops-ContentSection--centered .liteops-ContentSection__cta {
+      justify-content: center;
+    }
+
+    /* ═══════════════════════════════════════════════
+       4. CARD GRID (from organisms/card-grid)
+       ═══════════════════════════════════════════════ */
+
+    .liteops-CardGrid {
+      display: grid;
+      gap: var(--liteops-space-6);
+    }
+
+    .liteops-CardGrid--cols-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .liteops-CardGrid--cols-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .liteops-Card {
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-secondary);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-6);
+      box-shadow: var(--liteops-shadow-sm);
+      transition: box-shadow var(--liteops-duration-normal), transform var(--liteops-duration-normal);
+      display: flex;
+      flex-direction: column;
+      gap: var(--liteops-space-3);
+    }
+
+    .liteops-Card:hover {
+      box-shadow: var(--liteops-shadow-md);
+      transform: translateY(-2px);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .liteops-Card:hover {
+        transform: none;
+      }
+    }
+
+    .liteops-Card__icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--liteops-accent-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .liteops-Card__icon svg {
+      width: 20px;
+      height: 20px;
+      color: var(--liteops-accent-text);
+    }
+
+    .liteops-Card__title {
+      font-family: var(--liteops-font-body);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-Card__description {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ═══════════════════════════════════════════════
+       5. SOVEREIGNTY BADGE CARDS
+       ═══════════════════════════════════════════════ */
+
+    .liteops-BadgeCards {
+      display: flex;
+      gap: var(--liteops-space-6);
+      margin-top: var(--liteops-space-8);
+    }
+
+    .liteops-BadgeCard {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: var(--liteops-space-3);
+      padding: var(--liteops-space-6);
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-secondary);
+      border-radius: var(--liteops-radius-md);
+    }
+
+    .liteops-BadgeCard__icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--liteops-accent-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .liteops-BadgeCard__icon svg {
+      width: 24px;
+      height: 24px;
+      color: var(--liteops-accent-text);
+    }
+
+    .liteops-BadgeCard__label {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-accent-text);
+      background: var(--liteops-accent-subtle);
+      padding: 4px 12px;
+      border-radius: var(--liteops-radius-pill);
+    }
+
+    .liteops-BadgeCard__text {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ═══════════════════════════════════════════════
+       6. SECTOR CARDS
+       ═══════════════════════════════════════════════ */
+
+    .liteops-SectorCard {
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-secondary);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-6);
+      text-align: center;
+      transition: box-shadow var(--liteops-duration-normal);
+    }
+
+    .liteops-SectorCard:hover {
+      box-shadow: var(--liteops-shadow-md);
+    }
+
+    .liteops-SectorCard__name {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .liteops-SectorCard__description {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ═══════════════════════════════════════════════
+       7. TESTIMONIAL SECTION
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Testimonial {
+      width: 100%;
+      background: var(--liteops-olive-900);
+      padding: var(--liteops-space-24) 0;
+    }
+
+    .liteops-Testimonial__container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 var(--liteops-space-6);
+      text-align: center;
+    }
+
+    .liteops-Testimonial__quote {
+      font-family: var(--liteops-font-display);
+      font-style: italic;
+      font-size: 24px;
+      line-height: 1.5;
+      color: #E8E6E1;
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    .liteops-Testimonial__quote::before {
+      content: "\201C";
+      display: block;
+      font-size: 48px;
+      color: var(--liteops-lite-400);
+      line-height: 1;
+      margin-bottom: var(--liteops-space-4);
+    }
+
+    .liteops-Testimonial__name {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      font-weight: 600;
+      color: #E8E6E1;
+    }
+
+    .liteops-Testimonial__title {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: #C0BEB8;
+      margin-top: var(--liteops-space-1);
+    }
+
+    .liteops-Testimonial__logo {
+      width: 120px;
+      height: 32px;
+      background: rgba(232, 230, 225, 0.08);
+      border-radius: var(--liteops-radius-sm);
+      margin: var(--liteops-space-6) auto 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .liteops-Testimonial__logo-text {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #8A8880;
+    }
+
+    /* ═══════════════════════════════════════════════
+       8. CTA SECTION
+       ═══════════════════════════════════════════════ */
+
+    .liteops-CtaSection {
+      width: 100%;
+      background: var(--liteops-accent-subtle);
+      padding: var(--liteops-space-24) 0;
+    }
+
+    .liteops-CtaSection__container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 var(--liteops-space-6);
+      text-align: center;
+    }
+
+    .liteops-CtaSection__heading {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-4);
+    }
+
+    .liteops-CtaSection__body {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--liteops-text-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    .liteops-CtaSection__actions {
+      display: flex;
+      gap: var(--liteops-space-4);
+      justify-content: center;
+    }
+
+    /* ═══════════════════════════════════════════════
+       9. FOOTER
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Footer {
+      width: 100%;
+      background: var(--liteops-olive-900);
+      padding: var(--liteops-space-16) 0 var(--liteops-space-8);
+    }
+
+    .liteops-Footer__container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 var(--liteops-space-6);
+    }
+
+    .liteops-Footer__grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--liteops-space-8);
+      padding-bottom: var(--liteops-space-12);
+      border-bottom: 1px solid rgba(232, 230, 225, 0.07);
+    }
+
+    .liteops-Footer__column-title {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #8A8880;
+      margin-bottom: var(--liteops-space-4);
+    }
+
+    .liteops-Footer__links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--liteops-space-3);
+    }
+
+    .liteops-Footer__link {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: #C0BEB8;
+      text-decoration: none;
+      transition: color var(--liteops-duration-normal) ease;
+    }
+
+    .liteops-Footer__link:hover {
+      color: #E8E6E1;
+    }
+
+    .liteops-Footer__bottom {
+      padding-top: var(--liteops-space-6);
+      text-align: center;
+    }
+
+    .liteops-Footer__copyright {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      color: #8A8880;
+    }
+
+    /* ═══════════════════════════════════════════════
+       RESPONSIVE
+       ═══════════════════════════════════════════════ */
+
+    @media (max-width: 1024px) {
+      .liteops-CardGrid--cols-4 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .liteops-Hero__container {
+        grid-template-columns: 1fr;
+        gap: var(--liteops-space-8);
+      }
+
+      .liteops-Hero--gradient-green-olive .liteops-Hero__heading {
+        font-size: 40px;
+      }
+
+      .liteops-CardGrid--cols-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .liteops-CardGrid--cols-4 {
+        grid-template-columns: 1fr;
+      }
+
+      .liteops-BadgeCards {
+        flex-direction: column;
+      }
+
+      .liteops-Footer__grid {
+        grid-template-columns: 1fr;
+        gap: var(--liteops-space-6);
+      }
+
+      .liteops-Navbar__links {
+        display: none;
+      }
+
+      .liteops-ContentSection__heading {
+        font-size: 28px;
+      }
+
+      .liteops-CtaSection__heading {
+        font-size: 28px;
+      }
+
+      .liteops-Testimonial__quote {
+        font-size: 20px;
+      }
+
+      .liteops-CtaSection__actions {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .liteops-Hero__actions {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    /* ═══════════════════════════════════════════════
+       ANIMATIONS
+       ═══════════════════════════════════════════════ */
+
+    @media (prefers-reduced-motion: no-preference) {
+      .liteops-Hero__content {
+        animation: fadeUp 600ms var(--liteops-easing-out) both;
+      }
+      .liteops-Hero__visual {
+        animation: fadeUp 600ms var(--liteops-easing-out) 150ms both;
+      }
+
+      .fade-up {
+        opacity: 0;
+        transform: translateY(16px);
+        transition: opacity 500ms var(--liteops-easing-out), transform 500ms var(--liteops-easing-out);
+      }
+
+      .fade-up.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(16px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     1. NAVIGATION BAR
+     ═══════════════════════════════════════════════ -->
+
+<nav class="liteops-Navbar" role="navigation" aria-label="Navigation principale">
+  <div class="liteops-Navbar__container">
+    <a href="#" class="liteops-Navbar__logo" aria-label="LiteOps - Accueil">
+      <span class="liteops-Navbar__logo-lite">lite</span><span class="liteops-Navbar__logo-ops">Ops</span>
+    </a>
+    <ul class="liteops-Navbar__links">
+      <li><a href="#plateforme" class="liteops-Navbar__link">Plateforme</a></li>
+      <li><a href="#secteurs" class="liteops-Navbar__link">Secteurs</a></li>
+      <li><a href="#" class="liteops-Navbar__link">Ressources</a></li>
+      <li><a href="#" class="liteops-Navbar__link">A propos</a></li>
+    </ul>
+    <div class="liteops-Navbar__actions">
+      <a href="#contact" class="liteops-Button liteops-Button--primary liteops-Button--sm">Demander une demo</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════
+     2. HERO SECTION
+     ═══════════════════════════════════════════════ -->
+
+<section class="liteops-Hero liteops-Hero--gradient-green-olive">
+  <div class="liteops-Hero__container">
+    <div class="liteops-Hero__content">
+      <h1 class="liteops-Hero__heading">L'observabilite du changement pour les institutions qui comptent</h1>
+      <p class="liteops-Hero__subheading">Mesurez l'adoption, diagnostiquez les frictions, eclairez les decisions. Fonde sur 15 ans de recherche academique et 200+ transformations.</p>
+      <div class="liteops-Hero__actions">
+        <a href="#contact" class="liteops-Button liteops-Button--primary liteops-Button--lg">Demander une demo</a>
+        <a href="#plateforme" class="liteops-Button liteops-Button--secondary liteops-Button--lg">Decouvrir la plateforme</a>
+      </div>
+    </div>
+    <div class="liteops-Hero__visual">
+      <div class="liteops-Hero__visual-frame">
+        <div class="hero-sketch__topbar">
+          <span class="hero-sketch__dot hero-sketch__dot--accent"></span>
+          <span class="hero-sketch__dot"></span>
+          <span class="hero-sketch__dot"></span>
+          <span class="hero-sketch__bar"></span>
+        </div>
+        <div class="hero-sketch__kpis">
+          <div class="hero-sketch__kpi">
+            <span class="hero-sketch__kpi-label"></span>
+            <span class="hero-sketch__kpi-value"></span>
+          </div>
+          <div class="hero-sketch__kpi">
+            <span class="hero-sketch__kpi-label"></span>
+            <span class="hero-sketch__kpi-value"></span>
+          </div>
+          <div class="hero-sketch__kpi">
+            <span class="hero-sketch__kpi-label"></span>
+            <span class="hero-sketch__kpi-value"></span>
+          </div>
+        </div>
+        <div class="hero-sketch__chart">
+          <div class="hero-sketch__chart-bar" style="height: 30%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 50%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 70%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 55%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 85%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 65%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 90%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     3. SOVEREIGNTY / SECURITY SECTION
+     ═══════════════════════════════════════════════ -->
+
+<section class="liteops-ContentSection fade-up" style="background: var(--liteops-paper-100);">
+  <div class="liteops-ContentSection__container">
+    <span class="liteops-ContentSection__label">INFRASTRUCTURE SOUVERAINE</span>
+    <h2 class="liteops-ContentSection__heading" style="text-align: center;">Vos donnees restent en France. Point.</h2>
+    <div class="liteops-BadgeCards">
+      <div class="liteops-BadgeCard">
+        <div class="liteops-BadgeCard__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <span class="liteops-BadgeCard__label">Hebergement Scaleway</span>
+        <span class="liteops-BadgeCard__text">Infrastructure souveraine hebergee en France par Scaleway, qualifiee SecNumCloud.</span>
+      </div>
+      <div class="liteops-BadgeCard">
+        <div class="liteops-BadgeCard__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+        </div>
+        <span class="liteops-BadgeCard__label">Donnees en France</span>
+        <span class="liteops-BadgeCard__text">Aucune donnee ne quitte le territoire. Stockage et traitement exclusivement en France.</span>
+      </div>
+      <div class="liteops-BadgeCard">
+        <div class="liteops-BadgeCard__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        </div>
+        <span class="liteops-BadgeCard__label">RGPD natif</span>
+        <span class="liteops-BadgeCard__text">Conformite RGPD integree des la conception. Consentement, anonymisation et droit a l'oubli natifs.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     4. PRODUCTS SECTION
+     ═══════════════════════════════════════════════ -->
+
+<section id="plateforme" class="liteops-ContentSection fade-up" style="background: var(--liteops-surface-secondary);">
+  <div class="liteops-ContentSection__container">
+    <span class="liteops-ContentSection__label" style="text-align: center;">PLATEFORME</span>
+    <h2 class="liteops-ContentSection__heading" style="text-align: center;">Observer, diagnostiquer, agir</h2>
+    <p class="liteops-ContentSection__body" style="text-align: center; margin: 0 auto var(--liteops-space-10);">Trois piliers pour mesurer l'adoption reelle de vos transformations et transformer chaque signal en action concrete.</p>
+    <div class="liteops-CardGrid liteops-CardGrid--cols-3">
+      <div class="liteops-CardGrid__item">
+        <div class="liteops-Card">
+          <div class="liteops-Card__icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h2l3-7 4 14 3-7h2"/></svg>
+          </div>
+          <span class="liteops-Card__title">Diagnostic</span>
+          <span class="liteops-Card__description">Evaluez la readiness au changement avec des enquetes calibrees par la recherche academique. 42 facteurs de resistance identifies et mesures.</span>
+        </div>
+      </div>
+      <div class="liteops-CardGrid__item">
+        <div class="liteops-Card">
+          <div class="liteops-Card__icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M3 8h14"/><path d="M8 3v14"/></svg>
+          </div>
+          <span class="liteops-Card__title">Observabilite</span>
+          <span class="liteops-Card__description">Tableau de bord temps reel, signaux automatiques, KPIs d'adoption mesures. Chaque metrique est tracee jusqu'a sa source academique.</span>
+        </div>
+      </div>
+      <div class="liteops-CardGrid__item">
+        <div class="liteops-Card">
+          <div class="liteops-Card__icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2l2.5 5 5.5 1-4 4 1 5.5L10 15l-5 2.5 1-5.5-4-4 5.5-1z"/></svg>
+          </div>
+          <span class="liteops-Card__title">Agents IA</span>
+          <span class="liteops-Card__description">Agents souverains (OCR, RAG, analyse) deployes localement pour chaque institution. Aucune donnee ne transite par des serveurs tiers.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     5. SECTORS SECTION
+     ═══════════════════════════════════════════════ -->
+
+<section id="secteurs" class="liteops-ContentSection fade-up" style="background: var(--liteops-surface-tertiary);">
+  <div class="liteops-ContentSection__container">
+    <span class="liteops-ContentSection__label" style="text-align: center;">SECTEURS</span>
+    <h2 class="liteops-ContentSection__heading" style="text-align: center;">Concu pour les institutions exigeantes</h2>
+    <p class="liteops-ContentSection__body" style="text-align: center; margin: 0 auto var(--liteops-space-10);">Chaque secteur a ses contraintes reglementaires, ses rythmes de transformation et ses enjeux specifiques. LiteOps s'adapte.</p>
+    <div class="liteops-CardGrid liteops-CardGrid--cols-4">
+      <div class="liteops-CardGrid__item">
+        <div class="liteops-SectorCard">
+          <div class="liteops-SectorCard__name">Banque</div>
+          <div class="liteops-SectorCard__description">Conformite, fusions et migrations IT a grande echelle.</div>
+        </div>
+      </div>
+      <div class="liteops-CardGrid__item">
+        <div class="liteops-SectorCard">
+          <div class="liteops-SectorCard__name">Assurance</div>
+          <div class="liteops-SectorCard__description">Transformation des reseaux d'agences et digitalisation des parcours.</div>
+        </div>
+      </div>
+      <div class="liteops-CardGrid__item">
+        <div class="liteops-SectorCard">
+          <div class="liteops-SectorCard__name">Pharma</div>
+          <div class="liteops-SectorCard__description">Conduite du changement reglementaire et adoption des outils cliniques.</div>
+        </div>
+      </div>
+      <div class="liteops-CardGrid__item">
+        <div class="liteops-SectorCard">
+          <div class="liteops-SectorCard__name">Administration publique</div>
+          <div class="liteops-SectorCard__description">Modernisation des services publics et accompagnement des agents.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     6. TESTIMONIAL SECTION
+     ═══════════════════════════════════════════════ -->
+
+<section class="liteops-Testimonial fade-up">
+  <div class="liteops-Testimonial__container">
+    <blockquote class="liteops-Testimonial__quote">
+      LiteOps a transforme notre facon de piloter le changement. Pour la premiere fois, nous avions une visibilite reelle sur l'adoption.
+    </blockquote>
+    <div class="liteops-Testimonial__name">Cyril Vegni</div>
+    <div class="liteops-Testimonial__title">Directeur de la transformation, Groupe institutionnel</div>
+    <div class="liteops-Testimonial__logo">
+      <span class="liteops-Testimonial__logo-text">Logo client</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     7. CTA SECTION
+     ═══════════════════════════════════════════════ -->
+
+<section id="contact" class="liteops-CtaSection fade-up">
+  <div class="liteops-CtaSection__container">
+    <h2 class="liteops-CtaSection__heading">Pret a observer le changement ?</h2>
+    <p class="liteops-CtaSection__body">Demandez une demonstration personnalisee et decouvrez comment LiteOps eclaire vos transformations.</p>
+    <div class="liteops-CtaSection__actions">
+      <a href="#" class="liteops-Button liteops-Button--primary liteops-Button--lg">Demander une demo</a>
+      <a href="#" class="liteops-Button liteops-Button--secondary liteops-Button--lg">Nous contacter</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     8. FOOTER
+     ═══════════════════════════════════════════════ -->
+
+<footer class="liteops-Footer">
+  <div class="liteops-Footer__container">
+    <div class="liteops-Footer__grid">
+      <div class="liteops-Footer__column">
+        <div class="liteops-Footer__column-title">Plateforme</div>
+        <ul class="liteops-Footer__links">
+          <li><a href="#" class="liteops-Footer__link">Diagnostic</a></li>
+          <li><a href="#" class="liteops-Footer__link">Observabilite</a></li>
+          <li><a href="#" class="liteops-Footer__link">Agents IA</a></li>
+          <li><a href="#" class="liteops-Footer__link">Securite</a></li>
+        </ul>
+      </div>
+      <div class="liteops-Footer__column">
+        <div class="liteops-Footer__column-title">Ressources</div>
+        <ul class="liteops-Footer__links">
+          <li><a href="#" class="liteops-Footer__link">Documentation</a></li>
+          <li><a href="#" class="liteops-Footer__link">Recherche academique</a></li>
+          <li><a href="#" class="liteops-Footer__link">Blog</a></li>
+          <li><a href="#" class="liteops-Footer__link">Etudes de cas</a></li>
+        </ul>
+      </div>
+      <div class="liteops-Footer__column">
+        <div class="liteops-Footer__column-title">A propos</div>
+        <ul class="liteops-Footer__links">
+          <li><a href="#" class="liteops-Footer__link">Notre mission</a></li>
+          <li><a href="#" class="liteops-Footer__link">Equipe</a></li>
+          <li><a href="#" class="liteops-Footer__link">Mentions legales</a></li>
+          <li><a href="#" class="liteops-Footer__link">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="liteops-Footer__bottom">
+      <span class="liteops-Footer__copyright">2026 LiteOps. Tous droits reserves.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════
+     SCROLL ANIMATION SCRIPT
+     ═══════════════════════════════════════════════ -->
+
+<script>
+  (function() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var targets = document.querySelectorAll('.fade-up');
+    if (!targets.length) return;
+
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    targets.forEach(function(el) { observer.observe(el); });
+  })();
+</script>
+
+</body>
+</html>
