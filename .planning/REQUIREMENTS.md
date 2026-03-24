@@ -91,7 +91,7 @@ Deferred to future release. Tracked but not in current roadmap.
 
 ### Migration
 
-- **MIGR-01**: Automated migration script (lc- → liteops- in existing app files)
+- **MIGR-01**: Automated migration script (lc- to liteops- in existing app files)
 - **MIGR-02**: Minipilot tokens.css replacement with new system
 - **MIGR-03**: App globals.css migration to new token imports
 
@@ -112,60 +112,60 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TOKN-01 | — | Pending |
-| TOKN-02 | — | Pending |
-| TOKN-03 | — | Pending |
-| TOKN-04 | — | Pending |
-| TOKN-05 | — | Pending |
-| TOKN-06 | — | Pending |
-| TOKN-07 | — | Pending |
-| TOKN-08 | — | Pending |
-| TOKN-09 | — | Pending |
-| ATOM-01 | — | Pending |
-| ATOM-02 | — | Pending |
-| ATOM-03 | — | Pending |
-| ATOM-04 | — | Pending |
-| ATOM-05 | — | Pending |
-| ATOM-06 | — | Pending |
-| ATOM-07 | — | Pending |
-| ATOM-08 | — | Pending |
-| ATOM-09 | — | Pending |
-| ATOM-10 | — | Pending |
-| ATOM-11 | — | Pending |
-| ATOM-12 | — | Pending |
-| MOLC-01 | — | Pending |
-| MOLC-02 | — | Pending |
-| MOLC-03 | — | Pending |
-| MOLC-04 | — | Pending |
-| MOLC-05 | — | Pending |
-| MOLC-06 | — | Pending |
-| MOLC-07 | — | Pending |
-| MOLC-08 | — | Pending |
-| MOLC-09 | — | Pending |
-| ORGN-01 | — | Pending |
-| ORGN-02 | — | Pending |
-| ORGN-03 | — | Pending |
-| ORGN-04 | — | Pending |
-| ORGN-05 | — | Pending |
-| ORGN-06 | — | Pending |
-| ORGN-07 | — | Pending |
-| ORGN-08 | — | Pending |
-| ORGN-09 | — | Pending |
-| ORGN-10 | — | Pending |
-| PAGE-01 | — | Pending |
-| PAGE-02 | — | Pending |
-| PAGE-03 | — | Pending |
-| PAGE-04 | — | Pending |
-| PAGE-05 | — | Pending |
-| PAGE-06 | — | Pending |
-| COPY-01 | — | Pending |
-| COPY-02 | — | Pending |
+| TOKN-01 | Phase 1 | Pending |
+| TOKN-02 | Phase 1 | Pending |
+| TOKN-03 | Phase 1 | Pending |
+| TOKN-04 | Phase 1 | Pending |
+| TOKN-05 | Phase 1 | Pending |
+| TOKN-06 | Phase 1 | Pending |
+| TOKN-07 | Phase 1 | Pending |
+| TOKN-08 | Phase 1 | Pending |
+| TOKN-09 | Phase 1 | Pending |
+| ATOM-01 | Phase 2 | Pending |
+| ATOM-02 | Phase 2 | Pending |
+| ATOM-03 | Phase 2 | Pending |
+| ATOM-04 | Phase 2 | Pending |
+| ATOM-05 | Phase 2 | Pending |
+| ATOM-06 | Phase 2 | Pending |
+| ATOM-07 | Phase 2 | Pending |
+| ATOM-08 | Phase 2 | Pending |
+| ATOM-09 | Phase 2 | Pending |
+| ATOM-10 | Phase 2 | Pending |
+| ATOM-11 | Phase 2 | Pending |
+| ATOM-12 | Phase 2 | Pending |
+| MOLC-01 | Phase 2 | Pending |
+| MOLC-02 | Phase 2 | Pending |
+| MOLC-03 | Phase 2 | Pending |
+| MOLC-04 | Phase 2 | Pending |
+| MOLC-05 | Phase 2 | Pending |
+| MOLC-06 | Phase 2 | Pending |
+| MOLC-07 | Phase 2 | Pending |
+| MOLC-08 | Phase 2 | Pending |
+| MOLC-09 | Phase 2 | Pending |
+| ORGN-01 | Phase 3 | Pending |
+| ORGN-02 | Phase 3 | Pending |
+| ORGN-03 | Phase 3 | Pending |
+| ORGN-04 | Phase 3 | Pending |
+| ORGN-05 | Phase 3 | Pending |
+| ORGN-06 | Phase 3 | Pending |
+| ORGN-07 | Phase 3 | Pending |
+| ORGN-08 | Phase 3 | Pending |
+| ORGN-09 | Phase 3 | Pending |
+| ORGN-10 | Phase 3 | Pending |
+| PAGE-01 | Phase 4 | Pending |
+| PAGE-02 | Phase 4 | Pending |
+| PAGE-03 | Phase 4 | Pending |
+| PAGE-04 | Phase 4 | Pending |
+| PAGE-05 | Phase 4 | Pending |
+| PAGE-06 | Phase 4 | Pending |
+| COPY-01 | Phase 4 | Pending |
+| COPY-02 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 43 total
-- Mapped to phases: 0
-- Unmapped: 43 ⚠️
+- Mapped to phases: 43
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-24*
-*Last updated: 2026-03-24 after initial definition*
+*Last updated: 2026-03-24 after roadmap creation*
