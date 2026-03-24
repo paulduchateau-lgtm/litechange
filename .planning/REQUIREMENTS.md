@@ -25,10 +25,10 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **ATOM-02**: Badge/pill component — success, warning, error, info, accent variants with colored dot prefix
 - [x] **ATOM-03**: Text input with label, placeholder, focus ring, error state, disabled state
 - [x] **ATOM-04**: Select dropdown with custom styling matching input component
-- [ ] **ATOM-05**: Textarea with auto-height behavior indication and character count pattern
-- [ ] **ATOM-06**: Switch/toggle component with on/off states and label
-- [ ] **ATOM-07**: Checkbox and radio button components with custom styling
-- [ ] **ATOM-08**: Slider/range input for simulateur-style numeric controls
+- [x] **ATOM-05**: Textarea with auto-height behavior indication and character count pattern
+- [x] **ATOM-06**: Switch/toggle component with on/off states and label
+- [x] **ATOM-07**: Checkbox and radio button components with custom styling
+- [x] **ATOM-08**: Slider/range input for simulateur-style numeric controls
 - [ ] **ATOM-09**: Glassmorphism panel component (frosted backdrop-filter with subtle border)
 - [ ] **ATOM-10**: Skeleton loading states — rectangular, circular, and text-line variants
 - [ ] **ATOM-11**: Typography showcase page displaying all 3 font families with sizes, weights, and use cases
@@ -125,10 +125,10 @@ Deferred to future release. Tracked but not in current roadmap.
 | ATOM-02 | Phase 2 | Complete |
 | ATOM-03 | Phase 2 | Complete |
 | ATOM-04 | Phase 2 | Complete |
-| ATOM-05 | Phase 2 | Pending |
-| ATOM-06 | Phase 2 | Pending |
-| ATOM-07 | Phase 2 | Pending |
-| ATOM-08 | Phase 2 | Pending |
+| ATOM-05 | Phase 2 | Complete |
+| ATOM-06 | Phase 2 | Complete |
+| ATOM-07 | Phase 2 | Complete |
+| ATOM-08 | Phase 2 | Complete |
 | ATOM-09 | Phase 2 | Pending |
 | ATOM-10 | Phase 2 | Pending |
 | ATOM-11 | Phase 2 | Pending |
