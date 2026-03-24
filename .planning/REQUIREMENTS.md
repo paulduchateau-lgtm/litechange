@@ -61,7 +61,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Pages & Documentation
 
-- [ ] **PAGE-01**: Component showcase — master page with all atoms, molecules, organisms displayed with code snippets
+- [x] **PAGE-01**: Component showcase — master page with all atoms, molecules, organisms displayed with code snippets
 - [x] **PAGE-02**: Spacing and sizing scale visualization with 4px grid stops
 - [x] **PAGE-03**: WCAG AA/AAA accessibility checklist with verified contrast ratios for all color combinations
 - [x] **PAGE-04**: Landing page mockup — full Cohere-style page with hero, security section, product showcase, testimonials, CTA
@@ -152,7 +152,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | ORGN-08 | Phase 3 | Complete |
 | ORGN-09 | Phase 3 | Complete |
 | ORGN-10 | Phase 3 | Complete |
-| PAGE-01 | Phase 4 | Pending |
+| PAGE-01 | Phase 4 | Complete |
 | PAGE-02 | Phase 4 | Complete |
 | PAGE-03 | Phase 4 | Complete |
 | PAGE-04 | Phase 4 | Complete |
