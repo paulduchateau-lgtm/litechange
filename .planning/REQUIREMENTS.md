@@ -64,14 +64,14 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **PAGE-01**: Component showcase — master page with all atoms, molecules, organisms displayed with code snippets
 - [ ] **PAGE-02**: Spacing and sizing scale visualization with 4px grid stops
 - [ ] **PAGE-03**: WCAG AA/AAA accessibility checklist with verified contrast ratios for all color combinations
-- [ ] **PAGE-04**: Landing page mockup — full Cohere-style page with hero, security section, product showcase, testimonials, CTA
+- [x] **PAGE-04**: Landing page mockup — full Cohere-style page with hero, security section, product showcase, testimonials, CTA
 - [ ] **PAGE-05**: Dashboard page mockup — KPI cards, data table, sidebar, topbar, charts area
 - [ ] **PAGE-06**: Before/after comparison page — simulateur-lite-ops current vs upgraded design side by side
 
 ### Content & Voice
 
 - [ ] **COPY-01**: Naming convention documentation — BEM-like CSS classes, kebab-case components, semantic token names, Figma-ready atom/molecule/organism structure
-- [ ] **COPY-02**: 10+ French institutional copy snippets for hero, sections, CTAs in Cohere-inspired register
+- [x] **COPY-02**: 10+ French institutional copy snippets for hero, sections, CTAs in Cohere-inspired register
 
 ## v2 Requirements
 
@@ -155,11 +155,11 @@ Deferred to future release. Tracked but not in current roadmap.
 | PAGE-01 | Phase 4 | Pending |
 | PAGE-02 | Phase 4 | Pending |
 | PAGE-03 | Phase 4 | Pending |
-| PAGE-04 | Phase 4 | Pending |
+| PAGE-04 | Phase 4 | Complete |
 | PAGE-05 | Phase 4 | Pending |
 | PAGE-06 | Phase 4 | Pending |
 | COPY-01 | Phase 4 | Pending |
-| COPY-02 | Phase 4 | Pending |
+| COPY-02 | Phase 4 | Complete |
 
 **Coverage:**
 - v1 requirements: 43 total
