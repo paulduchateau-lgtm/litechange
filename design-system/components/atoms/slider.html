@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Atom -- Slider</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header { margin-bottom: var(--liteops-space-16); }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: #1C1D1A;
+      color: #E8E6E1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: background 200ms, color 200ms;
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: #F5F4F0;
+      color: #1C1D1A;
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: var(--liteops-space-16); }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    .showcase-grid {
+      display: flex;
+      flex-direction: column;
+      gap: var(--liteops-space-8);
+    }
+
+    .showcase-row {
+      display: flex;
+      gap: var(--liteops-space-8);
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    .showcase-item {
+      flex: 1;
+      min-width: 280px;
+      max-width: 480px;
+    }
+
+    .showcase-item-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-3);
+    }
+
+    /* ── Dark Theme Panel ── */
+    .dark-panel {
+      background: var(--liteops-olive-900);
+      border-radius: var(--liteops-radius-lg);
+      padding: var(--liteops-space-8);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       COMPONENT: Slider
+       ════════════════════════════════════════════════════════════════ */
+
+    .liteops-Slider {
+      display: flex;
+      flex-direction: column;
+      gap: var(--liteops-space-2);
+    }
+
+    .liteops-Slider__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .liteops-Slider__label {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-Slider__value {
+      font-family: var(--liteops-font-mono);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-Slider__input {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--liteops-surface-tertiary);
+      outline: none;
+      cursor: pointer;
+      transition: opacity var(--liteops-duration-normal) ease;
+    }
+
+    /* WebKit Track */
+    .liteops-Slider__input::-webkit-slider-runnable-track {
+      height: 4px;
+      border-radius: 2px;
+      background: var(--liteops-surface-tertiary);
+    }
+
+    /* WebKit Thumb */
+    .liteops-Slider__input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--liteops-interactive-primary);
+      border: 2px solid var(--liteops-surface-secondary);
+      cursor: pointer;
+      margin-top: -8px;
+      box-shadow: var(--liteops-shadow-sm);
+      transition: background var(--liteops-duration-normal) ease,
+                  box-shadow var(--liteops-duration-normal) ease;
+    }
+
+    .liteops-Slider__input::-webkit-slider-thumb:hover {
+      background: var(--liteops-interactive-primary-hover);
+      box-shadow: var(--liteops-shadow-md);
+    }
+
+    /* Firefox Track */
+    .liteops-Slider__input::-moz-range-track {
+      height: 4px;
+      border-radius: 2px;
+      background: var(--liteops-surface-tertiary);
+      border: none;
+    }
+
+    /* Firefox Thumb */
+    .liteops-Slider__input::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--liteops-interactive-primary);
+      border: 2px solid var(--liteops-surface-secondary);
+      cursor: pointer;
+      box-shadow: var(--liteops-shadow-sm);
+      transition: background var(--liteops-duration-normal) ease,
+                  box-shadow var(--liteops-duration-normal) ease;
+    }
+
+    .liteops-Slider__input::-moz-range-thumb:hover {
+      background: var(--liteops-interactive-primary-hover);
+      box-shadow: var(--liteops-shadow-md);
+    }
+
+    /* Focus */
+    .liteops-Slider__input:focus-visible {
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+
+    /* Disabled */
+    .liteops-Slider.is-disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .liteops-Slider.is-disabled .liteops-Slider__input {
+      cursor: not-allowed;
+    }
+
+    /* ── Min/Max labels ── */
+    .liteops-Slider__range {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .liteops-Slider__min,
+    .liteops-Slider__max {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--liteops-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark Mode</button>
+
+<div class="page">
+
+  <!-- Header -->
+  <header class="page-header">
+    <h1 class="page-title">Slider</h1>
+    <p class="page-subtitle">Controle de selection numerique via curseur, pour parametres et ajustements.</p>
+  </header>
+
+  <!-- Section: Default -->
+  <section class="section">
+    <h2 class="section-heading">Default</h2>
+    <span class="section-label">Slider / Default</span>
+    <hr class="section-divider">
+    <div class="showcase-grid">
+      <div class="showcase-row">
+        <div class="showcase-item">
+          <p class="showcase-item-label">Simple slider</p>
+          <div class="liteops-Slider">
+            <input type="range" class="liteops-Slider__input" min="0" max="100" value="50">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: With Label and Value -->
+  <section class="section">
+    <h2 class="section-heading">With Label and Value</h2>
+    <span class="section-label">Slider / Labeled</span>
+    <hr class="section-divider">
+    <div class="showcase-grid">
+      <div class="showcase-row">
+        <div class="showcase-item">
+          <p class="showcase-item-label">25%</p>
+          <div class="liteops-Slider">
+            <div class="liteops-Slider__header">
+              <label class="liteops-Slider__label">Taux d'adoption cible</label>
+              <span class="liteops-Slider__value">25%</span>
+            </div>
+            <input type="range" class="liteops-Slider__input" min="0" max="100" value="25">
+          </div>
+        </div>
+        <div class="showcase-item">
+          <p class="showcase-item-label">50%</p>
+          <div class="liteops-Slider">
+            <div class="liteops-Slider__header">
+              <label class="liteops-Slider__label">Seuil d'alerte friction</label>
+              <span class="liteops-Slider__value">50%</span>
+            </div>
+            <input type="range" class="liteops-Slider__input" min="0" max="100" value="50">
+          </div>
+        </div>
+        <div class="showcase-item">
+          <p class="showcase-item-label">75%</p>
+          <div class="liteops-Slider">
+            <div class="liteops-Slider__header">
+              <label class="liteops-Slider__label">Objectif de couverture</label>
+              <span class="liteops-Slider__value">75%</span>
+            </div>
+            <input type="range" class="liteops-Slider__input" min="0" max="100" value="75">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Different Positions -->
+  <section class="section">
+    <h2 class="section-heading">Different Positions</h2>
+    <span class="section-label">Slider / Positions</span>
+    <hr class="section-divider">
+    <div class="showcase-grid">
+      <div class="showcase-row">
+        <div class="showcase-item">
+          <p class="showcase-item-label">Minimum (0)</p>
+          <div class="liteops-Slider">
+            <div class="liteops-Slider__header">
+              <label class="liteops-Slider__label">Niveau de risque</label>
+              <span class="liteops-Slider__value">0</span>
+            </div>
+            <input type="range" class="liteops-Slider__input" min="0" max="10" value="0">
+          </div>
+        </div>
+        <div class="showcase-item">
+          <p class="showcase-item-label">Mid (5)</p>
+          <div class="liteops-Slider">
+            <div class="liteops-Slider__header">
+              <label class="liteops-Slider__label">Niveau de risque</label>
+              <span class="liteops-Slider__value">5</span>
+            </div>
+            <input type="range" class="liteops-Slider__input" min="0" max="10" value="5">
+          </div>
+        </div>
+        <div class="showcase-item">
+          <p class="showcase-item-label">Maximum (10)</p>
+          <div class="liteops-Slider">
+            <div class="liteops-Slider__header">
+              <label class="liteops-Slider__label">Niveau de risque</label>
+              <span class="liteops-Slider__value">10</span>
+            </div>
+            <input type="range" class="liteops-Slider__input" min="0" max="10" value="10">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: With Min/Max Labels (Simulateur style) -->
+  <section class="section">
+    <h2 class="section-heading">With Min/Max Labels</h2>
+    <span class="section-label">Slider / Simulateur Pattern</span>
+    <hr class="section-divider">
+    <div class="showcase-grid">
+      <div class="showcase-row">
+        <div class="showcase-item">
+          <p class="showcase-item-label">Score d'impact</p>
+          <div class="liteops-Slider">
+            <div class="liteops-Slider__header">
+              <label class="liteops-Slider__label">Score d'impact</label>
+              <span class="liteops-Slider__value">6 / 10</span>
+            </div>
+            <input type="range" class="liteops-Slider__input" min="0" max="10" value="6">
+            <div class="liteops-Slider__range">
+              <span class="liteops-Slider__min">0 - Faible</span>
+              <span class="liteops-Slider__max">10 - Critique</span>
+            </div>
+          </div>
+        </div>
+        <div class="showcase-item">
+          <p class="showcase-item-label">Duree estimee</p>
+          <div class="liteops-Slider">
+            <div class="liteops-Slider__header">
+              <label class="liteops-Slider__label">Duree du programme (mois)</label>
+              <span class="liteops-Slider__value">12 mois</span>
+            </div>
+            <input type="range" class="liteops-Slider__input" min="3" max="36" value="12" step="3">
+            <div class="liteops-Slider__range">
+              <span class="liteops-Slider__min">3 mois</span>
+              <span class="liteops-Slider__max">36 mois</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Disabled -->
+  <section class="section">
+    <h2 class="section-heading">Disabled</h2>
+    <span class="section-label">Slider / Disabled</span>
+    <hr class="section-divider">
+    <div class="showcase-grid">
+      <div class="showcase-row">
+        <div class="showcase-item">
+          <p class="showcase-item-label">Disabled slider</p>
+          <div class="liteops-Slider is-disabled">
+            <div class="liteops-Slider__header">
+              <label class="liteops-Slider__label">Parametre verrouille</label>
+              <span class="liteops-Slider__value">60%</span>
+            </div>
+            <input type="range" class="liteops-Slider__input" min="0" max="100" value="60" disabled>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Dark Theme -->
+  <section class="section">
+    <h2 class="section-heading">Dark Theme</h2>
+    <span class="section-label">Slider / Dark</span>
+    <hr class="section-divider">
+    <div class="dark-panel" data-theme="dark">
+      <div class="showcase-grid">
+        <div class="showcase-row">
+          <div class="showcase-item">
+            <p class="showcase-item-label" style="color: #8A8880;">With value</p>
+            <div class="liteops-Slider">
+              <div class="liteops-Slider__header">
+                <label class="liteops-Slider__label" style="color: #E8E6E1;">Seuil de friction</label>
+                <span class="liteops-Slider__value" style="color: #E8E6E1;">45%</span>
+              </div>
+              <input type="range" class="liteops-Slider__input" min="0" max="100" value="45">
+            </div>
+          </div>
+          <div class="showcase-item">
+            <p class="showcase-item-label" style="color: #8A8880;">With min/max</p>
+            <div class="liteops-Slider">
+              <div class="liteops-Slider__header">
+                <label class="liteops-Slider__label" style="color: #E8E6E1;">Niveau de maturite</label>
+                <span class="liteops-Slider__value" style="color: #E8E6E1;">3 / 5</span>
+              </div>
+              <input type="range" class="liteops-Slider__input" min="1" max="5" value="3">
+              <div class="liteops-Slider__range">
+                <span class="liteops-Slider__min">1 - Initial</span>
+                <span class="liteops-Slider__max">5 - Optimise</span>
+              </div>
+            </div>
+          </div>
+          <div class="showcase-item">
+            <p class="showcase-item-label" style="color: #8A8880;">Disabled</p>
+            <div class="liteops-Slider is-disabled">
+              <div class="liteops-Slider__header">
+                <label class="liteops-Slider__label" style="color: #E8E6E1;">Verrouille</label>
+                <span class="liteops-Slider__value" style="color: #E8E6E1;">70%</span>
+              </div>
+              <input type="range" class="liteops-Slider__input" min="0" max="100" value="70" disabled>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>

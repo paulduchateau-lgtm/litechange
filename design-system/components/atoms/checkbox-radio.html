@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Atom -- Checkbox &amp; Radio</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header { margin-bottom: var(--liteops-space-16); }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: #1C1D1A;
+      color: #E8E6E1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: background 200ms, color 200ms;
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: #F5F4F0;
+      color: #1C1D1A;
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: var(--liteops-space-16); }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    .showcase-grid {
+      display: flex;
+      flex-direction: column;
+      gap: var(--liteops-space-8);
+    }
+
+    .showcase-row {
+      display: flex;
+      gap: var(--liteops-space-8);
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    .showcase-item { min-width: 200px; }
+
+    .showcase-item-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-3);
+    }
+
+    /* ── Dark Theme Panel ── */
+    .dark-panel {
+      background: var(--liteops-olive-900);
+      border-radius: var(--liteops-radius-lg);
+      padding: var(--liteops-space-8);
+    }
+
+    /* ── Control Group ── */
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--liteops-space-3);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       COMPONENT: Checkbox
+       ════════════════════════════════════════════════════════════════ */
+
+    .liteops-Checkbox {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--liteops-space-3);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .liteops-Checkbox__input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+
+    .liteops-Checkbox__indicator {
+      position: relative;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--liteops-border-primary);
+      border-radius: var(--liteops-radius-sm);
+      background: var(--liteops-surface-secondary);
+      transition: all var(--liteops-duration-normal) ease;
+      flex-shrink: 0;
+    }
+
+    .liteops-Checkbox__indicator::after {
+      content: '';
+      position: absolute;
+      display: none;
+      left: 5px;
+      top: 1px;
+      width: 5px;
+      height: 10px;
+      border: solid var(--liteops-white);
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    /* Checked */
+    .liteops-Checkbox__input:checked + .liteops-Checkbox__indicator {
+      background: var(--liteops-interactive-primary);
+      border-color: var(--liteops-interactive-primary);
+    }
+
+    .liteops-Checkbox__input:checked + .liteops-Checkbox__indicator::after {
+      display: block;
+    }
+
+    /* Focus */
+    .liteops-Checkbox__input:focus-visible + .liteops-Checkbox__indicator {
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+
+    /* Hover */
+    .liteops-Checkbox:hover .liteops-Checkbox__indicator {
+      border-color: var(--liteops-interactive-primary);
+    }
+
+    /* Disabled */
+    .liteops-Checkbox.is-disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .liteops-Checkbox__label {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-primary);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       COMPONENT: Radio
+       ════════════════════════════════════════════════════════════════ */
+
+    .liteops-Radio {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--liteops-space-3);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .liteops-Radio__input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+
+    .liteops-Radio__indicator {
+      position: relative;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--liteops-border-primary);
+      border-radius: 50%;
+      background: var(--liteops-surface-secondary);
+      transition: all var(--liteops-duration-normal) ease;
+      flex-shrink: 0;
+    }
+
+    .liteops-Radio__indicator::after {
+      content: '';
+      position: absolute;
+      display: none;
+      top: 50%;
+      left: 50%;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--liteops-interactive-primary);
+      transform: translate(-50%, -50%);
+    }
+
+    /* Checked */
+    .liteops-Radio__input:checked + .liteops-Radio__indicator {
+      border-color: var(--liteops-interactive-primary);
+    }
+
+    .liteops-Radio__input:checked + .liteops-Radio__indicator::after {
+      display: block;
+    }
+
+    /* Focus */
+    .liteops-Radio__input:focus-visible + .liteops-Radio__indicator {
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+
+    /* Hover */
+    .liteops-Radio:hover .liteops-Radio__indicator {
+      border-color: var(--liteops-interactive-primary);
+    }
+
+    /* Disabled */
+    .liteops-Radio.is-disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .liteops-Radio__label {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-primary);
+      cursor: pointer;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark Mode</button>
+
+<div class="page">
+
+  <!-- Header -->
+  <header class="page-header">
+    <h1 class="page-title">Checkbox &amp; Radio</h1>
+    <p class="page-subtitle">Controles de selection personnalises avec indicateurs visuels accessibles.</p>
+  </header>
+
+  <!-- Section: Checkbox States -->
+  <section class="section">
+    <h2 class="section-heading">Checkbox States</h2>
+    <span class="section-label">Checkbox / States</span>
+    <hr class="section-divider">
+    <div class="showcase-grid">
+      <div class="showcase-row">
+        <div class="showcase-item">
+          <p class="showcase-item-label">Unchecked</p>
+          <label class="liteops-Checkbox">
+            <input type="checkbox" class="liteops-Checkbox__input">
+            <span class="liteops-Checkbox__indicator"></span>
+            <span class="liteops-Checkbox__label">Accepter les conditions</span>
+          </label>
+        </div>
+        <div class="showcase-item">
+          <p class="showcase-item-label">Checked</p>
+          <label class="liteops-Checkbox">
+            <input type="checkbox" class="liteops-Checkbox__input" checked>
+            <span class="liteops-Checkbox__indicator"></span>
+            <span class="liteops-Checkbox__label">Conditions acceptees</span>
+          </label>
+        </div>
+        <div class="showcase-item">
+          <p class="showcase-item-label">Disabled unchecked</p>
+          <label class="liteops-Checkbox is-disabled">
+            <input type="checkbox" class="liteops-Checkbox__input" disabled>
+            <span class="liteops-Checkbox__indicator"></span>
+            <span class="liteops-Checkbox__label">Option indisponible</span>
+          </label>
+        </div>
+        <div class="showcase-item">
+          <p class="showcase-item-label">Disabled checked</p>
+          <label class="liteops-Checkbox is-disabled">
+            <input type="checkbox" class="liteops-Checkbox__input" checked disabled>
+            <span class="liteops-Checkbox__indicator"></span>
+            <span class="liteops-Checkbox__label">Selection verrouillee</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Checkbox Group -->
+  <section class="section">
+    <h2 class="section-heading">Checkbox Group</h2>
+    <span class="section-label">Checkbox / Group</span>
+    <hr class="section-divider">
+    <div class="showcase-grid">
+      <div class="showcase-row">
+        <div class="showcase-item">
+          <p class="showcase-item-label">Dimensions du changement</p>
+          <div class="control-group">
+            <label class="liteops-Checkbox">
+              <input type="checkbox" class="liteops-Checkbox__input" checked>
+              <span class="liteops-Checkbox__indicator"></span>
+              <span class="liteops-Checkbox__label">Organisationnelle</span>
+            </label>
+            <label class="liteops-Checkbox">
+              <input type="checkbox" class="liteops-Checkbox__input" checked>
+              <span class="liteops-Checkbox__indicator"></span>
+              <span class="liteops-Checkbox__label">Culturelle</span>
+            </label>
+            <label class="liteops-Checkbox">
+              <input type="checkbox" class="liteops-Checkbox__input">
+              <span class="liteops-Checkbox__indicator"></span>
+              <span class="liteops-Checkbox__label">Technologique</span>
+            </label>
+            <label class="liteops-Checkbox">
+              <input type="checkbox" class="liteops-Checkbox__input">
+              <span class="liteops-Checkbox__indicator"></span>
+              <span class="liteops-Checkbox__label">Strategique</span>
+            </label>
+            <label class="liteops-Checkbox">
+              <input type="checkbox" class="liteops-Checkbox__input">
+              <span class="liteops-Checkbox__indicator"></span>
+              <span class="liteops-Checkbox__label">Humaine</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Radio States -->
+  <section class="section">
+    <h2 class="section-heading">Radio States</h2>
+    <span class="section-label">Radio / States</span>
+    <hr class="section-divider">
+    <div class="showcase-grid">
+      <div class="showcase-row">
+        <div class="showcase-item">
+          <p class="showcase-item-label">Unselected</p>
+          <label class="liteops-Radio">
+            <input type="radio" class="liteops-Radio__input" name="radio-demo-single">
+            <span class="liteops-Radio__indicator"></span>
+            <span class="liteops-Radio__label">Option non selectionnee</span>
+          </label>
+        </div>
+        <div class="showcase-item">
+          <p class="showcase-item-label">Selected</p>
+          <label class="liteops-Radio">
+            <input type="radio" class="liteops-Radio__input" name="radio-demo-selected" checked>
+            <span class="liteops-Radio__indicator"></span>
+            <span class="liteops-Radio__label">Option selectionnee</span>
+          </label>
+        </div>
+        <div class="showcase-item">
+          <p class="showcase-item-label">Disabled</p>
+          <label class="liteops-Radio is-disabled">
+            <input type="radio" class="liteops-Radio__input" name="radio-demo-disabled" disabled>
+            <span class="liteops-Radio__indicator"></span>
+            <span class="liteops-Radio__label">Option indisponible</span>
+          </label>
+        </div>
+        <div class="showcase-item">
+          <p class="showcase-item-label">Disabled selected</p>
+          <label class="liteops-Radio is-disabled">
+            <input type="radio" class="liteops-Radio__input" name="radio-demo-disabled-sel" checked disabled>
+            <span class="liteops-Radio__indicator"></span>
+            <span class="liteops-Radio__label">Selection verrouillee</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Radio Group -->
+  <section class="section">
+    <h2 class="section-heading">Radio Group</h2>
+    <span class="section-label">Radio / Group (Mutual Exclusion)</span>
+    <hr class="section-divider">
+    <div class="showcase-grid">
+      <div class="showcase-row">
+        <div class="showcase-item">
+          <p class="showcase-item-label">Niveau d'impact</p>
+          <div class="control-group">
+            <label class="liteops-Radio">
+              <input type="radio" class="liteops-Radio__input" name="impact-level" value="faible">
+              <span class="liteops-Radio__indicator"></span>
+              <span class="liteops-Radio__label">Faible</span>
+            </label>
+            <label class="liteops-Radio">
+              <input type="radio" class="liteops-Radio__input" name="impact-level" value="modere" checked>
+              <span class="liteops-Radio__indicator"></span>
+              <span class="liteops-Radio__label">Modere</span>
+            </label>
+            <label class="liteops-Radio">
+              <input type="radio" class="liteops-Radio__input" name="impact-level" value="eleve">
+              <span class="liteops-Radio__indicator"></span>
+              <span class="liteops-Radio__label">Eleve</span>
+            </label>
+            <label class="liteops-Radio">
+              <input type="radio" class="liteops-Radio__input" name="impact-level" value="critique">
+              <span class="liteops-Radio__indicator"></span>
+              <span class="liteops-Radio__label">Critique</span>
+            </label>
+          </div>
+        </div>
+        <div class="showcase-item">
+          <p class="showcase-item-label">Frequence de collecte</p>
+          <div class="control-group">
+            <label class="liteops-Radio">
+              <input type="radio" class="liteops-Radio__input" name="frequency" value="hebdo">
+              <span class="liteops-Radio__indicator"></span>
+              <span class="liteops-Radio__label">Hebdomadaire</span>
+            </label>
+            <label class="liteops-Radio">
+              <input type="radio" class="liteops-Radio__input" name="frequency" value="mensuel" checked>
+              <span class="liteops-Radio__indicator"></span>
+              <span class="liteops-Radio__label">Mensuel</span>
+            </label>
+            <label class="liteops-Radio">
+              <input type="radio" class="liteops-Radio__input" name="frequency" value="trimestriel">
+              <span class="liteops-Radio__indicator"></span>
+              <span class="liteops-Radio__label">Trimestriel</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Dark Theme -->
+  <section class="section">
+    <h2 class="section-heading">Dark Theme</h2>
+    <span class="section-label">Checkbox &amp; Radio / Dark</span>
+    <hr class="section-divider">
+    <div class="dark-panel" data-theme="dark">
+      <div class="showcase-grid">
+        <div class="showcase-row">
+          <div class="showcase-item">
+            <p class="showcase-item-label" style="color: #8A8880;">Checkbox group</p>
+            <div class="control-group">
+              <label class="liteops-Checkbox">
+                <input type="checkbox" class="liteops-Checkbox__input" checked>
+                <span class="liteops-Checkbox__indicator"></span>
+                <span class="liteops-Checkbox__label" style="color: #E8E6E1;">Observabilite</span>
+              </label>
+              <label class="liteops-Checkbox">
+                <input type="checkbox" class="liteops-Checkbox__input">
+                <span class="liteops-Checkbox__indicator"></span>
+                <span class="liteops-Checkbox__label" style="color: #E8E6E1;">Diagnostic</span>
+              </label>
+              <label class="liteops-Checkbox">
+                <input type="checkbox" class="liteops-Checkbox__input" checked>
+                <span class="liteops-Checkbox__indicator"></span>
+                <span class="liteops-Checkbox__label" style="color: #E8E6E1;">Mesure d'adoption</span>
+              </label>
+            </div>
+          </div>
+          <div class="showcase-item">
+            <p class="showcase-item-label" style="color: #8A8880;">Radio group</p>
+            <div class="control-group">
+              <label class="liteops-Radio">
+                <input type="radio" class="liteops-Radio__input" name="dark-priority" value="basse">
+                <span class="liteops-Radio__indicator"></span>
+                <span class="liteops-Radio__label" style="color: #E8E6E1;">Priorite basse</span>
+              </label>
+              <label class="liteops-Radio">
+                <input type="radio" class="liteops-Radio__input" name="dark-priority" value="moyenne" checked>
+                <span class="liteops-Radio__indicator"></span>
+                <span class="liteops-Radio__label" style="color: #E8E6E1;">Priorite moyenne</span>
+              </label>
+              <label class="liteops-Radio">
+                <input type="radio" class="liteops-Radio__input" name="dark-priority" value="haute">
+                <span class="liteops-Radio__indicator"></span>
+                <span class="liteops-Radio__label" style="color: #E8E6E1;">Priorite haute</span>
+              </label>
+            </div>
+          </div>
+          <div class="showcase-item">
+            <p class="showcase-item-label" style="color: #8A8880;">Disabled</p>
+            <div class="control-group">
+              <label class="liteops-Checkbox is-disabled">
+                <input type="checkbox" class="liteops-Checkbox__input" checked disabled>
+                <span class="liteops-Checkbox__indicator"></span>
+                <span class="liteops-Checkbox__label" style="color: #E8E6E1;">Verrouille (coche)</span>
+              </label>
+              <label class="liteops-Radio is-disabled">
+                <input type="radio" class="liteops-Radio__input" name="dark-disabled" checked disabled>
+                <span class="liteops-Radio__indicator"></span>
+                <span class="liteops-Radio__label" style="color: #E8E6E1;">Verrouille (radio)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>
