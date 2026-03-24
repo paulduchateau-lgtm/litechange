@@ -14,9 +14,9 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **TOKN-03**: Style Dictionary generates Tailwind CSS theme configuration from same JSON source
 - [x] **TOKN-04**: Light/dark theme token switching preserved and extended with liteops- prefix
 - [x] **TOKN-05**: Backward compatibility shim mapping lc- variables to liteops- equivalents
-- [ ] **TOKN-06**: Six-level elevation/shadow scale (Cohere-like depth from subtle to dramatic)
-- [ ] **TOKN-07**: Gradient token definitions for landing hero sections (green-to-olive, green-to-black)
-- [ ] **TOKN-08**: Motion token system (duration, easing curves, stagger delays as named tokens)
+- [x] **TOKN-06**: Six-level elevation/shadow scale (Cohere-like depth from subtle to dramatic)
+- [x] **TOKN-07**: Gradient token definitions for landing hero sections (green-to-olive, green-to-black)
+- [x] **TOKN-08**: Motion token system (duration, easing curves, stagger delays as named tokens)
 - [x] **TOKN-09**: JSON export format suitable for future Figma token import
 
 ### Atoms
@@ -117,9 +117,9 @@ Deferred to future release. Tracked but not in current roadmap.
 | TOKN-03 | Phase 1 | Complete |
 | TOKN-04 | Phase 1 | Complete |
 | TOKN-05 | Phase 1 | Complete |
-| TOKN-06 | Phase 1 | Pending |
-| TOKN-07 | Phase 1 | Pending |
-| TOKN-08 | Phase 1 | Pending |
+| TOKN-06 | Phase 1 | Complete |
+| TOKN-07 | Phase 1 | Complete |
+| TOKN-08 | Phase 1 | Complete |
 | TOKN-09 | Phase 1 | Complete |
 | ATOM-01 | Phase 2 | Pending |
 | ATOM-02 | Phase 2 | Pending |

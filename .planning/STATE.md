@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Phase 1 planned (2 plans, 2 waves)
-last_updated: "2026-03-24T13:48:04.276Z"
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-03-24T14:01:40.194Z"
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -46,6 +46,7 @@ Plan: 2 of 2
 - Trend: starting
 
 *Updated after each plan completion*
+| Phase 01 P02 | 3min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -58,6 +59,8 @@ Recent decisions affecting current work:
 - Roadmap: Atoms and molecules combined into single phase (compression from research-suggested 6 phases to 4)
 - 01-01: Custom build pipeline instead of SD v5 built-in formats for themed output (light/dark nested JSON)
 - 01-01: Tailwind @theme includes only raw palette + typography + spacing + radius (not semantic tokens)
+- [Phase 01]: Composite shadow arrays for xl elevation level (Cohere-like multi-layer depth)
+- [Phase 01]: Gradient/motion tokens placed in raw (non-themed) tier, available in both themes
 
 ### Pending Todos
 
@@ -70,6 +73,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-24T13:53:11Z
-Stopped at: Completed 01-01-PLAN.md
-Resume file: .planning/phases/01-token-foundation/01-02-PLAN.md
+Last session: 2026-03-24T14:01:40.192Z
+Stopped at: Completed 01-02-PLAN.md
+Resume file: None
