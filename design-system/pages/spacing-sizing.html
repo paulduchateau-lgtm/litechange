@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Design System — Espacement et dimensions</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header { margin-bottom: var(--liteops-space-16); }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: #1C1D1A;
+      color: #E8E6E1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: background 200ms, color 200ms;
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: #F5F4F0;
+      color: #1C1D1A;
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: var(--liteops-space-16); }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    .section-note {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-secondary);
+      margin-bottom: var(--liteops-space-6);
+      max-width: 680px;
+    }
+
+    /* ── Spacing Scale ── */
+    .space-row {
+      display: flex;
+      align-items: center;
+      gap: var(--liteops-space-4);
+      margin-bottom: var(--liteops-space-3);
+    }
+
+    .space-token {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-secondary);
+      width: 180px;
+      flex-shrink: 0;
+    }
+
+    .space-bar {
+      height: 24px;
+      background: var(--liteops-accent-subtle);
+      border-left: 3px solid var(--liteops-accent-primary);
+      border-radius: 0 var(--liteops-radius-sm) var(--liteops-radius-sm) 0;
+      transition: width 200ms;
+    }
+
+    .space-value {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--liteops-text-tertiary);
+      white-space: nowrap;
+      width: 100px;
+      flex-shrink: 0;
+      text-align: right;
+    }
+
+    /* ── Radius Demo ── */
+    .radius-grid {
+      display: flex;
+      gap: var(--liteops-space-8);
+      flex-wrap: wrap;
+      margin-bottom: var(--liteops-space-6);
+    }
+
+    .radius-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--liteops-space-3);
+    }
+
+    .radius-box {
+      width: 80px;
+      height: 80px;
+      border: 1px solid var(--liteops-accent-primary);
+      background: var(--liteops-accent-subtle);
+    }
+
+    .radius-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-secondary);
+      text-align: center;
+    }
+
+    .radius-px {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      color: var(--liteops-text-tertiary);
+    }
+
+    /* ── Sizing Containers ── */
+    .sizing-demo {
+      margin-bottom: var(--liteops-space-6);
+    }
+
+    .sizing-container {
+      background: var(--liteops-surface-secondary);
+      border: 1px dashed var(--liteops-border-primary);
+      padding: var(--liteops-space-4);
+      border-radius: var(--liteops-radius-md);
+      margin-bottom: var(--liteops-space-4);
+      position: relative;
+    }
+
+    .sizing-container-inner {
+      background: var(--liteops-accent-subtle);
+      border: 1px dashed var(--liteops-accent-primary);
+      padding: var(--liteops-space-4);
+      border-radius: var(--liteops-radius-sm);
+    }
+
+    .sizing-tag {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-accent-text);
+      background: var(--liteops-accent-subtle);
+      padding: 2px 8px;
+      border-radius: var(--liteops-radius-sm);
+      display: inline-block;
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .sizing-text {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── 4px Grid Overlay ── */
+    .grid-demo {
+      position: relative;
+      background: var(--liteops-surface-secondary);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-6);
+      overflow: hidden;
+      border: 1px solid var(--liteops-border-secondary);
+    }
+
+    .grid-overlay {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, var(--liteops-accent-subtle) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--liteops-accent-subtle) 1px, transparent 1px);
+      background-size: 4px 4px;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    .grid-sample-card {
+      position: relative;
+      z-index: 1;
+      background: var(--liteops-surface-elevated);
+      border: 1px solid var(--liteops-border-primary);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-4);
+      max-width: 280px;
+      box-shadow: var(--liteops-shadow-sm);
+    }
+
+    .grid-sample-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .grid-sample-value {
+      font-family: var(--liteops-font-body);
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--liteops-text-primary);
+      font-variant-numeric: tabular-nums;
+      margin-bottom: var(--liteops-space-1);
+    }
+
+    .grid-sample-trend {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      color: var(--liteops-status-success);
+    }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark Mode</button>
+
+<div class="page">
+
+  <!-- ── Header ── -->
+  <header class="page-header">
+    <h1 class="page-title">Espacement et dimensions</h1>
+    <p class="page-subtitle">Grille 4px, echelle d'espacement, rayons de bordure et gabarits de largeur.</p>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 1: SPACING SCALE
+       ══════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section A — Echelle d'espacement</span>
+    <h2 class="section-heading">Spacing Scale</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Tous les espacements suivent une grille de base 4px. Douze valeurs couvrent l'ensemble des besoins, du micro-espacement interne (4px) aux marges de section (96px).
+    </p>
+
+    <div class="space-row">
+      <span class="space-token">--liteops-space-1</span>
+      <div class="space-bar" style="width: 4px;"></div>
+      <span class="space-value">4px / 0.25rem</span>
+    </div>
+    <div class="space-row">
+      <span class="space-token">--liteops-space-2</span>
+      <div class="space-bar" style="width: 8px;"></div>
+      <span class="space-value">8px / 0.5rem</span>
+    </div>
+    <div class="space-row">
+      <span class="space-token">--liteops-space-3</span>
+      <div class="space-bar" style="width: 12px;"></div>
+      <span class="space-value">12px / 0.75rem</span>
+    </div>
+    <div class="space-row">
+      <span class="space-token">--liteops-space-4</span>
+      <div class="space-bar" style="width: 16px;"></div>
+      <span class="space-value">16px / 1rem</span>
+    </div>
+    <div class="space-row">
+      <span class="space-token">--liteops-space-5</span>
+      <div class="space-bar" style="width: 20px;"></div>
+      <span class="space-value">20px / 1.25rem</span>
+    </div>
+    <div class="space-row">
+      <span class="space-token">--liteops-space-6</span>
+      <div class="space-bar" style="width: 24px;"></div>
+      <span class="space-value">24px / 1.5rem</span>
+    </div>
+    <div class="space-row">
+      <span class="space-token">--liteops-space-8</span>
+      <div class="space-bar" style="width: 32px;"></div>
+      <span class="space-value">32px / 2rem</span>
+    </div>
+    <div class="space-row">
+      <span class="space-token">--liteops-space-10</span>
+      <div class="space-bar" style="width: 40px;"></div>
+      <span class="space-value">40px / 2.5rem</span>
+    </div>
+    <div class="space-row">
+      <span class="space-token">--liteops-space-12</span>
+      <div class="space-bar" style="width: 48px;"></div>
+      <span class="space-value">48px / 3rem</span>
+    </div>
+    <div class="space-row">
+      <span class="space-token">--liteops-space-16</span>
+      <div class="space-bar" style="width: 64px;"></div>
+      <span class="space-value">64px / 4rem</span>
+    </div>
+    <div class="space-row">
+      <span class="space-token">--liteops-space-20</span>
+      <div class="space-bar" style="width: 80px;"></div>
+      <span class="space-value">80px / 5rem</span>
+    </div>
+    <div class="space-row">
+      <span class="space-token">--liteops-space-24</span>
+      <div class="space-bar" style="width: 96px;"></div>
+      <span class="space-value">96px / 6rem</span>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 2: BORDER RADIUS
+       ══════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section B — Rayons de bordure</span>
+    <h2 class="section-heading">Border Radius</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Quatre niveaux d'arrondi, du subtil (6px) au pill (9999px). Chaque composant utilise un rayon defini par son role.
+    </p>
+
+    <div class="radius-grid">
+      <div class="radius-item">
+        <div class="radius-box" style="border-radius: var(--liteops-radius-sm);"></div>
+        <span class="radius-label">--liteops-radius-sm</span>
+        <span class="radius-px">6px</span>
+      </div>
+      <div class="radius-item">
+        <div class="radius-box" style="border-radius: var(--liteops-radius-md);"></div>
+        <span class="radius-label">--liteops-radius-md</span>
+        <span class="radius-px">10px</span>
+      </div>
+      <div class="radius-item">
+        <div class="radius-box" style="border-radius: var(--liteops-radius-lg);"></div>
+        <span class="radius-label">--liteops-radius-lg</span>
+        <span class="radius-px">20px</span>
+      </div>
+      <div class="radius-item">
+        <div class="radius-box" style="border-radius: var(--liteops-radius-pill);"></div>
+        <span class="radius-label">--liteops-radius-pill</span>
+        <span class="radius-px">9999px</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 3: SIZING GUIDELINES
+       ══════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section C — Gabarits de largeur</span>
+    <h2 class="section-heading">Sizing Guidelines</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Deux largeurs maximales structurent la mise en page : 1140px pour le contenu global, 680px pour la prose editoriale.
+    </p>
+
+    <div class="sizing-demo">
+      <div class="sizing-container" style="max-width: 1140px;">
+        <span class="sizing-tag">max-width: 1140px — content</span>
+        <p class="sizing-text" style="margin-bottom: var(--liteops-space-4);">
+          Conteneur principal de la page. Tous les elements de contenu (tableaux, grilles de cartes, formulaires) s'inscrivent dans cette largeur.
+        </p>
+        <div class="sizing-container-inner" style="max-width: 680px;">
+          <span class="sizing-tag">max-width: 680px — prose</span>
+          <p class="sizing-text">
+            Conteneur de texte editorial. Optimise pour la lisibilite longue forme : rapports, descriptions, texte d'aide. Environ 65 a 75 caracteres par ligne.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4px Grid Concept -->
+    <h3 style="font-family: var(--liteops-font-display); font-size: 18px; font-weight: 600; margin-bottom: var(--liteops-space-3); margin-top: var(--liteops-space-8);">Grille de base 4px</h3>
+    <p class="section-note">
+      Tous les espacements, tailles et positionnements respectent des multiples de 4px. Ci-dessous, un composant KPI place sur la grille.
+    </p>
+
+    <div class="grid-demo">
+      <div class="grid-overlay"></div>
+      <div class="grid-sample-card">
+        <div class="grid-sample-label">Taux d'adoption</div>
+        <div class="grid-sample-value">78.4%</div>
+        <div class="grid-sample-trend">+2.3% ce trimestre</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>
