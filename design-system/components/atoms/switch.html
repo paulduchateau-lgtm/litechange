@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Atom -- Switch</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header {
+      margin-bottom: var(--liteops-space-16);
+    }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: #1C1D1A;
+      color: #E8E6E1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: background 200ms, color 200ms;
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: #F5F4F0;
+      color: #1C1D1A;
+    }
+
+    /* ── Section ── */
+    .section {
+      margin-bottom: var(--liteops-space-16);
+    }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    .showcase-grid {
+      display: flex;
+      flex-direction: column;
+      gap: var(--liteops-space-6);
+    }
+
+    .showcase-row {
+      display: flex;
+      gap: var(--liteops-space-8);
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    .showcase-item {
+      min-width: 200px;
+    }
+
+    .showcase-item-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-3);
+    }
+
+    /* ── Dark Theme Panel ── */
+    .dark-panel {
+      background: var(--liteops-olive-900);
+      border-radius: var(--liteops-radius-lg);
+      padding: var(--liteops-space-8);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       COMPONENT: Switch
+       ════════════════════════════════════════════════════════════════ */
+
+    .liteops-Switch {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--liteops-space-3);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .liteops-Switch__input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+
+    .liteops-Switch__track {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      border-radius: var(--liteops-radius-pill);
+      background: var(--liteops-border-primary);
+      transition: background var(--liteops-duration-normal) ease;
+      flex-shrink: 0;
+    }
+
+    .liteops-Switch__thumb {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--liteops-white);
+      transition: transform var(--liteops-duration-normal) ease;
+      box-shadow: var(--liteops-shadow-sm);
+    }
+
+    /* Checked state */
+    .liteops-Switch__input:checked + .liteops-Switch__track {
+      background: var(--liteops-interactive-primary);
+    }
+
+    .liteops-Switch__input:checked + .liteops-Switch__track .liteops-Switch__thumb {
+      transform: translateX(20px);
+    }
+
+    /* Focus */
+    .liteops-Switch__input:focus-visible + .liteops-Switch__track {
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+
+    /* Hover */
+    .liteops-Switch:hover .liteops-Switch__track {
+      background: var(--liteops-text-tertiary);
+    }
+
+    .liteops-Switch:hover .liteops-Switch__input:checked + .liteops-Switch__track {
+      background: var(--liteops-interactive-primary-hover);
+    }
+
+    /* Disabled */
+    .liteops-Switch.is-disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .liteops-Switch__label {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-primary);
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark Mode</button>
+
+<div class="page">
+
+  <!-- Header -->
+  <header class="page-header">
+    <h1 class="page-title">Switch</h1>
+    <p class="page-subtitle">Interrupteur binaire on/off avec etiquette accessible.</p>
+  </header>
+
+  <!-- Section: States -->
+  <section class="section">
+    <h2 class="section-heading">States</h2>
+    <span class="section-label">Switch / On &amp; Off</span>
+    <hr class="section-divider">
+    <div class="showcase-grid">
+      <div class="showcase-row">
+        <div class="showcase-item">
+          <p class="showcase-item-label">Off</p>
+          <label class="liteops-Switch">
+            <input type="checkbox" class="liteops-Switch__input">
+            <span class="liteops-Switch__track">
+              <span class="liteops-Switch__thumb"></span>
+            </span>
+            <span class="liteops-Switch__label">Notifications desactivees</span>
+          </label>
+        </div>
+        <div class="showcase-item">
+          <p class="showcase-item-label">On</p>
+          <label class="liteops-Switch">
+            <input type="checkbox" class="liteops-Switch__input" checked>
+            <span class="liteops-Switch__track">
+              <span class="liteops-Switch__thumb"></span>
+            </span>
+            <span class="liteops-Switch__label">Notifications activees</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: With Label -->
+  <section class="section">
+    <h2 class="section-heading">With Label</h2>
+    <span class="section-label">Switch / Labeled</span>
+    <hr class="section-divider">
+    <div class="showcase-grid">
+      <div class="showcase-row">
+        <div class="showcase-item">
+          <p class="showcase-item-label">Survey automation</p>
+          <label class="liteops-Switch">
+            <input type="checkbox" class="liteops-Switch__input" checked>
+            <span class="liteops-Switch__track">
+              <span class="liteops-Switch__thumb"></span>
+            </span>
+            <span class="liteops-Switch__label">Envoi automatique des enquetes</span>
+          </label>
+        </div>
+        <div class="showcase-item">
+          <p class="showcase-item-label">Anonymous mode</p>
+          <label class="liteops-Switch">
+            <input type="checkbox" class="liteops-Switch__input">
+            <span class="liteops-Switch__track">
+              <span class="liteops-Switch__thumb"></span>
+            </span>
+            <span class="liteops-Switch__label">Mode anonyme</span>
+          </label>
+        </div>
+        <div class="showcase-item">
+          <p class="showcase-item-label">Dark mode preference</p>
+          <label class="liteops-Switch">
+            <input type="checkbox" class="liteops-Switch__input" checked>
+            <span class="liteops-Switch__track">
+              <span class="liteops-Switch__thumb"></span>
+            </span>
+            <span class="liteops-Switch__label">Theme sombre</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Disabled -->
+  <section class="section">
+    <h2 class="section-heading">Disabled</h2>
+    <span class="section-label">Switch / Disabled</span>
+    <hr class="section-divider">
+    <div class="showcase-grid">
+      <div class="showcase-row">
+        <div class="showcase-item">
+          <p class="showcase-item-label">Disabled off</p>
+          <label class="liteops-Switch is-disabled">
+            <input type="checkbox" class="liteops-Switch__input" disabled>
+            <span class="liteops-Switch__track">
+              <span class="liteops-Switch__thumb"></span>
+            </span>
+            <span class="liteops-Switch__label">Fonctionnalite indisponible</span>
+          </label>
+        </div>
+        <div class="showcase-item">
+          <p class="showcase-item-label">Disabled on</p>
+          <label class="liteops-Switch is-disabled">
+            <input type="checkbox" class="liteops-Switch__input" checked disabled>
+            <span class="liteops-Switch__track">
+              <span class="liteops-Switch__thumb"></span>
+            </span>
+            <span class="liteops-Switch__label">Toujours actif (admin)</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Dark Theme -->
+  <section class="section">
+    <h2 class="section-heading">Dark Theme</h2>
+    <span class="section-label">Switch / Dark</span>
+    <hr class="section-divider">
+    <div class="dark-panel" data-theme="dark">
+      <div class="showcase-grid">
+        <div class="showcase-row">
+          <div class="showcase-item">
+            <p class="showcase-item-label" style="color: #8A8880;">Off</p>
+            <label class="liteops-Switch">
+              <input type="checkbox" class="liteops-Switch__input">
+              <span class="liteops-Switch__track">
+                <span class="liteops-Switch__thumb"></span>
+              </span>
+              <span class="liteops-Switch__label" style="color: #E8E6E1;">Alertes desactivees</span>
+            </label>
+          </div>
+          <div class="showcase-item">
+            <p class="showcase-item-label" style="color: #8A8880;">On</p>
+            <label class="liteops-Switch">
+              <input type="checkbox" class="liteops-Switch__input" checked>
+              <span class="liteops-Switch__track">
+                <span class="liteops-Switch__thumb"></span>
+              </span>
+              <span class="liteops-Switch__label" style="color: #E8E6E1;">Alertes activees</span>
+            </label>
+          </div>
+          <div class="showcase-item">
+            <p class="showcase-item-label" style="color: #8A8880;">Disabled on</p>
+            <label class="liteops-Switch is-disabled">
+              <input type="checkbox" class="liteops-Switch__input" checked disabled>
+              <span class="liteops-Switch__track">
+                <span class="liteops-Switch__thumb"></span>
+              </span>
+              <span class="liteops-Switch__label" style="color: #E8E6E1;">Verrouille</span>
+            </label>
+          </div>
+          <div class="showcase-item">
+            <p class="showcase-item-label" style="color: #8A8880;">Disabled off</p>
+            <label class="liteops-Switch is-disabled">
+              <input type="checkbox" class="liteops-Switch__input" disabled>
+              <span class="liteops-Switch__track">
+                <span class="liteops-Switch__thumb"></span>
+              </span>
+              <span class="liteops-Switch__label" style="color: #E8E6E1;">Indisponible</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>

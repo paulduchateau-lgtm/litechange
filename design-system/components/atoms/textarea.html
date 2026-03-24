@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Atom -- Textarea</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header {
+      margin-bottom: var(--liteops-space-16);
+    }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: #1C1D1A;
+      color: #E8E6E1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: background 200ms, color 200ms;
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: #F5F4F0;
+      color: #1C1D1A;
+    }
+
+    /* ── Section ── */
+    .section {
+      margin-bottom: var(--liteops-space-16);
+    }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    .showcase-grid {
+      display: flex;
+      flex-direction: column;
+      gap: var(--liteops-space-8);
+    }
+
+    .showcase-row {
+      display: flex;
+      gap: var(--liteops-space-8);
+      flex-wrap: wrap;
+    }
+
+    .showcase-item {
+      flex: 1;
+      min-width: 280px;
+      max-width: 480px;
+    }
+
+    .showcase-item-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-3);
+    }
+
+    /* ── Dark Theme Panel ── */
+    .dark-panel {
+      background: var(--liteops-olive-900);
+      border-radius: var(--liteops-radius-lg);
+      padding: var(--liteops-space-8);
+    }
+    .dark-panel [data-theme="dark"] {
+      /* inherits from parent */
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       COMPONENT: Textarea
+       ════════════════════════════════════════════════════════════════ */
+
+    .liteops-Textarea {
+      display: flex;
+      flex-direction: column;
+      gap: var(--liteops-space-1);
+    }
+
+    .liteops-Textarea__label {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-Textarea__field-wrapper {
+      position: relative;
+    }
+
+    .liteops-Textarea__field {
+      width: 100%;
+      min-height: 100px;
+      resize: vertical;
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      font-family: var(--liteops-font-body);
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--liteops-text-primary);
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-primary);
+      border-radius: var(--liteops-radius-sm);
+      transition: border-color var(--liteops-duration-normal) ease,
+                  box-shadow var(--liteops-duration-normal) ease;
+      outline: none;
+    }
+
+    .liteops-Textarea__field::placeholder {
+      color: var(--liteops-text-tertiary);
+    }
+
+    .liteops-Textarea__field:focus {
+      border-color: var(--liteops-border-focus);
+      box-shadow: 0 0 0 2px var(--liteops-border-focus);
+    }
+
+    .liteops-Textarea__field:focus-visible {
+      border-color: var(--liteops-border-focus);
+      box-shadow: 0 0 0 2px var(--liteops-border-focus);
+    }
+
+    /* Error state */
+    .liteops-Textarea.is-error .liteops-Textarea__field {
+      border-color: var(--liteops-border-error);
+    }
+
+    .liteops-Textarea.is-error .liteops-Textarea__field:focus {
+      box-shadow: 0 0 0 2px var(--liteops-border-error);
+    }
+
+    /* Disabled state */
+    .liteops-Textarea.is-disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .liteops-Textarea.is-disabled .liteops-Textarea__field {
+      background: var(--liteops-surface-tertiary);
+      cursor: not-allowed;
+      resize: none;
+    }
+
+    .liteops-Textarea__helper {
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+      color: var(--liteops-text-tertiary);
+    }
+
+    .liteops-Textarea__error {
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+      color: var(--liteops-status-error);
+    }
+
+    .liteops-Textarea__counter {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      color: var(--liteops-text-tertiary);
+      text-align: right;
+    }
+
+    .liteops-Textarea__counter.is-limit {
+      color: var(--liteops-status-error);
+    }
+
+    .liteops-Textarea__footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark Mode</button>
+
+<div class="page">
+
+  <!-- Header -->
+  <header class="page-header">
+    <h1 class="page-title">Textarea</h1>
+    <p class="page-subtitle">Zone de texte multiligne avec compteur de caracteres et redimensionnement vertical.</p>
+  </header>
+
+  <!-- Section: Default -->
+  <section class="section">
+    <h2 class="section-heading">Default</h2>
+    <span class="section-label">Textarea / Default</span>
+    <hr class="section-divider">
+    <div class="showcase-grid">
+      <div class="showcase-row">
+        <div class="showcase-item">
+          <p class="showcase-item-label">Default</p>
+          <div class="liteops-Textarea">
+            <label class="liteops-Textarea__label" for="ta-default">Description</label>
+            <div class="liteops-Textarea__field-wrapper">
+              <textarea class="liteops-Textarea__field" id="ta-default" placeholder="Decrivez le contexte du changement..."></textarea>
+            </div>
+            <div class="liteops-Textarea__helper">Hauteur ajustable</div>
+          </div>
+        </div>
+        <div class="showcase-item">
+          <p class="showcase-item-label">With content</p>
+          <div class="liteops-Textarea">
+            <label class="liteops-Textarea__label" for="ta-content">Observations terrain</label>
+            <div class="liteops-Textarea__field-wrapper">
+              <textarea class="liteops-Textarea__field" id="ta-content">Les equipes montrent une resistance au changement plus marquee dans le departement finance. Les entretiens individuels revelent une inquietude liee a la complexite des nouveaux outils.</textarea>
+            </div>
+            <div class="liteops-Textarea__helper">Hauteur ajustable</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: With Character Count -->
+  <section class="section">
+    <h2 class="section-heading">With Character Count</h2>
+    <span class="section-label">Textarea / Counter Pattern</span>
+    <hr class="section-divider">
+    <div class="showcase-grid">
+      <div class="showcase-row">
+        <div class="showcase-item">
+          <p class="showcase-item-label">Empty (0 / 500)</p>
+          <div class="liteops-Textarea">
+            <label class="liteops-Textarea__label" for="ta-count-empty">Commentaire</label>
+            <div class="liteops-Textarea__field-wrapper">
+              <textarea class="liteops-Textarea__field" id="ta-count-empty" placeholder="Ajoutez un commentaire..." maxlength="500"></textarea>
+            </div>
+            <div class="liteops-Textarea__footer">
+              <span class="liteops-Textarea__helper">Hauteur ajustable</span>
+              <span class="liteops-Textarea__counter">0 / 500</span>
+            </div>
+          </div>
+        </div>
+        <div class="showcase-item">
+          <p class="showcase-item-label">Partial (245 / 500)</p>
+          <div class="liteops-Textarea">
+            <label class="liteops-Textarea__label" for="ta-count-partial">Commentaire</label>
+            <div class="liteops-Textarea__field-wrapper">
+              <textarea class="liteops-Textarea__field" id="ta-count-partial" maxlength="500">Les equipes montrent une resistance au changement plus marquee dans le departement finance. Les entretiens individuels revelent une inquietude liee a la complexite des nouveaux outils de reporting.</textarea>
+            </div>
+            <div class="liteops-Textarea__footer">
+              <span class="liteops-Textarea__helper">Hauteur ajustable</span>
+              <span class="liteops-Textarea__counter">245 / 500</span>
+            </div>
+          </div>
+        </div>
+        <div class="showcase-item">
+          <p class="showcase-item-label">At limit (500 / 500)</p>
+          <div class="liteops-Textarea">
+            <label class="liteops-Textarea__label" for="ta-count-limit">Commentaire</label>
+            <div class="liteops-Textarea__field-wrapper">
+              <textarea class="liteops-Textarea__field" id="ta-count-limit" maxlength="500">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed.</textarea>
+            </div>
+            <div class="liteops-Textarea__footer">
+              <span class="liteops-Textarea__helper"></span>
+              <span class="liteops-Textarea__counter is-limit">500 / 500</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Error State -->
+  <section class="section">
+    <h2 class="section-heading">Error State</h2>
+    <span class="section-label">Textarea / Error</span>
+    <hr class="section-divider">
+    <div class="showcase-grid">
+      <div class="showcase-row">
+        <div class="showcase-item">
+          <p class="showcase-item-label">Error with message</p>
+          <div class="liteops-Textarea is-error">
+            <label class="liteops-Textarea__label" for="ta-error">Description du risque</label>
+            <div class="liteops-Textarea__field-wrapper">
+              <textarea class="liteops-Textarea__field" id="ta-error">Texte trop court.</textarea>
+            </div>
+            <div class="liteops-Textarea__footer">
+              <span class="liteops-Textarea__error">La description doit contenir au moins 50 caracteres.</span>
+              <span class="liteops-Textarea__counter">16 / 500</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Disabled -->
+  <section class="section">
+    <h2 class="section-heading">Disabled</h2>
+    <span class="section-label">Textarea / Disabled</span>
+    <hr class="section-divider">
+    <div class="showcase-grid">
+      <div class="showcase-row">
+        <div class="showcase-item">
+          <p class="showcase-item-label">Disabled with content</p>
+          <div class="liteops-Textarea is-disabled">
+            <label class="liteops-Textarea__label" for="ta-disabled">Rapport valide</label>
+            <div class="liteops-Textarea__field-wrapper">
+              <textarea class="liteops-Textarea__field" id="ta-disabled" disabled>Ce champ a ete verrouille apres validation par le comite de pilotage. Les modifications ne sont plus possibles.</textarea>
+            </div>
+            <div class="liteops-Textarea__helper">Champ verrouille</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Dark Theme -->
+  <section class="section">
+    <h2 class="section-heading">Dark Theme</h2>
+    <span class="section-label">Textarea / Dark</span>
+    <hr class="section-divider">
+    <div class="dark-panel" data-theme="dark">
+      <div class="showcase-grid">
+        <div class="showcase-row">
+          <div class="showcase-item">
+            <p class="showcase-item-label" style="color: var(--liteops-text-tertiary);">Default</p>
+            <div class="liteops-Textarea">
+              <label class="liteops-Textarea__label" for="ta-dark-default" style="color: #E8E6E1;">Description</label>
+              <div class="liteops-Textarea__field-wrapper">
+                <textarea class="liteops-Textarea__field" id="ta-dark-default" placeholder="Decrivez le contexte..."></textarea>
+              </div>
+              <div class="liteops-Textarea__helper">Hauteur ajustable</div>
+            </div>
+          </div>
+          <div class="showcase-item">
+            <p class="showcase-item-label" style="color: var(--liteops-text-tertiary);">With counter</p>
+            <div class="liteops-Textarea">
+              <label class="liteops-Textarea__label" for="ta-dark-counter" style="color: #E8E6E1;">Commentaire</label>
+              <div class="liteops-Textarea__field-wrapper">
+                <textarea class="liteops-Textarea__field" id="ta-dark-counter" maxlength="500">Analyse des retours terrain sur la phase de deploiement.</textarea>
+              </div>
+              <div class="liteops-Textarea__footer">
+                <span class="liteops-Textarea__helper">Hauteur ajustable</span>
+                <span class="liteops-Textarea__counter">56 / 500</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="showcase-row">
+          <div class="showcase-item">
+            <p class="showcase-item-label" style="color: var(--liteops-text-tertiary);">Error</p>
+            <div class="liteops-Textarea is-error">
+              <label class="liteops-Textarea__label" for="ta-dark-error" style="color: #E8E6E1;">Description du risque</label>
+              <div class="liteops-Textarea__field-wrapper">
+                <textarea class="liteops-Textarea__field" id="ta-dark-error">Court.</textarea>
+              </div>
+              <div class="liteops-Textarea__footer">
+                <span class="liteops-Textarea__error">Minimum 50 caracteres requis.</span>
+                <span class="liteops-Textarea__counter">6 / 500</span>
+              </div>
+            </div>
+          </div>
+          <div class="showcase-item">
+            <p class="showcase-item-label" style="color: var(--liteops-text-tertiary);">Disabled</p>
+            <div class="liteops-Textarea is-disabled">
+              <label class="liteops-Textarea__label" for="ta-dark-disabled" style="color: #E8E6E1;">Champ verrouille</label>
+              <div class="liteops-Textarea__field-wrapper">
+                <textarea class="liteops-Textarea__field" id="ta-dark-disabled" disabled>Contenu valide et verrouille.</textarea>
+              </div>
+              <div class="liteops-Textarea__helper">Champ verrouille</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>
