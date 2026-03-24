@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Token Foundation** - DTCG JSON source, Style Dictionary pipeline, CSS/Tailwind output, elevation/gradient/motion tokens, backward compat shim
 - [ ] **Phase 2: Atoms and Molecules** - All foundational components (buttons, inputs, badges, switches) and their compositions (KPI cards, alerts, form groups, nav items, tabs)
-- [ ] **Phase 3: Organisms** - Complex interface regions: sidebar, data table, modal, topbar, hero section, agent card, pipeline viz, card grid, content section, multi-select
+- [x] **Phase 3: Organisms** - Complex interface regions: sidebar, data table, modal, topbar, hero section, agent card, pipeline viz, card grid, content section, multi-select (completed 2026-03-24)
 - [ ] **Phase 4: Pages and Documentation** - Showcase master page, mockups (landing, dashboard, simulateur before/after), accessibility checklist, spacing docs, naming conventions, French copy
 
 ## Phase Details
@@ -96,5 +96,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 |-------|----------------|--------|-----------|
 | 1. Token Foundation | 0/2 | Not started | - |
 | 2. Atoms and Molecules | 0/5 | Not started | - |
-| 3. Organisms | 0/4 | Not started | - |
+| 3. Organisms | 4/4 | Complete   | 2026-03-24 |
 | 4. Pages and Documentation | 0/2 | Not started | - |
