@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Atom — Button</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header { margin-bottom: var(--liteops-space-16); }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--liteops-olive-900);
+      color: var(--liteops-paper-100);
+      box-shadow: var(--liteops-shadow-md);
+      transition: background var(--liteops-duration-normal), color var(--liteops-duration-normal);
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: var(--liteops-paper-100);
+      color: var(--liteops-olive-900);
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: var(--liteops-space-16); }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    /* ── Button Grid ── */
+    .button-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--liteops-space-4);
+      align-items: center;
+      margin-bottom: var(--liteops-space-6);
+    }
+
+    .variant-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      width: 100%;
+      margin-bottom: var(--liteops-space-1);
+    }
+
+    /* ═══════════════════════════════════════════════
+       BUTTON COMPONENT
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--liteops-space-2);
+      font-family: var(--liteops-font-body);
+      font-weight: 500;
+      border: 1px solid transparent;
+      border-radius: var(--liteops-radius-md);
+      cursor: pointer;
+      transition: all var(--liteops-duration-normal) ease;
+      text-decoration: none;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    /* ── Sizes ── */
+    .liteops-Button--sm { padding: 6px 16px; font-size: 13px; }
+    .liteops-Button--md { padding: 10px 24px; font-size: 15px; }
+    .liteops-Button--lg { padding: 14px 32px; font-size: 17px; }
+
+    /* ── Primary ── */
+    .liteops-Button--primary {
+      background: var(--liteops-interactive-primary);
+      color: var(--liteops-interactive-primary-text);
+    }
+    .liteops-Button--primary:hover {
+      background: var(--liteops-interactive-primary-hover);
+    }
+
+    /* ── Secondary ── */
+    .liteops-Button--secondary {
+      background: var(--liteops-interactive-secondary);
+      border-color: var(--liteops-border-primary);
+      color: var(--liteops-interactive-secondary-text);
+    }
+    .liteops-Button--secondary:hover {
+      background: var(--liteops-interactive-secondary-hover);
+    }
+
+    /* ── Ghost ── */
+    .liteops-Button--ghost {
+      background: transparent;
+      color: var(--liteops-text-primary);
+    }
+    .liteops-Button--ghost:hover {
+      background: var(--liteops-interactive-ghost-hover);
+    }
+
+    /* ── Danger ── */
+    .liteops-Button--danger {
+      background: var(--liteops-status-error);
+      color: var(--liteops-white);
+    }
+    .liteops-Button--danger:hover {
+      opacity: 0.9;
+    }
+
+    /* ── States ── */
+    .liteops-Button:focus-visible {
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+
+    .liteops-Button[disabled],
+    .liteops-Button.is-disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* ── Focus Demo Helper ── */
+    .focus-demo-hint {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-3);
+    }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark Mode</button>
+
+<div class="page">
+
+  <header class="page-header">
+    <h1 class="page-title">Button</h1>
+    <p class="page-subtitle">Interactive button atom — 4 variants, 3 sizes, focus/disabled states. All colors via design tokens.</p>
+  </header>
+
+  <!-- ── Variants x Sizes ── -->
+  <section class="section">
+    <h2 class="section-heading">Variants &times; Sizes</h2>
+    <span class="section-label">All combinations</span>
+    <hr class="section-divider">
+
+    <p class="variant-label">Primary</p>
+    <div class="button-grid">
+      <button class="liteops-Button liteops-Button--primary liteops-Button--sm">Small</button>
+      <button class="liteops-Button liteops-Button--primary liteops-Button--md">Medium</button>
+      <button class="liteops-Button liteops-Button--primary liteops-Button--lg">Large</button>
+    </div>
+
+    <p class="variant-label">Secondary</p>
+    <div class="button-grid">
+      <button class="liteops-Button liteops-Button--secondary liteops-Button--sm">Small</button>
+      <button class="liteops-Button liteops-Button--secondary liteops-Button--md">Medium</button>
+      <button class="liteops-Button liteops-Button--secondary liteops-Button--lg">Large</button>
+    </div>
+
+    <p class="variant-label">Ghost</p>
+    <div class="button-grid">
+      <button class="liteops-Button liteops-Button--ghost liteops-Button--sm">Small</button>
+      <button class="liteops-Button liteops-Button--ghost liteops-Button--md">Medium</button>
+      <button class="liteops-Button liteops-Button--ghost liteops-Button--lg">Large</button>
+    </div>
+
+    <p class="variant-label">Danger</p>
+    <div class="button-grid">
+      <button class="liteops-Button liteops-Button--danger liteops-Button--sm">Small</button>
+      <button class="liteops-Button liteops-Button--danger liteops-Button--md">Medium</button>
+      <button class="liteops-Button liteops-Button--danger liteops-Button--lg">Large</button>
+    </div>
+  </section>
+
+  <!-- ── Disabled States ── -->
+  <section class="section">
+    <h2 class="section-heading">Disabled States</h2>
+    <span class="section-label">Using disabled attribute and .is-disabled class</span>
+    <hr class="section-divider">
+
+    <div class="button-grid">
+      <button class="liteops-Button liteops-Button--primary liteops-Button--md" disabled>Primary disabled</button>
+      <button class="liteops-Button liteops-Button--secondary liteops-Button--md is-disabled">Secondary disabled</button>
+      <button class="liteops-Button liteops-Button--ghost liteops-Button--md" disabled>Ghost disabled</button>
+      <button class="liteops-Button liteops-Button--danger liteops-Button--md is-disabled">Danger disabled</button>
+    </div>
+  </section>
+
+  <!-- ── Focus Visible ── -->
+  <section class="section">
+    <h2 class="section-heading">Focus Visible</h2>
+    <span class="section-label">Tab through to see focus ring</span>
+    <hr class="section-divider">
+
+    <p class="focus-demo-hint">Press Tab to navigate through these buttons and observe the focus ring.</p>
+    <div class="button-grid">
+      <button class="liteops-Button liteops-Button--primary liteops-Button--md">Focusable Primary</button>
+      <button class="liteops-Button liteops-Button--secondary liteops-Button--md">Focusable Secondary</button>
+      <button class="liteops-Button liteops-Button--ghost liteops-Button--md">Focusable Ghost</button>
+      <button class="liteops-Button liteops-Button--danger liteops-Button--md">Focusable Danger</button>
+    </div>
+  </section>
+
+  <!-- ── With Icons (Slot Pattern) ── -->
+  <section class="section">
+    <h2 class="section-heading">With Icons</h2>
+    <span class="section-label">Inline SVG icon + text via flex gap</span>
+    <hr class="section-divider">
+
+    <div class="button-grid">
+      <button class="liteops-Button liteops-Button--primary liteops-Button--md">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
+        Ajouter
+      </button>
+      <button class="liteops-Button liteops-Button--secondary liteops-Button--md">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 5.5L6.5 12.5L2.5 8.5"/></svg>
+        Valider
+      </button>
+      <button class="liteops-Button liteops-Button--danger liteops-Button--sm">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>
+        Supprimer
+      </button>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>
