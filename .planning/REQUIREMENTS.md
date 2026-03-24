@@ -65,8 +65,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **PAGE-02**: Spacing and sizing scale visualization with 4px grid stops
 - [ ] **PAGE-03**: WCAG AA/AAA accessibility checklist with verified contrast ratios for all color combinations
 - [x] **PAGE-04**: Landing page mockup — full Cohere-style page with hero, security section, product showcase, testimonials, CTA
-- [ ] **PAGE-05**: Dashboard page mockup — KPI cards, data table, sidebar, topbar, charts area
-- [ ] **PAGE-06**: Before/after comparison page — simulateur-lite-ops current vs upgraded design side by side
+- [x] **PAGE-05**: Dashboard page mockup — KPI cards, data table, sidebar, topbar, charts area
+- [x] **PAGE-06**: Before/after comparison page — simulateur-lite-ops current vs upgraded design side by side
 
 ### Content & Voice
 
@@ -156,8 +156,8 @@ Deferred to future release. Tracked but not in current roadmap.
 | PAGE-02 | Phase 4 | Pending |
 | PAGE-03 | Phase 4 | Pending |
 | PAGE-04 | Phase 4 | Complete |
-| PAGE-05 | Phase 4 | Pending |
-| PAGE-06 | Phase 4 | Pending |
+| PAGE-05 | Phase 4 | Complete |
+| PAGE-06 | Phase 4 | Complete |
 | COPY-01 | Phase 4 | Pending |
 | COPY-02 | Phase 4 | Complete |
 
