@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Organism — Hero Section</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Showcase Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header { margin-bottom: var(--liteops-space-16); }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    .section { margin-bottom: var(--liteops-space-16); }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    /* ═══════════════════════════════════════════════
+       BUTTON COMPONENT (composed from atoms/button)
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--liteops-space-2);
+      font-family: var(--liteops-font-body);
+      font-weight: 500;
+      border: 1px solid transparent;
+      border-radius: var(--liteops-radius-md);
+      cursor: pointer;
+      transition: all var(--liteops-duration-normal) ease;
+      text-decoration: none;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .liteops-Button--sm { padding: 6px 16px; font-size: 13px; }
+    .liteops-Button--md { padding: 10px 24px; font-size: 15px; }
+    .liteops-Button--lg { padding: 14px 32px; font-size: 17px; }
+
+    .liteops-Button--primary {
+      background: var(--liteops-interactive-primary);
+      color: var(--liteops-interactive-primary-text);
+    }
+    .liteops-Button--primary:hover {
+      background: var(--liteops-interactive-primary-hover);
+    }
+
+    .liteops-Button--secondary {
+      background: var(--liteops-interactive-secondary);
+      border-color: var(--liteops-border-primary);
+      color: var(--liteops-interactive-secondary-text);
+    }
+    .liteops-Button--secondary:hover {
+      background: var(--liteops-interactive-secondary-hover);
+    }
+
+    .liteops-Button:focus-visible {
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       HERO SECTION ORGANISM
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Hero {
+      width: 100%;
+      min-height: 500px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .liteops-Hero--gradient-green-olive {
+      background: var(--liteops-gradient-hero-green-olive);
+    }
+
+    .liteops-Hero--gradient-green-black {
+      background: var(--liteops-gradient-hero-green-black);
+    }
+
+    .liteops-Hero--subtle {
+      background: var(--liteops-gradient-hero-subtle);
+      background-color: var(--liteops-paper-100);
+    }
+
+    .liteops-Hero__container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-24) var(--liteops-space-6);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--liteops-space-16);
+      align-items: center;
+      width: 100%;
+    }
+
+    .liteops-Hero__content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Dark gradient text ── */
+    .liteops-Hero--gradient-green-olive .liteops-Hero__heading,
+    .liteops-Hero--gradient-green-black .liteops-Hero__heading {
+      font-family: var(--liteops-font-display);
+      font-size: 56px;
+      font-weight: 700;
+      line-height: 1.1;
+      color: #E8E6E1;
+    }
+
+    .liteops-Hero--gradient-green-olive .liteops-Hero__subheading,
+    .liteops-Hero--gradient-green-black .liteops-Hero__subheading {
+      font-family: var(--liteops-font-body);
+      font-size: 18px;
+      line-height: 1.6;
+      color: #C0BEB8;
+      margin-top: var(--liteops-space-6);
+      max-width: 520px;
+    }
+
+    /* ── Subtle (light) text ── */
+    .liteops-Hero--subtle .liteops-Hero__heading {
+      font-family: var(--liteops-font-display);
+      font-size: 56px;
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--liteops-olive-900);
+    }
+
+    .liteops-Hero--subtle .liteops-Hero__subheading {
+      font-family: var(--liteops-font-body);
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--liteops-olive-600);
+      margin-top: var(--liteops-space-6);
+      max-width: 520px;
+    }
+
+    .liteops-Hero__actions {
+      display: flex;
+      flex-direction: row;
+      gap: var(--liteops-space-4);
+      margin-top: var(--liteops-space-8);
+    }
+
+    /* ── Secondary button override for dark gradient context ── */
+    .liteops-Hero--gradient-green-olive .liteops-Button--secondary,
+    .liteops-Hero--gradient-green-black .liteops-Button--secondary {
+      border-color: rgba(232, 230, 225, 0.3);
+      color: #E8E6E1;
+      background: transparent;
+    }
+    .liteops-Hero--gradient-green-olive .liteops-Button--secondary:hover,
+    .liteops-Hero--gradient-green-black .liteops-Button--secondary:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    /* ── Primary button on dark gradient ── */
+    .liteops-Hero--gradient-green-olive .liteops-Button--primary,
+    .liteops-Hero--gradient-green-black .liteops-Button--primary {
+      background: var(--liteops-lite-400);
+      color: var(--liteops-olive-900);
+    }
+    .liteops-Hero--gradient-green-olive .liteops-Button--primary:hover,
+    .liteops-Hero--gradient-green-black .liteops-Button--primary:hover {
+      background: var(--liteops-lite-300);
+    }
+
+    /* ── Visual placeholder ── */
+    .liteops-Hero__visual {
+      position: relative;
+    }
+
+    .liteops-Hero__visual-frame {
+      background: var(--liteops-olive-800);
+      border: 1px solid rgba(232, 230, 225, 0.1);
+      border-radius: var(--liteops-radius-lg);
+      padding: var(--liteops-space-6);
+      min-height: 340px;
+      box-shadow: 0 0 80px rgba(176, 216, 56, 0.15);
+      display: flex;
+      flex-direction: column;
+      gap: var(--liteops-space-4);
+    }
+
+    .liteops-Hero--subtle .liteops-Hero__visual-frame {
+      background: var(--liteops-white);
+      border-color: var(--liteops-paper-300);
+      box-shadow: var(--liteops-shadow-lg);
+    }
+
+    /* ── Mini dashboard sketch ── */
+    .hero-sketch__topbar {
+      display: flex;
+      gap: var(--liteops-space-2);
+      align-items: center;
+      padding-bottom: var(--liteops-space-3);
+      border-bottom: 1px solid rgba(232, 230, 225, 0.08);
+    }
+
+    .hero-sketch__dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(232, 230, 225, 0.15);
+    }
+    .hero-sketch__dot--accent {
+      background: var(--liteops-lite-400);
+      box-shadow: 0 0 6px rgba(176, 216, 56, 0.4);
+    }
+
+    .hero-sketch__bar {
+      flex: 1;
+      height: 8px;
+      border-radius: 4px;
+      background: rgba(232, 230, 225, 0.06);
+    }
+
+    .hero-sketch__kpis {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--liteops-space-3);
+    }
+
+    .hero-sketch__kpi {
+      background: rgba(232, 230, 225, 0.04);
+      border: 1px solid rgba(232, 230, 225, 0.06);
+      border-radius: var(--liteops-radius-sm);
+      padding: var(--liteops-space-3);
+      display: flex;
+      flex-direction: column;
+      gap: var(--liteops-space-1);
+    }
+
+    .hero-sketch__kpi-label {
+      width: 60%;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(232, 230, 225, 0.1);
+    }
+
+    .hero-sketch__kpi-value {
+      width: 40%;
+      height: 14px;
+      border-radius: 3px;
+      background: rgba(232, 230, 225, 0.12);
+    }
+
+    .hero-sketch__chart {
+      flex: 1;
+      background: rgba(232, 230, 225, 0.03);
+      border: 1px solid rgba(232, 230, 225, 0.06);
+      border-radius: var(--liteops-radius-sm);
+      padding: var(--liteops-space-3);
+      display: flex;
+      align-items: flex-end;
+      gap: var(--liteops-space-2);
+      min-height: 100px;
+    }
+
+    .hero-sketch__chart-bar {
+      flex: 1;
+      border-radius: 3px 3px 0 0;
+      background: var(--liteops-lite-400);
+      opacity: 0.3;
+    }
+    .hero-sketch__chart-bar:nth-child(2) { opacity: 0.45; }
+    .hero-sketch__chart-bar:nth-child(3) { opacity: 0.6; }
+    .hero-sketch__chart-bar:nth-child(4) { opacity: 0.5; }
+    .hero-sketch__chart-bar:nth-child(5) { opacity: 0.75; }
+    .hero-sketch__chart-bar:nth-child(6) { opacity: 0.65; }
+    .hero-sketch__chart-bar:nth-child(7) { opacity: 0.85; }
+
+    /* Light sketch variant */
+    .liteops-Hero--subtle .hero-sketch__topbar {
+      border-bottom-color: var(--liteops-paper-200);
+    }
+    .liteops-Hero--subtle .hero-sketch__dot {
+      background: var(--liteops-paper-300);
+    }
+    .liteops-Hero--subtle .hero-sketch__dot--accent {
+      background: var(--liteops-lite-700);
+      box-shadow: 0 0 6px rgba(107, 138, 26, 0.3);
+    }
+    .liteops-Hero--subtle .hero-sketch__bar {
+      background: var(--liteops-paper-200);
+    }
+    .liteops-Hero--subtle .hero-sketch__kpi {
+      background: var(--liteops-paper-50);
+      border-color: var(--liteops-paper-200);
+    }
+    .liteops-Hero--subtle .hero-sketch__kpi-label {
+      background: var(--liteops-paper-300);
+    }
+    .liteops-Hero--subtle .hero-sketch__kpi-value {
+      background: var(--liteops-paper-400);
+    }
+    .liteops-Hero--subtle .hero-sketch__chart {
+      background: var(--liteops-paper-50);
+      border-color: var(--liteops-paper-200);
+    }
+    .liteops-Hero--subtle .hero-sketch__chart-bar {
+      background: var(--liteops-lite-700);
+    }
+
+    /* ── Subtle variant button overrides ── */
+    .liteops-Hero--subtle .liteops-Button--primary {
+      background: var(--liteops-lite-700);
+      color: var(--liteops-white);
+    }
+    .liteops-Hero--subtle .liteops-Button--primary:hover {
+      background: var(--liteops-lite-800);
+    }
+    .liteops-Hero--subtle .liteops-Button--secondary {
+      border-color: var(--liteops-paper-400);
+      color: var(--liteops-olive-900);
+    }
+    .liteops-Hero--subtle .liteops-Button--secondary:hover {
+      background: var(--liteops-paper-200);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .liteops-Hero__container {
+        grid-template-columns: 1fr;
+        gap: var(--liteops-space-8);
+      }
+      .liteops-Hero--gradient-green-olive .liteops-Hero__heading,
+      .liteops-Hero--gradient-green-black .liteops-Hero__heading,
+      .liteops-Hero--subtle .liteops-Hero__heading {
+        font-size: 40px;
+      }
+    }
+
+    /* ── Gradient Rule Notice ── */
+    .gradient-notice {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      color: var(--liteops-text-tertiary);
+      background: var(--liteops-surface-tertiary);
+      border: 1px solid var(--liteops-border-secondary);
+      border-radius: var(--liteops-radius-sm);
+      padding: var(--liteops-space-4) var(--liteops-space-6);
+      line-height: 1.6;
+      max-width: 680px;
+    }
+
+    .gradient-notice strong {
+      color: var(--liteops-text-primary);
+    }
+
+    /* ── Animations ── */
+    @media (prefers-reduced-motion: no-preference) {
+      .liteops-Hero__content {
+        animation: heroFadeUp 600ms var(--liteops-easing-out) both;
+      }
+      .liteops-Hero__visual {
+        animation: heroFadeUp 600ms var(--liteops-easing-out) 150ms both;
+      }
+      @keyframes heroFadeUp {
+        from { opacity: 0; transform: translateY(16px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+  <header class="page-header">
+    <h1 class="page-title">Hero Section</h1>
+    <p class="page-subtitle">Landing page hero organism -- gradient background, bold Source Serif 4 heading, CTA buttons, product visual placeholder. Gradients are reserved for this organism only.</p>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════
+       1. Green-to-Olive Gradient
+       ═══════════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">Green-to-Olive Gradient</h2>
+    <span class="section-label">gradient-hero-green-olive</span>
+    <hr class="section-divider">
+  </section>
+</div>
+
+<section class="liteops-Hero liteops-Hero--gradient-green-olive">
+  <div class="liteops-Hero__container">
+    <div class="liteops-Hero__content">
+      <h1 class="liteops-Hero__heading">Observer le changement. Eclairer les decisions.</h1>
+      <p class="liteops-Hero__subheading">LiteOps donne aux institutions les outils d'observabilite pour mesurer, diagnostiquer et piloter leurs transformations. Fonde sur 15 ans de recherche academique.</p>
+      <div class="liteops-Hero__actions">
+        <button class="liteops-Button liteops-Button--primary liteops-Button--lg">Demander une demo</button>
+        <button class="liteops-Button liteops-Button--secondary liteops-Button--lg">Decouvrir la plateforme</button>
+      </div>
+    </div>
+    <div class="liteops-Hero__visual">
+      <div class="liteops-Hero__visual-frame">
+        <div class="hero-sketch__topbar">
+          <span class="hero-sketch__dot hero-sketch__dot--accent"></span>
+          <span class="hero-sketch__dot"></span>
+          <span class="hero-sketch__dot"></span>
+          <span class="hero-sketch__bar"></span>
+        </div>
+        <div class="hero-sketch__kpis">
+          <div class="hero-sketch__kpi">
+            <span class="hero-sketch__kpi-label"></span>
+            <span class="hero-sketch__kpi-value"></span>
+          </div>
+          <div class="hero-sketch__kpi">
+            <span class="hero-sketch__kpi-label"></span>
+            <span class="hero-sketch__kpi-value"></span>
+          </div>
+          <div class="hero-sketch__kpi">
+            <span class="hero-sketch__kpi-label"></span>
+            <span class="hero-sketch__kpi-value"></span>
+          </div>
+        </div>
+        <div class="hero-sketch__chart">
+          <div class="hero-sketch__chart-bar" style="height: 30%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 50%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 70%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 55%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 85%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 65%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 90%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="page">
+
+  <!-- ═══════════════════════════════════════════════
+       2. Green-to-Black Gradient
+       ═══════════════════════════════════════════════ -->
+  <section class="section" style="margin-top: var(--liteops-space-16);">
+    <h2 class="section-heading">Green-to-Black Gradient</h2>
+    <span class="section-label">gradient-hero-green-black</span>
+    <hr class="section-divider">
+  </section>
+</div>
+
+<section class="liteops-Hero liteops-Hero--gradient-green-black">
+  <div class="liteops-Hero__container">
+    <div class="liteops-Hero__content">
+      <h1 class="liteops-Hero__heading">Observer le changement. Eclairer les decisions.</h1>
+      <p class="liteops-Hero__subheading">LiteOps donne aux institutions les outils d'observabilite pour mesurer, diagnostiquer et piloter leurs transformations. Fonde sur 15 ans de recherche academique.</p>
+      <div class="liteops-Hero__actions">
+        <button class="liteops-Button liteops-Button--primary liteops-Button--lg">Demander une demo</button>
+        <button class="liteops-Button liteops-Button--secondary liteops-Button--lg">Decouvrir la plateforme</button>
+      </div>
+    </div>
+    <div class="liteops-Hero__visual">
+      <div class="liteops-Hero__visual-frame">
+        <div class="hero-sketch__topbar">
+          <span class="hero-sketch__dot hero-sketch__dot--accent"></span>
+          <span class="hero-sketch__dot"></span>
+          <span class="hero-sketch__dot"></span>
+          <span class="hero-sketch__bar"></span>
+        </div>
+        <div class="hero-sketch__kpis">
+          <div class="hero-sketch__kpi">
+            <span class="hero-sketch__kpi-label"></span>
+            <span class="hero-sketch__kpi-value"></span>
+          </div>
+          <div class="hero-sketch__kpi">
+            <span class="hero-sketch__kpi-label"></span>
+            <span class="hero-sketch__kpi-value"></span>
+          </div>
+          <div class="hero-sketch__kpi">
+            <span class="hero-sketch__kpi-label"></span>
+            <span class="hero-sketch__kpi-value"></span>
+          </div>
+        </div>
+        <div class="hero-sketch__chart">
+          <div class="hero-sketch__chart-bar" style="height: 40%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 60%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 45%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 75%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 55%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 80%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 70%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="page">
+
+  <!-- ═══════════════════════════════════════════════
+       3. Subtle Variant (Light Theme)
+       ═══════════════════════════════════════════════ -->
+  <section class="section" style="margin-top: var(--liteops-space-16);">
+    <h2 class="section-heading">Subtle Variant</h2>
+    <span class="section-label">gradient-hero-subtle on paper-100 background</span>
+    <hr class="section-divider">
+  </section>
+</div>
+
+<section class="liteops-Hero liteops-Hero--subtle">
+  <div class="liteops-Hero__container">
+    <div class="liteops-Hero__content">
+      <h1 class="liteops-Hero__heading">Observer le changement. Eclairer les decisions.</h1>
+      <p class="liteops-Hero__subheading">LiteOps donne aux institutions les outils d'observabilite pour mesurer, diagnostiquer et piloter leurs transformations. Fonde sur 15 ans de recherche academique.</p>
+      <div class="liteops-Hero__actions">
+        <button class="liteops-Button liteops-Button--primary liteops-Button--lg">Demander une demo</button>
+        <button class="liteops-Button liteops-Button--secondary liteops-Button--lg">Decouvrir la plateforme</button>
+      </div>
+    </div>
+    <div class="liteops-Hero__visual">
+      <div class="liteops-Hero__visual-frame">
+        <div class="hero-sketch__topbar">
+          <span class="hero-sketch__dot hero-sketch__dot--accent"></span>
+          <span class="hero-sketch__dot"></span>
+          <span class="hero-sketch__dot"></span>
+          <span class="hero-sketch__bar"></span>
+        </div>
+        <div class="hero-sketch__kpis">
+          <div class="hero-sketch__kpi">
+            <span class="hero-sketch__kpi-label"></span>
+            <span class="hero-sketch__kpi-value"></span>
+          </div>
+          <div class="hero-sketch__kpi">
+            <span class="hero-sketch__kpi-label"></span>
+            <span class="hero-sketch__kpi-value"></span>
+          </div>
+          <div class="hero-sketch__kpi">
+            <span class="hero-sketch__kpi-label"></span>
+            <span class="hero-sketch__kpi-value"></span>
+          </div>
+        </div>
+        <div class="hero-sketch__chart">
+          <div class="hero-sketch__chart-bar" style="height: 35%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 55%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 75%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 50%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 90%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 60%"></div>
+          <div class="hero-sketch__chart-bar" style="height: 80%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="page">
+
+  <!-- ═══════════════════════════════════════════════
+       4. Gradient Rule Notice
+       ═══════════════════════════════════════════════ -->
+  <section class="section" style="margin-top: var(--liteops-space-16);">
+    <h2 class="section-heading">Gradient Rule Notice</h2>
+    <span class="section-label">Design system constraint</span>
+    <hr class="section-divider">
+
+    <div class="gradient-notice">
+      <strong>Gradient backgrounds are reserved for the hero section only.</strong><br>
+      Dashboard organisms, content sections, card grids, and all other components use flat surface tokens
+      (<code>--liteops-surface-primary</code>, <code>--liteops-surface-secondary</code>, etc.).<br><br>
+      Available hero gradients:<br>
+      &bull; <code>--liteops-gradient-hero-green-olive</code> -- primary dark hero (green to olive 135deg)<br>
+      &bull; <code>--liteops-gradient-hero-green-black</code> -- deeper dark hero (green to black 135deg)<br>
+      &bull; <code>--liteops-gradient-hero-subtle</code> -- light hero (subtle green fade 180deg)
+    </div>
+  </section>
+
+</div>
+
+</body>
+</html>
