@@ -21,10 +21,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Atoms
 
-- [ ] **ATOM-01**: Button component family — primary, secondary, ghost, danger variants in sm/md/lg sizes with hover/focus/disabled states
-- [ ] **ATOM-02**: Badge/pill component — success, warning, error, info, accent variants with colored dot prefix
-- [ ] **ATOM-03**: Text input with label, placeholder, focus ring, error state, disabled state
-- [ ] **ATOM-04**: Select dropdown with custom styling matching input component
+- [x] **ATOM-01**: Button component family — primary, secondary, ghost, danger variants in sm/md/lg sizes with hover/focus/disabled states
+- [x] **ATOM-02**: Badge/pill component — success, warning, error, info, accent variants with colored dot prefix
+- [x] **ATOM-03**: Text input with label, placeholder, focus ring, error state, disabled state
+- [x] **ATOM-04**: Select dropdown with custom styling matching input component
 - [ ] **ATOM-05**: Textarea with auto-height behavior indication and character count pattern
 - [ ] **ATOM-06**: Switch/toggle component with on/off states and label
 - [ ] **ATOM-07**: Checkbox and radio button components with custom styling
@@ -121,10 +121,10 @@ Deferred to future release. Tracked but not in current roadmap.
 | TOKN-07 | Phase 1 | Complete |
 | TOKN-08 | Phase 1 | Complete |
 | TOKN-09 | Phase 1 | Complete |
-| ATOM-01 | Phase 2 | Pending |
-| ATOM-02 | Phase 2 | Pending |
-| ATOM-03 | Phase 2 | Pending |
-| ATOM-04 | Phase 2 | Pending |
+| ATOM-01 | Phase 2 | Complete |
+| ATOM-02 | Phase 2 | Complete |
+| ATOM-03 | Phase 2 | Complete |
+| ATOM-04 | Phase 2 | Complete |
 | ATOM-05 | Phase 2 | Pending |
 | ATOM-06 | Phase 2 | Pending |
 | ATOM-07 | Phase 2 | Pending |
