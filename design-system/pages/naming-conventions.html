@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Design System — Conventions de nommage</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header { margin-bottom: var(--liteops-space-16); }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: #1C1D1A;
+      color: #E8E6E1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: background 200ms, color 200ms;
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: #F5F4F0;
+      color: #1C1D1A;
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: var(--liteops-space-16); }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    .section-note {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-secondary);
+      margin-bottom: var(--liteops-space-6);
+      max-width: 680px;
+    }
+
+    /* ── Code Blocks ── */
+    .code-block {
+      background: #1C1D1A;
+      color: #E8E6E1;
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-4) var(--liteops-space-5);
+      font-family: var(--liteops-font-mono);
+      font-size: 13px;
+      line-height: 1.7;
+      overflow-x: auto;
+      margin-bottom: var(--liteops-space-6);
+    }
+
+    .code-block .kw { color: #B0D838; }
+    .code-block .val { color: #7AB4D4; }
+    .code-block .cmt { color: #6B7260; }
+    .code-block .str { color: #E8C46A; }
+
+    .code-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-2);
+      display: block;
+    }
+
+    /* ── Token Tiers Table ── */
+    .tier-table-wrap {
+      overflow-x: auto;
+      margin-bottom: var(--liteops-space-8);
+      border-radius: var(--liteops-radius-md);
+      border: 1px solid var(--liteops-border-secondary);
+    }
+
+    .tier-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+    }
+
+    .tier-table thead {
+      background: var(--liteops-surface-tertiary);
+    }
+
+    .tier-table th {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-secondary);
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      text-align: left;
+      border-bottom: 1px solid var(--liteops-border-secondary);
+    }
+
+    .tier-table td {
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      border-bottom: 1px solid var(--liteops-border-secondary);
+      vertical-align: top;
+    }
+
+    .tier-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .tier-table tr:hover {
+      background: var(--liteops-accent-subtle);
+    }
+
+    .token-example {
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      color: var(--liteops-accent-text);
+      background: var(--liteops-accent-subtle);
+      padding: 2px 6px;
+      border-radius: var(--liteops-radius-sm);
+      display: inline-block;
+    }
+
+    /* ── Component Taxonomy ── */
+    .taxonomy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--liteops-space-6);
+      margin-bottom: var(--liteops-space-6);
+    }
+
+    .taxonomy-card {
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-secondary);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-5);
+    }
+
+    .taxonomy-tier {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-accent-text);
+      margin-bottom: var(--liteops-space-1);
+    }
+
+    .taxonomy-title {
+      font-family: var(--liteops-font-display);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-3);
+    }
+
+    .taxonomy-list {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--liteops-space-2);
+    }
+
+    .taxonomy-item {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      color: var(--liteops-text-secondary);
+      background: var(--liteops-surface-tertiary);
+      padding: 3px 10px;
+      border-radius: 9999px;
+    }
+
+    /* ── File Structure ── */
+    .file-tree {
+      font-family: var(--liteops-font-mono);
+      font-size: 13px;
+      line-height: 2;
+      color: var(--liteops-text-secondary);
+      background: var(--liteops-surface-secondary);
+      border: 1px solid var(--liteops-border-secondary);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-5);
+    }
+
+    .file-tree .dir { color: var(--liteops-accent-text); font-weight: 500; }
+    .file-tree .file { color: var(--liteops-text-primary); }
+    .file-tree .desc { color: var(--liteops-text-tertiary); font-size: 11px; }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark Mode</button>
+
+<div class="page">
+
+  <!-- ── Header ── -->
+  <header class="page-header">
+    <h1 class="page-title">Conventions de nommage</h1>
+    <p class="page-subtitle">Classes BEM, tiers de tokens, taxonomie des composants et structure de fichiers.</p>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 1: BEM-LIKE CLASSES
+       ══════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section A — Classes CSS</span>
+    <h2 class="section-heading">BEM-like Naming</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Toutes les classes suivent une convention BEM adaptee, prefixee par <code>liteops-</code>. Le composant est en PascalCase, les elements et modificateurs en minuscules.
+    </p>
+
+    <span class="code-label">Pattern: composant</span>
+    <div class="code-block"><span class="cmt">/* Composant de base */</span>
+<span class="kw">.liteops-Component</span> { ... }
+
+<span class="cmt">/* Variante (modificateur) */</span>
+<span class="kw">.liteops-Component--variant</span> { ... }
+
+<span class="cmt">/* Element enfant */</span>
+<span class="kw">.liteops-Component__element</span> { ... }</div>
+
+    <span class="code-label">Pattern: etats</span>
+    <div class="code-block"><span class="cmt">/* Classes d'etat sur le wrapper */</span>
+<span class="kw">.is-error</span> { ... }
+<span class="kw">.is-disabled</span> { ... }
+<span class="kw">.is-active</span> { ... }
+<span class="kw">.is-hidden</span> { ... }
+
+<span class="cmt">/* L'etat cascade aux enfants */</span>
+<span class="kw">.liteops-Input.is-error</span> <span class="kw">.liteops-Input__field</span> {
+  <span class="kw">border-color</span>: <span class="kw">var</span>(<span class="val">--liteops-border-error</span>);
+}</div>
+
+    <span class="code-label">Exemples reels du design system</span>
+    <div class="code-block"><span class="cmt">/* Button */</span>
+<span class="kw">.liteops-Button</span>                    <span class="cmt">/* base */</span>
+<span class="kw">.liteops-Button--primary</span>            <span class="cmt">/* variante primaire */</span>
+<span class="kw">.liteops-Button--secondary</span>          <span class="cmt">/* variante secondaire */</span>
+<span class="kw">.liteops-Button--ghost</span>              <span class="cmt">/* variante ghost */</span>
+<span class="kw">.liteops-Button--sm</span>                 <span class="cmt">/* taille small */</span>
+<span class="kw">.liteops-Button--lg</span>                 <span class="cmt">/* taille large */</span>
+
+<span class="cmt">/* Badge */</span>
+<span class="kw">.liteops-Badge</span>                      <span class="cmt">/* base */</span>
+<span class="kw">.liteops-Badge--success</span>             <span class="cmt">/* variante succes */</span>
+<span class="kw">.liteops-Badge--warning</span>             <span class="cmt">/* variante attention */</span>
+<span class="kw">.liteops-Badge__dot</span>                 <span class="cmt">/* element point colore */</span>
+
+<span class="cmt">/* Hero Section */</span>
+<span class="kw">.liteops-Hero</span>                       <span class="cmt">/* base */</span>
+<span class="kw">.liteops-Hero__heading</span>              <span class="cmt">/* element titre */</span>
+<span class="kw">.liteops-Hero__subheading</span>           <span class="cmt">/* element sous-titre */</span>
+<span class="kw">.liteops-Hero__actions</span>              <span class="cmt">/* element conteneur boutons */</span>
+
+<span class="cmt">/* KPI Card */</span>
+<span class="kw">.liteops-KpiCard</span>                    <span class="cmt">/* base */</span>
+<span class="kw">.liteops-KpiCard__label</span>             <span class="cmt">/* element label */</span>
+<span class="kw">.liteops-KpiCard__value</span>             <span class="cmt">/* element valeur */</span>
+<span class="kw">.liteops-KpiCard__trend</span>             <span class="cmt">/* element tendance */</span>
+
+<span class="cmt">/* Data Table */</span>
+<span class="kw">.liteops-DataTable</span>                  <span class="cmt">/* base */</span>
+<span class="kw">.liteops-DataTable__header</span>          <span class="cmt">/* element en-tete */</span>
+<span class="kw">.liteops-DataTable__cell--numeric</span>   <span class="cmt">/* element + modificateur */</span></div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 2: TOKEN NAMING
+       ══════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section B — Tiers de tokens</span>
+    <h2 class="section-heading">Token Naming</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Les tokens CSS sont organises en trois tiers, du brut (valeurs fixes) au semantique (roles d'interface) puis au composant (proprietes specifiques).
+    </p>
+
+    <div class="tier-table-wrap">
+      <table class="tier-table">
+        <thead>
+          <tr>
+            <th scope="col">Tier</th>
+            <th scope="col">Pattern</th>
+            <th scope="col">Exemple</th>
+            <th scope="col">Usage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Tier 1 -- Raw</strong></td>
+            <td><span class="token-example">--liteops-{scale}-{step}</span></td>
+            <td><span class="token-example">--liteops-olive-900</span></td>
+            <td>Valeurs brutes de palette. Ne jamais utiliser directement en production.</td>
+          </tr>
+          <tr>
+            <td><strong>Tier 2 -- Semantic</strong></td>
+            <td><span class="token-example">--liteops-{role}-{variant}</span></td>
+            <td><span class="token-example">--liteops-text-primary</span></td>
+            <td>Tokens a usage direct. Referencent les Tier 1 et changent selon le theme.</td>
+          </tr>
+          <tr>
+            <td><strong>Tier 3 -- Component</strong></td>
+            <td><span class="token-example">--liteops-{component}-{property}</span></td>
+            <td><span class="token-example">--liteops-interactive-primary</span></td>
+            <td>Tokens specifiques a un contexte d'interaction ou de composant.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <span class="code-label">Exemples par tier</span>
+    <div class="code-block"><span class="cmt">/* Tier 1 — Raw palette (non-themed) */</span>
+<span class="kw">--liteops-olive-900</span>:  <span class="val">#1C1D1A</span>;
+<span class="kw">--liteops-paper-100</span>:  <span class="val">#F5F4F0</span>;
+<span class="kw">--liteops-lite-400</span>:   <span class="val">#B0D838</span>;
+<span class="kw">--liteops-space-4</span>:    <span class="val">16px</span>;
+<span class="kw">--liteops-radius-md</span>:  <span class="val">10px</span>;
+
+<span class="cmt">/* Tier 2 — Semantic (themed: light/dark) */</span>
+<span class="kw">--liteops-surface-primary</span>:  <span class="kw">var</span>(<span class="val">--liteops-paper-100</span>);
+<span class="kw">--liteops-text-primary</span>:    <span class="kw">var</span>(<span class="val">--liteops-olive-900</span>);
+<span class="kw">--liteops-accent-primary</span>:  <span class="kw">var</span>(<span class="val">--liteops-lite-700</span>);
+<span class="kw">--liteops-status-success</span>:  <span class="kw">var</span>(<span class="val">--liteops-success-500</span>);
+
+<span class="cmt">/* Tier 3 — Component (themed: light/dark) */</span>
+<span class="kw">--liteops-interactive-primary</span>:      <span class="kw">var</span>(<span class="val">--liteops-lite-700</span>);
+<span class="kw">--liteops-interactive-primary-text</span>: <span class="kw">var</span>(<span class="val">--liteops-white</span>);
+<span class="kw">--liteops-chart-primary</span>:            <span class="kw">var</span>(<span class="val">--liteops-lite-700</span>);</div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 3: COMPONENT STRUCTURE
+       ══════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section C — Taxonomie des composants</span>
+    <h2 class="section-heading">Component Structure</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Les composants sont organises en trois niveaux de complexite suivant la methodologie Atomic Design : atoms, molecules et organisms.
+    </p>
+
+    <div class="taxonomy-grid">
+      <div class="taxonomy-card">
+        <div class="taxonomy-tier">Atoms</div>
+        <h3 class="taxonomy-title">Elements de base</h3>
+        <ul class="taxonomy-list">
+          <li class="taxonomy-item">button</li>
+          <li class="taxonomy-item">badge</li>
+          <li class="taxonomy-item">input</li>
+          <li class="taxonomy-item">select</li>
+          <li class="taxonomy-item">textarea</li>
+          <li class="taxonomy-item">switch</li>
+          <li class="taxonomy-item">checkbox</li>
+          <li class="taxonomy-item">radio</li>
+          <li class="taxonomy-item">slider</li>
+          <li class="taxonomy-item">glass-panel</li>
+          <li class="taxonomy-item">skeleton</li>
+        </ul>
+      </div>
+      <div class="taxonomy-card">
+        <div class="taxonomy-tier">Molecules</div>
+        <h3 class="taxonomy-title">Composants composes</h3>
+        <ul class="taxonomy-list">
+          <li class="taxonomy-item">kpi-card</li>
+          <li class="taxonomy-item">alert</li>
+          <li class="taxonomy-item">form-group</li>
+          <li class="taxonomy-item">nav-item</li>
+          <li class="taxonomy-item">breadcrumb</li>
+          <li class="taxonomy-item">tab-pill</li>
+          <li class="taxonomy-item">progress-bar</li>
+          <li class="taxonomy-item">toast</li>
+        </ul>
+      </div>
+      <div class="taxonomy-card">
+        <div class="taxonomy-tier">Organisms</div>
+        <h3 class="taxonomy-title">Structures complexes</h3>
+        <ul class="taxonomy-list">
+          <li class="taxonomy-item">sidebar</li>
+          <li class="taxonomy-item">topbar</li>
+          <li class="taxonomy-item">data-table</li>
+          <li class="taxonomy-item">modal</li>
+          <li class="taxonomy-item">hero-section</li>
+          <li class="taxonomy-item">content-section</li>
+          <li class="taxonomy-item">card-grid</li>
+          <li class="taxonomy-item">agent-card</li>
+          <li class="taxonomy-item">pipeline-viz</li>
+          <li class="taxonomy-item">multi-select</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 4: FILE NAMING
+       ══════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section D — Structure de fichiers</span>
+    <h2 class="section-heading">File Naming</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Organisation des fichiers dans le design system. Chaque composant est un fichier HTML standalone dans son tier.
+    </p>
+
+    <div class="file-tree">
+      <span class="dir">design-system/</span><br>
+      &nbsp;&nbsp;<span class="dir">tokens/</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">liteops-tokens.css</span> <span class="desc">-- CSS custom properties (source of truth)</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">tailwind.config.js</span> <span class="desc">-- Tailwind theme extension</span><br>
+      &nbsp;&nbsp;<span class="dir">components/</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">atoms/</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">button.html</span> <span class="desc">-- .liteops-Button</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">badge.html</span> <span class="desc">-- .liteops-Badge</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">input.html</span> <span class="desc">-- .liteops-Input</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">...</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">molecules/</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">kpi-card.html</span> <span class="desc">-- .liteops-KpiCard</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">alert.html</span> <span class="desc">-- .liteops-Alert</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">...</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">organisms/</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">sidebar.html</span> <span class="desc">-- .liteops-Sidebar</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">data-table.html</span> <span class="desc">-- .liteops-DataTable</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">...</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">showcase.html</span> <span class="desc">-- Live component showcase</span><br>
+      &nbsp;&nbsp;<span class="dir">pages/</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">typography.html</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">color-palette.html</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">spacing-sizing.html</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">accessibility-checklist.html</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">naming-conventions.html</span><br>
+      &nbsp;&nbsp;<span class="dir">docs/</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">DESIGN-SYSTEM.md</span> <span class="desc">-- Full reference documentation</span><br>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>

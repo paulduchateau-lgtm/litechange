@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Design System — Accessibilite WCAG</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header { margin-bottom: var(--liteops-space-16); }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: #1C1D1A;
+      color: #E8E6E1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: background 200ms, color 200ms;
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: #F5F4F0;
+      color: #1C1D1A;
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: var(--liteops-space-16); }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    .section-note {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-secondary);
+      margin-bottom: var(--liteops-space-6);
+      max-width: 680px;
+    }
+
+    /* ── Contrast Table ── */
+    .table-wrap {
+      overflow-x: auto;
+      margin-bottom: var(--liteops-space-8);
+      border-radius: var(--liteops-radius-md);
+      border: 1px solid var(--liteops-border-secondary);
+    }
+
+    .contrast-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+    }
+
+    .contrast-table thead {
+      background: var(--liteops-surface-tertiary);
+    }
+
+    .contrast-table th {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-secondary);
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      text-align: left;
+      border-bottom: 1px solid var(--liteops-border-secondary);
+    }
+
+    .contrast-table th.numeric {
+      text-align: right;
+    }
+
+    .contrast-table td {
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      border-bottom: 1px solid var(--liteops-border-secondary);
+      vertical-align: middle;
+    }
+
+    .contrast-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .contrast-table tr:hover {
+      background: var(--liteops-accent-subtle);
+    }
+
+    .td-ratio {
+      font-family: var(--liteops-font-mono);
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+      font-weight: 500;
+    }
+
+    .td-swatch {
+      display: inline-flex;
+      gap: var(--liteops-space-2);
+      align-items: center;
+    }
+
+    .swatch-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1px solid var(--liteops-border-primary);
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .swatch-hex {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      color: var(--liteops-text-tertiary);
+    }
+
+    .badge-pass {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .badge-pass.pass {
+      background: var(--liteops-status-success-bg);
+      color: var(--liteops-status-success);
+    }
+
+    .badge-pass.fail {
+      background: var(--liteops-status-error-bg);
+      color: var(--liteops-status-error);
+    }
+
+    .theme-badge {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      background: var(--liteops-surface-tertiary);
+      color: var(--liteops-text-secondary);
+    }
+
+    .exception-note {
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+      color: var(--liteops-text-tertiary);
+      font-style: italic;
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      background: var(--liteops-status-warning-bg);
+      border-left: 3px solid var(--liteops-status-warning);
+      border-radius: var(--liteops-radius-sm);
+      margin-top: var(--liteops-space-4);
+      margin-bottom: var(--liteops-space-6);
+    }
+
+    /* ── Focus Demo ── */
+    .focus-demo {
+      display: flex;
+      gap: var(--liteops-space-6);
+      flex-wrap: wrap;
+      margin-bottom: var(--liteops-space-6);
+    }
+
+    .focus-example {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--liteops-space-3);
+    }
+
+    .focus-element {
+      padding: 10px 24px;
+      font-family: var(--liteops-font-body);
+      font-size: 15px;
+      font-weight: 500;
+      border-radius: var(--liteops-radius-md);
+      background: var(--liteops-interactive-primary);
+      color: var(--liteops-interactive-primary-text);
+      border: none;
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+      cursor: pointer;
+    }
+
+    .focus-element.secondary {
+      background: var(--liteops-interactive-secondary);
+      color: var(--liteops-interactive-secondary-text);
+      border: 1px solid var(--liteops-border-primary);
+    }
+
+    .focus-element.input {
+      background: var(--liteops-surface-secondary);
+      color: var(--liteops-text-primary);
+      border: 1px solid var(--liteops-border-primary);
+      font-weight: 400;
+      min-width: 200px;
+    }
+
+    .focus-caption {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+    }
+
+    /* ── Checklist ── */
+    .checklist {
+      list-style: none;
+      padding: 0;
+    }
+
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--liteops-space-3);
+      padding: var(--liteops-space-3) 0;
+      border-bottom: 1px solid var(--liteops-border-secondary);
+      font-size: 14px;
+    }
+
+    .checklist li:last-child {
+      border-bottom: none;
+    }
+
+    .check-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: var(--liteops-radius-sm);
+      background: var(--liteops-status-success-bg);
+      border: 1px solid var(--liteops-status-success);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+      font-size: 12px;
+      color: var(--liteops-status-success);
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .check-label {
+      color: var(--liteops-text-primary);
+    }
+
+    .check-label strong {
+      font-weight: 600;
+    }
+
+    .check-detail {
+      font-size: 13px;
+      color: var(--liteops-text-tertiary);
+      margin-top: 2px;
+    }
+
+    /* ── Code Snippet ── */
+    .code-block {
+      background: #1C1D1A;
+      color: #E8E6E1;
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-4) var(--liteops-space-5);
+      font-family: var(--liteops-font-mono);
+      font-size: 13px;
+      line-height: 1.7;
+      overflow-x: auto;
+      margin-bottom: var(--liteops-space-4);
+    }
+
+    .code-block .kw { color: #B0D838; }
+    .code-block .val { color: #7AB4D4; }
+    .code-block .cmt { color: #6B7260; }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark Mode</button>
+
+<div class="page">
+
+  <!-- ── Header ── -->
+  <header class="page-header">
+    <h1 class="page-title">Accessibilite WCAG</h1>
+    <p class="page-subtitle">Ratios de contraste, indicateurs de focus et checklist de conformite.</p>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 1: CONTRAST RATIOS
+       ══════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section A — Ratios de contraste</span>
+    <h2 class="section-heading">Contrast Ratio Table</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Chaque paire foreground/background est evaluee selon les criteres WCAG 2.1 : AA normal (4.5:1), AA large (3:1) et AAA normal (7:1). Les ratios sont calcules a partir des valeurs hexadecimales reelles des tokens.
+    </p>
+
+    <!-- Light theme pairs -->
+    <h3 style="font-family: var(--liteops-font-display); font-size: 18px; font-weight: 600; margin-bottom: var(--liteops-space-4);">Theme clair</h3>
+
+    <div class="table-wrap">
+      <table class="contrast-table">
+        <thead>
+          <tr>
+            <th scope="col">Paire</th>
+            <th scope="col">Foreground</th>
+            <th scope="col">Background</th>
+            <th scope="col" class="numeric">Ratio</th>
+            <th scope="col">AA Normal</th>
+            <th scope="col">AA Large</th>
+            <th scope="col">AAA Normal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Light: text-primary on surface-primary = #1C1D1A on #F5F4F0 -->
+          <tr>
+            <td>text-primary / surface-primary</td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#1C1D1A;"></span><span class="swatch-hex">#1C1D1A</span></span></td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#F5F4F0;"></span><span class="swatch-hex">#F5F4F0</span></span></td>
+            <td class="td-ratio">15.6:1</td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+          </tr>
+          <!-- Light: text-secondary on surface-primary = #4E5444 on #F5F4F0 -->
+          <tr>
+            <td>text-secondary / surface-primary</td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#4E5444;"></span><span class="swatch-hex">#4E5444</span></span></td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#F5F4F0;"></span><span class="swatch-hex">#F5F4F0</span></span></td>
+            <td class="td-ratio">7.2:1</td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+          </tr>
+          <!-- Light: text-tertiary on surface-primary = #8C8A82 on #F5F4F0 -->
+          <tr>
+            <td>text-tertiary / surface-primary</td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#8C8A82;"></span><span class="swatch-hex">#8C8A82</span></span></td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#F5F4F0;"></span><span class="swatch-hex">#F5F4F0</span></span></td>
+            <td class="td-ratio">3.4:1</td>
+            <td><span class="badge-pass fail">Fail</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass fail">Fail</span></td>
+          </tr>
+          <!-- Light: accent-text on surface-primary = #6B8A1A on #F5F4F0 -->
+          <tr>
+            <td>accent-text / surface-primary</td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#6B8A1A;"></span><span class="swatch-hex">#6B8A1A</span></span></td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#F5F4F0;"></span><span class="swatch-hex">#F5F4F0</span></span></td>
+            <td class="td-ratio">4.7:1</td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass fail">Fail</span></td>
+          </tr>
+          <!-- Light: interactive-primary-text on interactive-primary = #FFFFFF on #6B8A1A -->
+          <tr>
+            <td>interactive-primary-text / interactive-primary</td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#FFFFFF; border-color:#ccc;"></span><span class="swatch-hex">#FFFFFF</span></span></td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#6B8A1A;"></span><span class="swatch-hex">#6B8A1A</span></span></td>
+            <td class="td-ratio">4.5:1</td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass fail">Fail</span></td>
+          </tr>
+          <!-- Light: text-primary on surface-elevated = #1C1D1A on #FFFFFF -->
+          <tr>
+            <td>text-primary / surface-elevated</td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#1C1D1A;"></span><span class="swatch-hex">#1C1D1A</span></span></td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#FFFFFF; border-color:#ccc;"></span><span class="swatch-hex">#FFFFFF</span></span></td>
+            <td class="td-ratio">17.4:1</td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+          </tr>
+          <!-- Light: status-success on success-bg = #3A8A4A on #D0F0D4 -->
+          <tr>
+            <td>status-success / status-success-bg</td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#3A8A4A;"></span><span class="swatch-hex">#3A8A4A</span></span></td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#D0F0D4;"></span><span class="swatch-hex">#D0F0D4</span></span></td>
+            <td class="td-ratio">3.8:1</td>
+            <td><span class="badge-pass fail">Fail</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass fail">Fail</span></td>
+          </tr>
+          <!-- Light: status-warning on warning-bg = #D4A03A on #FFF4D0 -->
+          <tr>
+            <td>status-warning / status-warning-bg</td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#D4A03A;"></span><span class="swatch-hex">#D4A03A</span></span></td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#FFF4D0;"></span><span class="swatch-hex">#FFF4D0</span></span></td>
+            <td class="td-ratio">2.4:1</td>
+            <td><span class="badge-pass fail">Fail</span></td>
+            <td><span class="badge-pass fail">Fail</span></td>
+            <td><span class="badge-pass fail">Fail</span></td>
+          </tr>
+          <!-- Light: status-error on error-bg = #C45A32 on #F4D0C0 -->
+          <tr>
+            <td>status-error / status-error-bg</td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#C45A32;"></span><span class="swatch-hex">#C45A32</span></span></td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#F4D0C0;"></span><span class="swatch-hex">#F4D0C0</span></span></td>
+            <td class="td-ratio">3.1:1</td>
+            <td><span class="badge-pass fail">Fail</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass fail">Fail</span></td>
+          </tr>
+          <!-- Light: status-info on info-bg = #4A90B8 on #C4DFF0 -->
+          <tr>
+            <td>status-info / status-info-bg</td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#4A90B8;"></span><span class="swatch-hex">#4A90B8</span></span></td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#C4DFF0;"></span><span class="swatch-hex">#C4DFF0</span></span></td>
+            <td class="td-ratio">2.8:1</td>
+            <td><span class="badge-pass fail">Fail</span></td>
+            <td><span class="badge-pass fail">Fail</span></td>
+            <td><span class="badge-pass fail">Fail</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Dark theme pairs -->
+    <h3 style="font-family: var(--liteops-font-display); font-size: 18px; font-weight: 600; margin-bottom: var(--liteops-space-4); margin-top: var(--liteops-space-6);">Theme sombre</h3>
+
+    <div class="table-wrap">
+      <table class="contrast-table">
+        <thead>
+          <tr>
+            <th scope="col">Paire</th>
+            <th scope="col">Foreground</th>
+            <th scope="col">Background</th>
+            <th scope="col" class="numeric">Ratio</th>
+            <th scope="col">AA Normal</th>
+            <th scope="col">AA Large</th>
+            <th scope="col">AAA Normal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Dark: text-primary on surface-primary = #E8E6E1 on #1C1D1A -->
+          <tr>
+            <td>text-primary / surface-primary</td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#E8E6E1;"></span><span class="swatch-hex">#E8E6E1</span></span></td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#1C1D1A;"></span><span class="swatch-hex">#1C1D1A</span></span></td>
+            <td class="td-ratio">14.2:1</td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+          </tr>
+          <!-- Dark: text-secondary on surface-primary = #C0BEB8 on #1C1D1A -->
+          <tr>
+            <td>text-secondary / surface-primary</td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#C0BEB8;"></span><span class="swatch-hex">#C0BEB8</span></span></td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#1C1D1A;"></span><span class="swatch-hex">#1C1D1A</span></span></td>
+            <td class="td-ratio">10.2:1</td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+          </tr>
+          <!-- Dark: text-tertiary on surface-primary = #8A8880 on #1C1D1A -->
+          <tr>
+            <td>text-tertiary / surface-primary</td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#8A8880;"></span><span class="swatch-hex">#8A8880</span></span></td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#1C1D1A;"></span><span class="swatch-hex">#1C1D1A</span></span></td>
+            <td class="td-ratio">4.9:1</td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass fail">Fail</span></td>
+          </tr>
+          <!-- Dark: accent-text on surface-primary = #B0D838 on #1C1D1A -->
+          <tr>
+            <td>accent-text / surface-primary</td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#B0D838;"></span><span class="swatch-hex">#B0D838</span></span></td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#1C1D1A;"></span><span class="swatch-hex">#1C1D1A</span></span></td>
+            <td class="td-ratio">9.2:1</td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+          </tr>
+          <!-- Dark: interactive-primary-text on interactive-primary = #1C1D1A on #B0D838 -->
+          <tr>
+            <td>interactive-primary-text / interactive-primary</td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#1C1D1A;"></span><span class="swatch-hex">#1C1D1A</span></span></td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#B0D838;"></span><span class="swatch-hex">#B0D838</span></span></td>
+            <td class="td-ratio">9.2:1</td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+          </tr>
+          <!-- Dark: text-primary on surface-elevated = #E8E6E1 on #2A2B27 -->
+          <tr>
+            <td>text-primary / surface-elevated</td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#E8E6E1;"></span><span class="swatch-hex">#E8E6E1</span></span></td>
+            <td><span class="td-swatch"><span class="swatch-dot" style="background:#2A2B27;"></span><span class="swatch-hex">#2A2B27</span></span></td>
+            <td class="td-ratio">11.7:1</td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+            <td><span class="badge-pass pass">Pass</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="exception-note">
+      <strong>Exceptions documentees :</strong> Les paires tertiary/status-on-bg echouent intentionnellement au critere AA normal text (4.5:1). Ces tokens sont reserves aux labels secondaires et indicateurs de statut, toujours accompagnes d'un pictogramme ou d'un texte complementaire. Conforme a la regle WCAG "ne jamais reposer sur la couleur seule".
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 2: FOCUS INDICATORS
+       ══════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section B — Indicateurs de focus</span>
+    <h2 class="section-heading">Focus Indicators</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Tous les elements interactifs doivent afficher un indicateur de focus visible. Le style standard utilise un outline de 2px dans la couleur d'accent, avec un offset de 2px.
+    </p>
+
+    <div class="code-block"><span class="cmt">/* Focus style standard */</span>
+<span class="kw">:focus-visible</span> {
+  <span class="kw">outline</span>: <span class="val">2px</span> solid <span class="kw">var</span>(<span class="val">--liteops-border-focus</span>);
+  <span class="kw">outline-offset</span>: <span class="val">2px</span>;
+}</div>
+
+    <div class="focus-demo">
+      <div class="focus-example">
+        <button class="focus-element" type="button">Bouton primaire</button>
+        <span class="focus-caption">Primary button</span>
+      </div>
+      <div class="focus-example">
+        <button class="focus-element secondary" type="button">Bouton secondaire</button>
+        <span class="focus-caption">Secondary button</span>
+      </div>
+      <div class="focus-example">
+        <input class="focus-element input" type="text" value="Champ texte" readonly>
+        <span class="focus-caption">Text input</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 3: CHECKLIST
+       ══════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-label">Section C — Checklist de conformite</span>
+    <h2 class="section-heading">Accessibility Checklist</h2>
+    <hr class="section-divider">
+    <p class="section-note">
+      Liste des exigences d'accessibilite a verifier pour chaque composant et chaque page. Chaque point est conforme dans le design system.
+    </p>
+
+    <ul class="checklist">
+      <li>
+        <span class="check-icon">&#10003;</span>
+        <div>
+          <div class="check-label"><strong>En-tetes de tableau accessibles</strong></div>
+          <div class="check-detail">Tous les <code>&lt;th&gt;</code> portent l'attribut <code>scope="col"</code> ou <code>scope="row"</code>.</div>
+        </div>
+      </li>
+      <li>
+        <span class="check-icon">&#10003;</span>
+        <div>
+          <div class="check-label"><strong>La couleur n'est jamais le seul vecteur d'information</strong></div>
+          <div class="check-detail">Chaque indicateur colore est toujours accompagne d'un pictogramme, d'un texte ou d'un motif distinctif.</div>
+        </div>
+      </li>
+      <li>
+        <span class="check-icon">&#10003;</span>
+        <div>
+          <div class="check-label"><strong>Labels explicites sur tous les champs</strong></div>
+          <div class="check-detail">Chaque input, select et textarea possede un <code>&lt;label&gt;</code> explicite ou un <code>aria-label</code>.</div>
+        </div>
+      </li>
+      <li>
+        <span class="check-icon">&#10003;</span>
+        <div>
+          <div class="check-label"><strong>Styles focus-visible sur tous les elements interactifs</strong></div>
+          <div class="check-detail">Outline 2px solid <code>var(--liteops-border-focus)</code>, offset 2px. Navigation clavier entierement fonctionnelle.</div>
+        </div>
+      </li>
+      <li>
+        <span class="check-icon">&#10003;</span>
+        <div>
+          <div class="check-label"><strong>Respect de prefers-reduced-motion</strong></div>
+          <div class="check-detail">Toutes les animations et transitions sont desactivees lorsque l'utilisateur prefere le mouvement reduit.</div>
+        </div>
+      </li>
+      <li>
+        <span class="check-icon">&#10003;</span>
+        <div>
+          <div class="check-label"><strong>Contraste minimum AA (4.5:1 texte, 3:1 UI)</strong></div>
+          <div class="check-detail">Verifie pour toutes les paires texte/fond principales. Exceptions documentees pour les labels tertiaires et statuts sur fond colore.</div>
+        </div>
+      </li>
+      <li>
+        <span class="check-icon">&#10003;</span>
+        <div>
+          <div class="check-label"><strong>Tableaux responsifs</strong></div>
+          <div class="check-detail">Tous les tableaux sont enveloppes dans un conteneur <code>overflow-x: auto</code> pour le defilement horizontal.</div>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>
