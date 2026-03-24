@@ -29,10 +29,10 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **ATOM-06**: Switch/toggle component with on/off states and label
 - [x] **ATOM-07**: Checkbox and radio button components with custom styling
 - [x] **ATOM-08**: Slider/range input for simulateur-style numeric controls
-- [ ] **ATOM-09**: Glassmorphism panel component (frosted backdrop-filter with subtle border)
-- [ ] **ATOM-10**: Skeleton loading states — rectangular, circular, and text-line variants
-- [ ] **ATOM-11**: Typography showcase page displaying all 3 font families with sizes, weights, and use cases
-- [ ] **ATOM-12**: Color palette documentation page with full scales, semantic mappings, and verified contrast ratios
+- [x] **ATOM-09**: Glassmorphism panel component (frosted backdrop-filter with subtle border)
+- [x] **ATOM-10**: Skeleton loading states — rectangular, circular, and text-line variants
+- [x] **ATOM-11**: Typography showcase page displaying all 3 font families with sizes, weights, and use cases
+- [x] **ATOM-12**: Color palette documentation page with full scales, semantic mappings, and verified contrast ratios
 
 ### Molecules
 
@@ -129,10 +129,10 @@ Deferred to future release. Tracked but not in current roadmap.
 | ATOM-06 | Phase 2 | Complete |
 | ATOM-07 | Phase 2 | Complete |
 | ATOM-08 | Phase 2 | Complete |
-| ATOM-09 | Phase 2 | Pending |
-| ATOM-10 | Phase 2 | Pending |
-| ATOM-11 | Phase 2 | Pending |
-| ATOM-12 | Phase 2 | Pending |
+| ATOM-09 | Phase 2 | Complete |
+| ATOM-10 | Phase 2 | Complete |
+| ATOM-11 | Phase 2 | Complete |
+| ATOM-12 | Phase 2 | Complete |
 | MOLC-01 | Phase 2 | Pending |
 | MOLC-02 | Phase 2 | Pending |
 | MOLC-03 | Phase 2 | Pending |
