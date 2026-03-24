@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteOps Organism — Modal</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../tokens/liteops-tokens.css">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--liteops-font-body);
+      background-color: var(--liteops-surface-primary);
+      color: var(--liteops-text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .page-header { margin-bottom: var(--liteops-space-16); }
+
+    .page-title {
+      font-family: var(--liteops-font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--liteops-font-body);
+      font-size: 16px;
+      color: var(--liteops-text-secondary);
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: var(--liteops-font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--liteops-olive-900);
+      color: var(--liteops-paper-100);
+      box-shadow: var(--liteops-shadow-md);
+      transition: background var(--liteops-duration-normal), color var(--liteops-duration-normal);
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: var(--liteops-paper-100);
+      color: var(--liteops-olive-900);
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: var(--liteops-space-16); }
+
+    .section-heading {
+      font-family: var(--liteops-font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .section-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      display: block;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--liteops-border-secondary);
+      margin-bottom: var(--liteops-space-8);
+    }
+
+    .section-note {
+      font-family: var(--liteops-font-mono);
+      font-size: 11px;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-6);
+      padding: var(--liteops-space-3) var(--liteops-space-4);
+      background: var(--liteops-surface-tertiary);
+      border-radius: var(--liteops-radius-sm);
+      border-left: 3px solid var(--liteops-status-info);
+    }
+
+    /* ── Dark Panel ── */
+    .dark-panel {
+      background: var(--liteops-olive-900);
+      border-radius: var(--liteops-radius-md);
+      padding: var(--liteops-space-8);
+      margin-top: var(--liteops-space-4);
+    }
+
+    .dark-panel-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--liteops-paper-600);
+      margin-bottom: var(--liteops-space-4);
+      display: block;
+    }
+
+    /* ── Size Variants Layout ── */
+    .modal-showcase-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--liteops-space-6);
+      align-items: flex-start;
+    }
+
+    /* ═══════════════════════════════════════════════
+       BUTTON COMPONENT (composed from atoms/button)
+       ═══════════════════════════════════════════════ */
+
+    .liteops-Button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--liteops-space-2);
+      font-family: var(--liteops-font-body);
+      font-weight: 500;
+      border: 1px solid transparent;
+      border-radius: var(--liteops-radius-md);
+      cursor: pointer;
+      transition: all var(--liteops-duration-normal) ease;
+      text-decoration: none;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .liteops-Button--sm { padding: 6px 16px; font-size: 13px; }
+    .liteops-Button--md { padding: 10px 24px; font-size: 15px; }
+
+    .liteops-Button--primary {
+      background: var(--liteops-interactive-primary);
+      color: var(--liteops-interactive-primary-text);
+    }
+    .liteops-Button--primary:hover {
+      background: var(--liteops-interactive-primary-hover);
+    }
+
+    .liteops-Button--secondary {
+      background: var(--liteops-interactive-secondary);
+      border-color: var(--liteops-border-primary);
+      color: var(--liteops-interactive-secondary-text);
+    }
+    .liteops-Button--secondary:hover {
+      background: var(--liteops-interactive-secondary-hover);
+    }
+
+    .liteops-Button--ghost {
+      background: transparent;
+      color: var(--liteops-text-primary);
+    }
+    .liteops-Button--ghost:hover {
+      background: var(--liteops-interactive-ghost-hover);
+    }
+
+    .liteops-Button--danger {
+      background: var(--liteops-status-error);
+      color: var(--liteops-white);
+    }
+    .liteops-Button--danger:hover {
+      opacity: 0.9;
+    }
+
+    .liteops-Button:focus-visible {
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       MODAL COMPONENT
+       ═══════════════════════════════════════════════ */
+
+    /*
+      NOTE: In production, .liteops-Modal__overlay uses position: fixed
+      with inset: 0 to cover the viewport. For this showcase, overlays
+      are rendered statically (position: relative) so all variants are
+      visible without interaction.
+    */
+
+    .liteops-Modal__overlay {
+      /* Production: position: fixed; inset: 0; z-index: 50; */
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--liteops-surface-overlay);
+      border-radius: var(--liteops-radius-lg);
+      padding: var(--liteops-space-10) var(--liteops-space-6);
+    }
+
+    .liteops-Modal__content {
+      background: var(--liteops-surface-secondary);
+      border-radius: var(--liteops-radius-lg);
+      box-shadow: var(--liteops-shadow-2xl);
+      max-height: 85vh;
+      overflow-y: auto;
+      border: 1px solid var(--liteops-border-secondary);
+      width: 100%;
+    }
+
+    /* ── Size Variants ── */
+    .liteops-Modal--sm .liteops-Modal__content { max-width: 400px; }
+    .liteops-Modal--md .liteops-Modal__content { max-width: 560px; }
+    .liteops-Modal--lg .liteops-Modal__content { max-width: 720px; }
+
+    /* ── Header ── */
+    .liteops-Modal__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--liteops-space-6);
+      border-bottom: 1px solid var(--liteops-border-secondary);
+    }
+
+    .liteops-Modal__title {
+      font-family: var(--liteops-font-body);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--liteops-text-primary);
+      line-height: 1.3;
+    }
+
+    .liteops-Modal__close {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: var(--liteops-radius-sm);
+      background: transparent;
+      color: var(--liteops-text-tertiary);
+      cursor: pointer;
+      transition: background var(--liteops-duration-fast), color var(--liteops-duration-fast);
+      flex-shrink: 0;
+    }
+
+    .liteops-Modal__close:hover {
+      background: var(--liteops-interactive-ghost-hover);
+      color: var(--liteops-text-primary);
+    }
+
+    .liteops-Modal__close:focus-visible {
+      outline: 2px solid var(--liteops-border-focus);
+      outline-offset: 2px;
+    }
+
+    /* ── Body ── */
+    .liteops-Modal__body {
+      padding: var(--liteops-space-6);
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ── Footer ── */
+    .liteops-Modal__footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--liteops-space-3);
+      padding: var(--liteops-space-4) var(--liteops-space-6);
+      border-top: 1px solid var(--liteops-border-secondary);
+      background: var(--liteops-surface-tertiary);
+      border-radius: 0 0 var(--liteops-radius-lg) var(--liteops-radius-lg);
+    }
+
+    /* ── Form Group (for form modal) ── */
+    .liteops-FormGroup {
+      margin-bottom: var(--liteops-space-5);
+    }
+
+    .liteops-FormGroup:last-child {
+      margin-bottom: 0;
+    }
+
+    .liteops-FormGroup__label {
+      display: block;
+      font-family: var(--liteops-font-body);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--liteops-text-primary);
+      margin-bottom: var(--liteops-space-1);
+    }
+
+    .liteops-FormGroup__input {
+      width: 100%;
+      padding: var(--liteops-space-2) var(--liteops-space-3);
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-primary);
+      background: var(--liteops-surface-primary);
+      border: 1px solid var(--liteops-border-primary);
+      border-radius: var(--liteops-radius-sm);
+      transition: border-color var(--liteops-duration-fast);
+      line-height: 1.5;
+    }
+
+    .liteops-FormGroup__input:focus {
+      outline: none;
+      border-color: var(--liteops-border-focus);
+      box-shadow: 0 0 0 2px var(--liteops-accent-subtle);
+    }
+
+    .liteops-FormGroup__input::placeholder {
+      color: var(--liteops-text-disabled);
+    }
+
+    textarea.liteops-FormGroup__input {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    select.liteops-FormGroup__input {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%238C8A82' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+
+    .liteops-FormGroup__helper {
+      display: block;
+      font-family: var(--liteops-font-body);
+      font-size: 12px;
+      color: var(--liteops-text-tertiary);
+      margin-top: var(--liteops-space-1);
+    }
+
+    /* ── Detail Modal Sections ── */
+    .modal-detail-section {
+      margin-bottom: var(--liteops-space-5);
+    }
+
+    .modal-detail-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .modal-detail-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+      margin-bottom: var(--liteops-space-2);
+    }
+
+    .modal-detail-value {
+      font-family: var(--liteops-font-body);
+      font-size: 14px;
+      color: var(--liteops-text-primary);
+      line-height: 1.6;
+    }
+
+    .modal-detail-kpi-row {
+      display: flex;
+      gap: var(--liteops-space-8);
+      margin-top: var(--liteops-space-2);
+    }
+
+    .modal-detail-kpi {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-detail-kpi-value {
+      font-family: var(--liteops-font-body);
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--liteops-text-primary);
+    }
+
+    .modal-detail-kpi-label {
+      font-family: var(--liteops-font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--liteops-text-tertiary);
+    }
+
+    /* ── Warning text in confirmation ── */
+    .modal-warning-text {
+      color: var(--liteops-status-error);
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark Mode</button>
+
+<div class="page">
+
+  <header class="page-header">
+    <h1 class="page-title">Modal</h1>
+    <p class="page-subtitle">Dialog overlay organism with 3 size variants, close button, header/body/footer sections. Composes Button atoms for action bars.</p>
+  </header>
+
+  <p class="section-note">
+    These modals are rendered statically for showcase purposes. In production, the overlay uses <code>position: fixed; inset: 0; z-index: 50</code> to cover the viewport, centered with flexbox.
+  </p>
+
+  <!-- ══════════════════════════════════════════
+       Section 1: Size Variants
+       ══════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">Size Variants</h2>
+    <span class="section-label">Small (400px), Medium (560px), Large (720px)</span>
+    <hr class="section-divider">
+
+    <div class="modal-showcase-grid">
+
+      <!-- SM -->
+      <div class="liteops-Modal liteops-Modal--sm" style="flex: 0 0 auto; width: 400px;">
+        <div class="liteops-Modal__overlay">
+          <div class="liteops-Modal__content" role="dialog" aria-modal="true" aria-labelledby="modal-sm-title">
+            <div class="liteops-Modal__header">
+              <h3 class="liteops-Modal__title" id="modal-sm-title">Petite modale</h3>
+              <button class="liteops-Modal__close" aria-label="Fermer">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>
+              </button>
+            </div>
+            <div class="liteops-Modal__body">
+              <p>Contenu compact pour confirmations rapides ou messages courts. La largeur maximale est de 400 pixels.</p>
+            </div>
+            <div class="liteops-Modal__footer">
+              <button class="liteops-Button liteops-Button--secondary liteops-Button--sm">Annuler</button>
+              <button class="liteops-Button liteops-Button--primary liteops-Button--sm">Confirmer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MD -->
+      <div class="liteops-Modal liteops-Modal--md" style="flex: 0 0 auto; width: 560px;">
+        <div class="liteops-Modal__overlay">
+          <div class="liteops-Modal__content" role="dialog" aria-modal="true" aria-labelledby="modal-md-title">
+            <div class="liteops-Modal__header">
+              <h3 class="liteops-Modal__title" id="modal-md-title">Modale standard</h3>
+              <button class="liteops-Modal__close" aria-label="Fermer">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>
+              </button>
+            </div>
+            <div class="liteops-Modal__body">
+              <p>Taille par defaut pour la plupart des interactions : formulaires, details, confirmations avec contexte. La largeur maximale est de 560 pixels, suffisante pour la majorite des cas d'usage.</p>
+            </div>
+            <div class="liteops-Modal__footer">
+              <button class="liteops-Button liteops-Button--secondary liteops-Button--sm">Annuler</button>
+              <button class="liteops-Button liteops-Button--primary liteops-Button--sm">Confirmer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- LG (full width below) -->
+    <div style="margin-top: var(--liteops-space-6);">
+      <div class="liteops-Modal liteops-Modal--lg" style="max-width: 720px;">
+        <div class="liteops-Modal__overlay">
+          <div class="liteops-Modal__content" role="dialog" aria-modal="true" aria-labelledby="modal-lg-title">
+            <div class="liteops-Modal__header">
+              <h3 class="liteops-Modal__title" id="modal-lg-title">Grande modale</h3>
+              <button class="liteops-Modal__close" aria-label="Fermer">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>
+              </button>
+            </div>
+            <div class="liteops-Modal__body">
+              <p>Modale large pour les vues de detail, les formulaires complexes ou les contenus enrichis. Largeur maximale de 720 pixels. Utiliser pour les cas necessitant plus d'espace horizontal : tableaux embarques, vues comparatives, previsualisations.</p>
+            </div>
+            <div class="liteops-Modal__footer">
+              <button class="liteops-Button liteops-Button--secondary liteops-Button--sm">Annuler</button>
+              <button class="liteops-Button liteops-Button--primary liteops-Button--sm">Confirmer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       Section 2: Confirmation Dialog
+       ══════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">Confirmation Dialog</h2>
+    <span class="section-label">Destructive action confirmation &mdash; small modal with danger button</span>
+    <hr class="section-divider">
+
+    <div class="liteops-Modal liteops-Modal--sm" style="max-width: 400px;">
+      <div class="liteops-Modal__overlay">
+        <div class="liteops-Modal__content" role="dialog" aria-modal="true" aria-labelledby="modal-confirm-title">
+          <div class="liteops-Modal__header">
+            <h3 class="liteops-Modal__title" id="modal-confirm-title">Supprimer cette initiative ?</h3>
+            <button class="liteops-Modal__close" aria-label="Fermer">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>
+            </button>
+          </div>
+          <div class="liteops-Modal__body">
+            <p>L'initiative <strong>"Migration SI Finance"</strong> et toutes ses donnees associees (enquetes, signaux, plan d'action) seront definitivement supprimees.</p>
+            <p style="margin-top: var(--liteops-space-3);" class="modal-warning-text">Cette action est irreversible.</p>
+          </div>
+          <div class="liteops-Modal__footer">
+            <button class="liteops-Button liteops-Button--secondary liteops-Button--sm">Annuler</button>
+            <button class="liteops-Button liteops-Button--danger liteops-Button--sm">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 3 14 13 14 13 6"/><line x1="1" y1="6" x2="15" y2="6"/><line x1="6" y1="3" x2="10" y2="3"/><line x1="6" y1="9" x2="6" y2="12"/><line x1="10" y1="9" x2="10" y2="12"/></svg>
+              Supprimer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       Section 3: Form Modal
+       ══════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">Form Modal</h2>
+    <span class="section-label">Creation form &mdash; medium modal with input fields</span>
+    <hr class="section-divider">
+
+    <div class="liteops-Modal liteops-Modal--md" style="max-width: 560px;">
+      <div class="liteops-Modal__overlay">
+        <div class="liteops-Modal__content" role="dialog" aria-modal="true" aria-labelledby="modal-form-title">
+          <div class="liteops-Modal__header">
+            <h3 class="liteops-Modal__title" id="modal-form-title">Nouvelle initiative</h3>
+            <button class="liteops-Modal__close" aria-label="Fermer">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>
+            </button>
+          </div>
+          <div class="liteops-Modal__body">
+            <div class="liteops-FormGroup">
+              <label class="liteops-FormGroup__label" for="init-name">Nom de l'initiative</label>
+              <input type="text" id="init-name" class="liteops-FormGroup__input" placeholder="Ex : Migration SI Finance">
+              <span class="liteops-FormGroup__helper">Nom court et descriptif de l'initiative de changement.</span>
+            </div>
+
+            <div class="liteops-FormGroup">
+              <label class="liteops-FormGroup__label" for="init-sponsor">Sponsor</label>
+              <select id="init-sponsor" class="liteops-FormGroup__input">
+                <option value="" disabled selected>Selectionner un sponsor</option>
+                <option>M. Lefebvre — DSI</option>
+                <option>Mme Dubois — DRH</option>
+                <option>M. Martin — Direction Generale</option>
+                <option>Mme Bernard — Direction Commerciale</option>
+              </select>
+            </div>
+
+            <div class="liteops-FormGroup">
+              <label class="liteops-FormGroup__label" for="init-type">Type de changement</label>
+              <select id="init-type" class="liteops-FormGroup__input">
+                <option value="" disabled selected>Selectionner un type</option>
+                <option>Transformation organisationnelle</option>
+                <option>Transformation digitale</option>
+                <option>Fusion / Acquisition</option>
+                <option>Deploiement outil</option>
+                <option>Changement reglementaire</option>
+              </select>
+            </div>
+
+            <div class="liteops-FormGroup">
+              <label class="liteops-FormGroup__label" for="init-desc">Description</label>
+              <textarea id="init-desc" class="liteops-FormGroup__input" placeholder="Decrivez les objectifs et le perimetre de l'initiative..."></textarea>
+              <span class="liteops-FormGroup__helper">Optionnel. Visible par les acteurs du projet.</span>
+            </div>
+          </div>
+          <div class="liteops-Modal__footer">
+            <button class="liteops-Button liteops-Button--secondary liteops-Button--sm">Annuler</button>
+            <button class="liteops-Button liteops-Button--primary liteops-Button--sm">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
+              Creer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       Section 4: Detail Modal
+       ══════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">Detail Modal</h2>
+    <span class="section-label">Read-only detail view &mdash; large modal with structured content</span>
+    <hr class="section-divider">
+
+    <div class="liteops-Modal liteops-Modal--lg" style="max-width: 720px;">
+      <div class="liteops-Modal__overlay">
+        <div class="liteops-Modal__content" role="dialog" aria-modal="true" aria-labelledby="modal-detail-title">
+          <div class="liteops-Modal__header">
+            <h3 class="liteops-Modal__title" id="modal-detail-title">Details de l'initiative</h3>
+            <button class="liteops-Modal__close" aria-label="Fermer">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>
+            </button>
+          </div>
+          <div class="liteops-Modal__body">
+            <div class="modal-detail-section">
+              <p class="modal-detail-label">Initiative</p>
+              <p class="modal-detail-value" style="font-size: 16px; font-weight: 600;">Migration SI Finance</p>
+            </div>
+
+            <div class="modal-detail-section">
+              <p class="modal-detail-label">Description</p>
+              <p class="modal-detail-value">Migration complete du systeme d'information financier vers la nouvelle plateforme cloud. Ce projet impacte l'ensemble des equipes comptables, financieres et de controle de gestion sur 12 sites. L'objectif est de moderniser les outils tout en maintenant la continuite operationnelle pendant la transition.</p>
+            </div>
+
+            <div class="modal-detail-section">
+              <div class="modal-detail-kpi-row">
+                <div class="modal-detail-kpi">
+                  <span class="modal-detail-kpi-value">72%</span>
+                  <span class="modal-detail-kpi-label">Avancement</span>
+                </div>
+                <div class="modal-detail-kpi">
+                  <span class="modal-detail-kpi-value">14</span>
+                  <span class="modal-detail-kpi-label">Signaux actifs</span>
+                </div>
+                <div class="modal-detail-kpi">
+                  <span class="modal-detail-kpi-value">847</span>
+                  <span class="modal-detail-kpi-label">Collaborateurs impactes</span>
+                </div>
+                <div class="modal-detail-kpi">
+                  <span class="modal-detail-kpi-value">4.2</span>
+                  <span class="modal-detail-kpi-label">Score adoption</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-detail-section">
+              <p class="modal-detail-label">Sponsor</p>
+              <p class="modal-detail-value">M. Lefebvre — Directeur des Systemes d'Information</p>
+            </div>
+
+            <div class="modal-detail-section">
+              <p class="modal-detail-label">Periode</p>
+              <p class="modal-detail-value">Septembre 2025 &mdash; Juin 2026 (10 mois)</p>
+            </div>
+
+            <div class="modal-detail-section">
+              <p class="modal-detail-label">Derniere mise a jour</p>
+              <p class="modal-detail-value">12 mars 2026 par M. Lefebvre</p>
+            </div>
+          </div>
+          <div class="liteops-Modal__footer">
+            <button class="liteops-Button liteops-Button--ghost liteops-Button--sm">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 2L14 5L5 14H2V11L11 2Z"/></svg>
+              Modifier
+            </button>
+            <button class="liteops-Button liteops-Button--secondary liteops-Button--sm">Fermer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       Section 5: Dark Theme
+       ══════════════════════════════════════════ -->
+  <section class="section">
+    <h2 class="section-heading">Dark Theme</h2>
+    <span class="section-label">Medium modal on dark background via data-theme="dark"</span>
+    <hr class="section-divider">
+
+    <div class="dark-panel" data-theme="dark">
+      <span class="dark-panel-label">Dark context</span>
+      <div class="liteops-Modal liteops-Modal--md" style="max-width: 560px;">
+        <div class="liteops-Modal__overlay" style="background: var(--liteops-surface-overlay);">
+          <div class="liteops-Modal__content" role="dialog" aria-modal="true" aria-labelledby="modal-dark-title">
+            <div class="liteops-Modal__header">
+              <h3 class="liteops-Modal__title" id="modal-dark-title">Confirmer l'envoi</h3>
+              <button class="liteops-Modal__close" aria-label="Fermer">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>
+              </button>
+            </div>
+            <div class="liteops-Modal__body">
+              <p>L'enquete de satisfaction sera envoyee a 847 collaborateurs impactes par l'initiative "Migration SI Finance". Les resultats seront disponibles sous 48 heures.</p>
+              <p style="margin-top: var(--liteops-space-3);">Souhaitez-vous proceder a l'envoi ?</p>
+            </div>
+            <div class="liteops-Modal__footer">
+              <button class="liteops-Button liteops-Button--secondary liteops-Button--sm">Annuler</button>
+              <button class="liteops-Button liteops-Button--primary liteops-Button--sm">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3L8 8L2 13V3Z"/><line x1="10" y1="3" x2="10" y2="13"/></svg>
+                Envoyer
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Theme Toggle Script ── -->
+<script>
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+</script>
+
+</body>
+</html>
