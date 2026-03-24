@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:tokens": "node design-system/tokens/build.mjs"
+    "build:tokens": "node design-system/tokens/build.mjs",
+    "validate:tokens": "node design-system/tokens/validate.mjs"
   },
   "repository": {
     "type": "git",
