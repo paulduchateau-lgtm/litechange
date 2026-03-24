@@ -1,16 +1,26 @@
 {
   "shadow": {
     "light": {
-      "sm": { "$type": "shadow", "$value": { "offsetX": "0", "offsetY": "1px", "blur": "2px", "spread": "0", "color": "rgba(28, 29, 26, 0.05)" } },
-      "md": { "$type": "shadow", "$value": { "offsetX": "0", "offsetY": "4px", "blur": "12px", "spread": "0", "color": "rgba(28, 29, 26, 0.08)" } },
-      "lg": { "$type": "shadow", "$value": { "offsetX": "0", "offsetY": "12px", "blur": "40px", "spread": "0", "color": "rgba(28, 29, 26, 0.1)" } },
-      "xl": { "$type": "shadow", "$value": { "offsetX": "0", "offsetY": "24px", "blur": "80px", "spread": "0", "color": "rgba(28, 29, 26, 0.14)" } }
+      "xs":  { "$type": "shadow", "$value": { "offsetX": "0", "offsetY": "1px", "blur": "2px", "spread": "0", "color": "rgba(28, 29, 26, 0.03)" } },
+      "sm":  { "$type": "shadow", "$value": { "offsetX": "0", "offsetY": "1px", "blur": "3px", "spread": "0", "color": "rgba(28, 29, 26, 0.05)" } },
+      "md":  { "$type": "shadow", "$value": { "offsetX": "0", "offsetY": "4px", "blur": "12px", "spread": "0", "color": "rgba(28, 29, 26, 0.08)" } },
+      "lg":  { "$type": "shadow", "$value": { "offsetX": "0", "offsetY": "12px", "blur": "40px", "spread": "0", "color": "rgba(28, 29, 26, 0.1)" } },
+      "xl":  { "$type": "shadow", "$value": [
+        { "offsetX": "0", "offsetY": "20px", "blur": "25px", "spread": "-5px", "color": "rgba(28, 29, 26, 0.12)" },
+        { "offsetX": "0", "offsetY": "8px", "blur": "10px", "spread": "-6px", "color": "rgba(28, 29, 26, 0.06)" }
+      ]},
+      "2xl": { "$type": "shadow", "$value": { "offsetX": "0", "offsetY": "25px", "blur": "50px", "spread": "-12px", "color": "rgba(28, 29, 26, 0.18)" } }
     },
     "dark": {
-      "sm": { "$type": "shadow", "$value": { "offsetX": "0", "offsetY": "1px", "blur": "2px", "spread": "0", "color": "rgba(0, 0, 0, 0.2)" } },
-      "md": { "$type": "shadow", "$value": { "offsetX": "0", "offsetY": "4px", "blur": "12px", "spread": "0", "color": "rgba(0, 0, 0, 0.3)" } },
-      "lg": { "$type": "shadow", "$value": { "offsetX": "0", "offsetY": "12px", "blur": "40px", "spread": "0", "color": "rgba(0, 0, 0, 0.35)" } },
-      "xl": { "$type": "shadow", "$value": { "offsetX": "0", "offsetY": "24px", "blur": "80px", "spread": "0", "color": "rgba(0, 0, 0, 0.45)" } }
+      "xs":  { "$type": "shadow", "$value": { "offsetX": "0", "offsetY": "1px", "blur": "2px", "spread": "0", "color": "rgba(0, 0, 0, 0.15)" } },
+      "sm":  { "$type": "shadow", "$value": { "offsetX": "0", "offsetY": "1px", "blur": "3px", "spread": "0", "color": "rgba(0, 0, 0, 0.2)" } },
+      "md":  { "$type": "shadow", "$value": { "offsetX": "0", "offsetY": "4px", "blur": "12px", "spread": "0", "color": "rgba(0, 0, 0, 0.3)" } },
+      "lg":  { "$type": "shadow", "$value": { "offsetX": "0", "offsetY": "12px", "blur": "40px", "spread": "0", "color": "rgba(0, 0, 0, 0.35)" } },
+      "xl":  { "$type": "shadow", "$value": [
+        { "offsetX": "0", "offsetY": "20px", "blur": "25px", "spread": "-5px", "color": "rgba(0, 0, 0, 0.4)" },
+        { "offsetX": "0", "offsetY": "8px", "blur": "10px", "spread": "-6px", "color": "rgba(0, 0, 0, 0.2)" }
+      ]},
+      "2xl": { "$type": "shadow", "$value": { "offsetX": "0", "offsetY": "25px", "blur": "50px", "spread": "-12px", "color": "rgba(0, 0, 0, 0.5)" } }
     }
   }
 }

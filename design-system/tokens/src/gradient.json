@@ -1,0 +1,19 @@
+{
+  "gradient": {
+    "hero-green-olive": {
+      "$type": "gradient",
+      "$value": "linear-gradient(135deg, #6B8A1A 0%, #1C1D1A 100%)",
+      "$description": "Landing hero: green-to-olive. ONLY for marketing surfaces."
+    },
+    "hero-green-black": {
+      "$type": "gradient",
+      "$value": "linear-gradient(135deg, #527A10 0%, #101110 100%)",
+      "$description": "Landing hero variant: green-to-black. ONLY for marketing surfaces."
+    },
+    "hero-subtle": {
+      "$type": "gradient",
+      "$value": "linear-gradient(180deg, rgba(107, 138, 26, 0.08) 0%, rgba(28, 29, 26, 0) 100%)",
+      "$description": "Subtle green wash for section backgrounds on light theme."
+    }
+  }
+}

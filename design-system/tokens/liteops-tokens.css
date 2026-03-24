@@ -78,6 +78,24 @@
   --liteops-radius-md: 10px;
   --liteops-radius-lg: 20px;
   --liteops-radius-pill: 9999px;
+  --liteops-gradient-hero-green-olive: linear-gradient(135deg, #6B8A1A 0%, #1C1D1A 100%);
+  --liteops-gradient-hero-green-black: linear-gradient(135deg, #527A10 0%, #101110 100%);
+  --liteops-gradient-hero-subtle: linear-gradient(180deg, rgba(107, 138, 26, 0.08) 0%, rgba(28, 29, 26, 0) 100%);
+  --liteops-duration-instant: 0ms;
+  --liteops-duration-fast: 120ms;
+  --liteops-duration-normal: 200ms;
+  --liteops-duration-slow: 350ms;
+  --liteops-duration-slower: 500ms;
+  --liteops-duration-slowest: 800ms;
+  --liteops-easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --liteops-easing-in: cubic-bezier(0.4, 0, 1, 1);
+  --liteops-easing-out: cubic-bezier(0, 0, 0.2, 1);
+  --liteops-easing-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --liteops-easing-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --liteops-stagger-item: 100ms;
+  --liteops-stagger-section: 150ms;
+  --liteops-loop-pulse-glow: 4s;
+  --liteops-loop-blob-drift: 10s;
 
   /* ── Semantic Tokens (Light) ── */
   --liteops-surface-primary: var(--liteops-paper-100);
@@ -124,10 +142,12 @@
   --liteops-chart-axis: var(--liteops-paper-600);
 
   /* ── Shadows (Light) ── */
-  --liteops-shadow-sm: 0 1px 2px 0 rgba(28, 29, 26, 0.05);
+  --liteops-shadow-xs: 0 1px 2px 0 rgba(28, 29, 26, 0.03);
+  --liteops-shadow-sm: 0 1px 3px 0 rgba(28, 29, 26, 0.05);
   --liteops-shadow-md: 0 4px 12px 0 rgba(28, 29, 26, 0.08);
   --liteops-shadow-lg: 0 12px 40px 0 rgba(28, 29, 26, 0.1);
-  --liteops-shadow-xl: 0 24px 80px 0 rgba(28, 29, 26, 0.14);
+  --liteops-shadow-xl: 0 20px 25px -5px rgba(28, 29, 26, 0.12), 0 8px 10px -6px rgba(28, 29, 26, 0.06);
+  --liteops-shadow-2xl: 0 25px 50px -12px rgba(28, 29, 26, 0.18);
 }
 
 [data-theme="dark"] {
@@ -176,8 +196,10 @@
   --liteops-chart-axis: var(--liteops-olive-500);
 
   /* ── Shadows (Dark) ── */
-  --liteops-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --liteops-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+  --liteops-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
   --liteops-shadow-md: 0 4px 12px 0 rgba(0, 0, 0, 0.3);
   --liteops-shadow-lg: 0 12px 40px 0 rgba(0, 0, 0, 0.35);
-  --liteops-shadow-xl: 0 24px 80px 0 rgba(0, 0, 0, 0.45);
+  --liteops-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+  --liteops-shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }

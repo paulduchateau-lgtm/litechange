@@ -79,11 +79,22 @@ function resolveRef(value, rawLookup) {
 }
 
 /**
- * Format a shadow $value object to CSS string.
+ * Format a shadow $value object (or array of shadow objects) to CSS string.
  */
 function shadowToCSS(val) {
   if (typeof val === 'string') return val;
+  if (Array.isArray(val)) {
+    return val.map(v => shadowToCSS(v)).join(', ');
+  }
   return `${val.offsetX} ${val.offsetY} ${val.blur} ${val.spread} ${val.color}`;
+}
+
+/**
+ * Format a cubicBezier $value array to CSS string.
+ */
+function cubicBezierToCSS(val) {
+  if (Array.isArray(val)) return `cubic-bezier(${val.join(', ')})`;
+  return val;
 }
 
 // ─── Read all source files ─────────────────────────────────────────────
@@ -93,6 +104,8 @@ const typographyData = readJson('typography.json');
 const spacingData = readJson('spacing.json');
 const radiusData = readJson('radius.json');
 const elevationData = readJson('elevation.json');
+const gradientData = readJson('gradient.json');
+const motionData = readJson('motion.json');
 
 const surfaceData = readJson('surface.json');
 const textData = readJson('text.json');
@@ -109,6 +122,8 @@ const rawTokens = [
   ...flattenTokens(typographyData),
   ...flattenTokens(spacingData),
   ...flattenTokens(radiusData),
+  ...flattenTokens(gradientData),
+  ...flattenTokens(motionData),
 ];
 
 // Build a lookup map for reference resolution
@@ -148,6 +163,7 @@ function cssVarName(tokenPath) {
 
 function formatValue(token) {
   if (token.type === 'shadow') return shadowToCSS(token.value);
+  if (token.type === 'cubicBezier') return cubicBezierToCSS(token.value);
   return token.value;
 }
 

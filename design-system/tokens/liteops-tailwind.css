@@ -72,4 +72,22 @@
   --radius-md: 10px;
   --radius-lg: 20px;
   --radius-pill: 9999px;
+  --gradient-hero-green-olive: linear-gradient(135deg, #6B8A1A 0%, #1C1D1A 100%);
+  --gradient-hero-green-black: linear-gradient(135deg, #527A10 0%, #101110 100%);
+  --gradient-hero-subtle: linear-gradient(180deg, rgba(107, 138, 26, 0.08) 0%, rgba(28, 29, 26, 0) 100%);
+  --duration-instant: 0ms;
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+  --duration-slow: 350ms;
+  --duration-slower: 500ms;
+  --duration-slowest: 800ms;
+  --easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-in: cubic-bezier(0.4, 0, 1, 1);
+  --easing-out: cubic-bezier(0, 0, 0.2, 1);
+  --easing-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --stagger-item: 100ms;
+  --stagger-section: 150ms;
+  --loop-pulse-glow: 4s;
+  --loop-blob-drift: 10s;
 }

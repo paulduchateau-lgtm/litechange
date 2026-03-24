@@ -1,0 +1,25 @@
+{
+  "duration": {
+    "instant": { "$type": "duration", "$value": "0ms" },
+    "fast": { "$type": "duration", "$value": "120ms" },
+    "normal": { "$type": "duration", "$value": "200ms" },
+    "slow": { "$type": "duration", "$value": "350ms" },
+    "slower": { "$type": "duration", "$value": "500ms" },
+    "slowest": { "$type": "duration", "$value": "800ms" }
+  },
+  "easing": {
+    "default": { "$type": "cubicBezier", "$value": [0.4, 0, 0.2, 1] },
+    "in": { "$type": "cubicBezier", "$value": [0.4, 0, 1, 1] },
+    "out": { "$type": "cubicBezier", "$value": [0, 0, 0.2, 1] },
+    "in-out": { "$type": "cubicBezier", "$value": [0.4, 0, 0.2, 1] },
+    "spring": { "$type": "cubicBezier", "$value": [0.175, 0.885, 0.32, 1.275] }
+  },
+  "stagger": {
+    "item": { "$type": "duration", "$value": "100ms", "$description": "Delay between staggered items. Cap total sequence at 800ms max." },
+    "section": { "$type": "duration", "$value": "150ms", "$description": "Delay between staggered page sections." }
+  },
+  "loop": {
+    "pulse-glow": { "$type": "duration", "$value": "4s", "$description": "Observability dot pulse cycle." },
+    "blob-drift": { "$type": "duration", "$value": "10s", "$description": "Landing page blob drift cycle. Paused under prefers-reduced-motion." }
+  }
+}
