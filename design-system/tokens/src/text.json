@@ -1,0 +1,34 @@
+{
+  "text": {
+    "primary": {
+      "$type": "color",
+      "light": { "$value": "{olive.900}" },
+      "dark":  { "$value": "#E8E6E1" }
+    },
+    "secondary": {
+      "$type": "color",
+      "light": { "$value": "{olive.600}" },
+      "dark":  { "$value": "#C0BEB8" }
+    },
+    "tertiary": {
+      "$type": "color",
+      "light": { "$value": "{paper.700}" },
+      "dark":  { "$value": "#8A8880" }
+    },
+    "disabled": {
+      "$type": "color",
+      "light": { "$value": "{paper.500}" },
+      "dark":  { "$value": "{olive.600}" }
+    },
+    "inverse": {
+      "$type": "color",
+      "light": { "$value": "{paper.100}" },
+      "dark":  { "$value": "{olive.900}" }
+    },
+    "on-accent": {
+      "$type": "color",
+      "light": { "$value": "{olive.900}" },
+      "dark":  { "$value": "{olive.900}" }
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "status": {
+    "success": {
+      "$type": "color",
+      "light": { "$value": "{success.500}" },
+      "dark":  { "$value": "{success.300}" }
+    },
+    "success-bg": {
+      "$type": "color",
+      "light": { "$value": "{success.100}" },
+      "dark":  { "$value": "rgba(58, 138, 74, 0.12)" }
+    },
+    "warning": {
+      "$type": "color",
+      "light": { "$value": "{warning.500}" },
+      "dark":  { "$value": "{warning.300}" }
+    },
+    "warning-bg": {
+      "$type": "color",
+      "light": { "$value": "{warning.100}" },
+      "dark":  { "$value": "rgba(212, 160, 58, 0.12)" }
+    },
+    "error": {
+      "$type": "color",
+      "light": { "$value": "{warm.500}" },
+      "dark":  { "$value": "{warm.300}" }
+    },
+    "error-bg": {
+      "$type": "color",
+      "light": { "$value": "{warm.100}" },
+      "dark":  { "$value": "rgba(196, 90, 50, 0.12)" }
+    },
+    "info": {
+      "$type": "color",
+      "light": { "$value": "{signal.500}" },
+      "dark":  { "$value": "{signal.300}" }
+    },
+    "info-bg": {
+      "$type": "color",
+      "light": { "$value": "{signal.100}" },
+      "dark":  { "$value": "rgba(74, 144, 184, 0.12)" }
+    }
+  }
+}

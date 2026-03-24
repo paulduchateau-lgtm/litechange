@@ -1,0 +1,34 @@
+{
+  "surface": {
+    "primary": {
+      "$type": "color",
+      "light": { "$value": "{paper.100}" },
+      "dark":  { "$value": "{olive.900}" }
+    },
+    "secondary": {
+      "$type": "color",
+      "light": { "$value": "{white}" },
+      "dark":  { "$value": "{olive.800}" }
+    },
+    "tertiary": {
+      "$type": "color",
+      "light": { "$value": "{paper.200}" },
+      "dark":  { "$value": "{olive.950}" }
+    },
+    "elevated": {
+      "$type": "color",
+      "light": { "$value": "{white}" },
+      "dark":  { "$value": "{olive.800}" }
+    },
+    "sunken": {
+      "$type": "color",
+      "light": { "$value": "{paper.300}" },
+      "dark":  { "$value": "{olive.950}" }
+    },
+    "overlay": {
+      "$type": "color",
+      "light": { "$value": "rgba(28, 29, 26, 0.5)" },
+      "dark":  { "$value": "rgba(16, 17, 16, 0.7)" }
+    }
+  }
+}

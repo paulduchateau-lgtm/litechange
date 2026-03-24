@@ -1,0 +1,24 @@
+{
+  "border": {
+    "primary": {
+      "$type": "color",
+      "light": { "$value": "{paper.300}" },
+      "dark":  { "$value": "rgba(232, 230, 225, 0.12)" }
+    },
+    "secondary": {
+      "$type": "color",
+      "light": { "$value": "{paper.200}" },
+      "dark":  { "$value": "rgba(232, 230, 225, 0.07)" }
+    },
+    "focus": {
+      "$type": "color",
+      "light": { "$value": "{lite.700}" },
+      "dark":  { "$value": "{lite.400}" }
+    },
+    "error": {
+      "$type": "color",
+      "light": { "$value": "{warm.500}" },
+      "dark":  { "$value": "{warm.300}" }
+    }
+  }
+}

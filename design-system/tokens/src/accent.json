@@ -1,0 +1,29 @@
+{
+  "accent": {
+    "primary": {
+      "$type": "color",
+      "light": { "$value": "{lite.700}" },
+      "dark":  { "$value": "{lite.400}" }
+    },
+    "primary-hover": {
+      "$type": "color",
+      "light": { "$value": "{lite.800}" },
+      "dark":  { "$value": "{lite.300}" }
+    },
+    "secondary": {
+      "$type": "color",
+      "light": { "$value": "{lite.300}" },
+      "dark":  { "$value": "{lite.700}" }
+    },
+    "subtle": {
+      "$type": "color",
+      "light": { "$value": "rgba(107, 138, 26, 0.08)" },
+      "dark":  { "$value": "rgba(176, 216, 56, 0.05)" }
+    },
+    "text": {
+      "$type": "color",
+      "light": { "$value": "{lite.700}" },
+      "dark":  { "$value": "{lite.400}" }
+    }
+  }
+}

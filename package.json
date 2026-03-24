@@ -1,0 +1,28 @@
+{
+  "name": "litechange",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:tokens": "node design-system/tokens/build.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paulduchateau-lgtm/litechange.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/paulduchateau-lgtm/litechange/issues"
+  },
+  "homepage": "https://github.com/paulduchateau-lgtm/litechange#readme",
+  "devDependencies": {
+    "style-dictionary": "^5.4.0"
+  }
+}

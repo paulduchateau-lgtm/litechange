@@ -1,0 +1,39 @@
+{
+  "interactive": {
+    "primary": {
+      "$type": "color",
+      "light": { "$value": "{lite.700}" },
+      "dark":  { "$value": "{lite.400}" }
+    },
+    "primary-hover": {
+      "$type": "color",
+      "light": { "$value": "{lite.800}" },
+      "dark":  { "$value": "{lite.300}" }
+    },
+    "primary-text": {
+      "$type": "color",
+      "light": { "$value": "{white}" },
+      "dark":  { "$value": "{olive.900}" }
+    },
+    "secondary": {
+      "$type": "color",
+      "light": { "$value": "transparent" },
+      "dark":  { "$value": "transparent" }
+    },
+    "secondary-hover": {
+      "$type": "color",
+      "light": { "$value": "{paper.200}" },
+      "dark":  { "$value": "rgba(232, 230, 225, 0.06)" }
+    },
+    "secondary-text": {
+      "$type": "color",
+      "light": { "$value": "{olive.900}" },
+      "dark":  { "$value": "#E8E6E1" }
+    },
+    "ghost-hover": {
+      "$type": "color",
+      "light": { "$value": "{paper.200}" },
+      "dark":  { "$value": "rgba(232, 230, 225, 0.04)" }
+    }
+  }
+}

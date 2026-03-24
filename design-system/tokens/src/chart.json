@@ -1,0 +1,34 @@
+{
+  "chart": {
+    "primary": {
+      "$type": "color",
+      "light": { "$value": "{lite.700}" },
+      "dark":  { "$value": "{lite.400}" }
+    },
+    "secondary": {
+      "$type": "color",
+      "light": { "$value": "{signal.500}" },
+      "dark":  { "$value": "{signal.300}" }
+    },
+    "tertiary": {
+      "$type": "color",
+      "light": { "$value": "{warm.500}" },
+      "dark":  { "$value": "{warm.300}" }
+    },
+    "quaternary": {
+      "$type": "color",
+      "light": { "$value": "{lite.300}" },
+      "dark":  { "$value": "{lite.600}" }
+    },
+    "grid": {
+      "$type": "color",
+      "light": { "$value": "{paper.300}" },
+      "dark":  { "$value": "rgba(232, 230, 225, 0.05)" }
+    },
+    "axis": {
+      "$type": "color",
+      "light": { "$value": "{paper.600}" },
+      "dark":  { "$value": "{olive.500}" }
+    }
+  }
+}

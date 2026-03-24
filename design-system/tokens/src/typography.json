@@ -1,0 +1,7 @@
+{
+  "font": {
+    "display": { "$type": "fontFamily", "$value": "'Source Serif 4', 'Georgia', serif" },
+    "body":    { "$type": "fontFamily", "$value": "'DM Sans', 'Helvetica Neue', sans-serif" },
+    "mono":    { "$type": "fontFamily", "$value": "'IBM Plex Mono', 'Menlo', monospace" }
+  }
+}
