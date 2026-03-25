@@ -375,6 +375,43 @@ async function aiChat(systemPrompt, chatMessages, { maxTokens = 4096 } = {}) {
   return ollamaChat(ollamaMsgs, { maxTokens });
 }
 
+/**
+ * AI Vision — analyse images via Claude Vision API (premium only, text fallback otherwise)
+ */
+async function aiVision(systemPrompt, textPrompt, images, { maxTokens = 4096 } = {}) {
+  // Build content blocks: images first, then text
+  const content = [];
+  for (const img of images) {
+    content.push({
+      type: "image",
+      source: {
+        type: "base64",
+        media_type: img.mediaType,
+        data: img.base64,
+      },
+    });
+  }
+  content.push({ type: "text", text: textPrompt });
+
+  if (anthropic) {
+    try {
+      const message = await anthropic.messages.create({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: maxTokens,
+        system: systemPrompt || undefined,
+        messages: [{ role: "user", content }],
+      });
+      return { text: message.content[0].text, provider: "anthropic", model: "claude-sonnet-4" };
+    } catch (err) {
+      console.warn("[aiVision] Anthropic failed:", err.message);
+    }
+  }
+
+  // Fallback: text-only (no vision support in Mistral/Ollama)
+  console.warn("[aiVision] No vision-capable model available, falling back to text-only");
+  return aiComplete(systemPrompt, textPrompt + "\n\n[Note: les images n'ont pas pu être analysées — modèle vision indisponible]", { maxTokens });
+}
+
 // ─── Express app ─────────────────────────────────────────────────────────────
 
 const app = express();
@@ -424,11 +461,15 @@ const uploadTemplate = multer({
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       "application/msword",
       "application/vnd.ms-excel",
+      "image/png",
+      "image/jpeg",
+      "image/webp",
     ];
-    if (allowedMimes.includes(file.mimetype) || [".xlsx", ".xls", ".docx", ".doc"].includes(ext)) {
+    const allowedExts = [".xlsx", ".xls", ".docx", ".doc", ".png", ".jpg", ".jpeg", ".webp"];
+    if (allowedMimes.includes(file.mimetype) || allowedExts.includes(ext)) {
       cb(null, true);
     } else {
-      cb(new Error("Seuls les fichiers .xlsx et .docx sont acceptés comme modèles."));
+      cb(new Error("Format non supporté. Utilisez .xlsx, .docx, .png ou .jpg."));
     }
   },
 });
@@ -2666,27 +2707,109 @@ Réponds UNIQUEMENT avec un JSON valide, sans markdown :
 
 // ── TEMPLATE IMPORT ──────────────────────────────────────────────────────────
 
-app.post("/api/w/:slug/reports/import-template", uploadTemplate.single("file"), async (req, res) => {
+app.post("/api/w/:slug/reports/import-template", uploadTemplate.array("files", 10), async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ error: "Aucun fichier reçu." });
+    // Support both single "file" field (legacy) and multi "files" field
+    const uploadedFiles = req.files || (req.file ? [req.file] : []);
+    if (uploadedFiles.length === 0) return res.status(400).json({ error: "Aucun fichier reçu." });
 
-    const ext = path.extname(req.file.originalname).toLowerCase();
-    let templateContent;
+    const imageExts = [".png", ".jpg", ".jpeg", ".webp"];
+    const docExts = [".xlsx", ".xls", ".docx", ".doc"];
 
-    if (ext === ".docx" || ext === ".doc") {
-      templateContent = await parseDocxTemplate(req.file.path);
-    } else if (ext === ".xlsx" || ext === ".xls") {
-      const sheets = parseXlsxTemplate(req.file.path);
-      templateContent = JSON.stringify(sheets, null, 2);
-    } else {
-      return res.status(400).json({ error: "Format non supporté. Utilisez .xlsx ou .docx." });
+    // Separate images from documents
+    const images = uploadedFiles.filter(f => imageExts.includes(path.extname(f.originalname).toLowerCase()));
+    const docs = uploadedFiles.filter(f => docExts.includes(path.extname(f.originalname).toLowerCase()));
+
+    let fingerprint;
+
+    if (images.length > 0) {
+      // ── IMAGE MODE: Vision AI analysis ──
+      const imagePayloads = images.map(img => {
+        const buffer = fs.readFileSync(img.path);
+        const base64 = buffer.toString("base64");
+        const ext = path.extname(img.originalname).toLowerCase();
+        const mediaType = ext === ".png" ? "image/png" : ext === ".webp" ? "image/webp" : "image/jpeg";
+        return { base64, mediaType };
+      });
+
+      // Get workspace data context for better analysis
+      const workspaceId = req.workspace.id;
+      const colStats = buildColumnStats(workspaceId);
+      let dataContext = "";
+      if (Object.keys(colStats).length > 0) {
+        const cols = [];
+        for (const [table, tableStats] of Object.entries(colStats)) {
+          for (const [col, stats] of Object.entries(tableStats)) {
+            if (stats.type === "number") {
+              cols.push(`${table}.${col} (nombre, min=${stats.min}, max=${stats.max})`);
+            } else {
+              const samples = stats.sampleValues?.slice(0, 3).join(", ") || "";
+              cols.push(`${table}.${col} (texte, ex: ${samples})`);
+            }
+          }
+        }
+        dataContext = `\n\nDONNÉES DISPONIBLES DANS LE WORKSPACE :\n${cols.join("\n")}`;
+      }
+
+      const visionPrompt = `Tu analyses ${images.length > 1 ? "ces captures d'écran" : "cette capture d'écran"} d'un rapport existant (Excel, PowerBI, ou autre outil).
+Ton objectif : identifier précisément la structure pour la recréer dans Pilot.
+
+Pour chaque tableau visible :
+- Extrais les en-têtes de colonnes et les noms de lignes
+- Note si les valeurs sont en pourcentage, en nombre, en euros, etc.
+- Identifie les totaux et sous-totaux
+
+Pour chaque graphique visible :
+- Identifie le type (barres, camembert, courbe, waterfall, etc.)
+- Note les axes, légendes et séries de données
+
+Réponds UNIQUEMENT en JSON valide sans markdown :
+{
+  "title": "Titre probable du rapport",
+  "objective": "Objectif ou description du rapport",
+  "kpis": [{ "label": "Nom du KPI", "unit": "% ou nombre ou €..." }],
+  "sections": [
+    {
+      "title": "Titre de la section/tableau/graphique",
+      "type": "bar|line|pie|table|area_multi|text|waterfall",
+      "description": "Description détaillée de ce que montre cette section",
+      "fields": ["colonne1", "colonne2"],
+      "dataStructure": "Description de la structure des données (lignes x colonnes, séries, etc.)"
     }
+  ],
+  "detectedFields": ["liste de toutes les variables/colonnes/métriques détectées dans les images"]
+}${dataContext}`;
 
-    // AI fingerprint extraction
-    const aiResult = await aiComplete("", buildFingerprintPrompt(templateContent), { maxTokens: 2000 });
-    const rawText = aiResult.text.trim();
-    const jsonText = rawText.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
-    const fingerprint = JSON.parse(jsonText);
+      const aiResult = await aiVision(
+        "Tu es un expert en analyse de rapports RH, financiers et opérationnels. Tu extrais la structure de rapports à partir de captures d'écran.",
+        visionPrompt,
+        imagePayloads,
+        { maxTokens: 4000 }
+      );
+
+      const rawText = aiResult.text.trim();
+      const jsonText = rawText.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
+      fingerprint = JSON.parse(jsonText);
+    } else if (docs.length > 0) {
+      // ── DOCUMENT MODE: existing flow ──
+      const file = docs[0];
+      const ext = path.extname(file.originalname).toLowerCase();
+      let templateContent;
+
+      if (ext === ".docx" || ext === ".doc") {
+        templateContent = await parseDocxTemplate(file.path);
+      } else if (ext === ".xlsx" || ext === ".xls") {
+        const sheets = parseXlsxTemplate(file.path);
+        templateContent = JSON.stringify(sheets, null, 2);
+      }
+
+      const aiResult = await aiComplete("", buildFingerprintPrompt(templateContent), { maxTokens: 2000 });
+      const rawText = aiResult.text.trim();
+      const jsonText = rawText.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
+      fingerprint = JSON.parse(jsonText);
+    } else {
+      return res.status(400).json({ error: "Format non supporté. Utilisez .xlsx, .docx, .png ou .jpg." });
+    }
 
     // Get workspace available columns for the field mapping step
     const workspaceId = req.workspace.id;
