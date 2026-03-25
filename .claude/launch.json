@@ -35,6 +35,26 @@
       "cwd": "roadmap/app"
     },
     {
+      "name": "sailor-server",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "--watch",
+        "index.js"
+      ],
+      "port": 3003,
+      "cwd": "sailor/server"
+    },
+    {
+      "name": "sailor",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
+      "port": 5185,
+      "cwd": "sailor/app"
+    },
+    {
       "name": "design-system",
       "runtimeExecutable": "npx",
       "runtimeArgs": [
