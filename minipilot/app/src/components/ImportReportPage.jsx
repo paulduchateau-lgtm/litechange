@@ -1,7 +1,20 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Upload, Loader2, ChevronLeft } from "lucide-react";
+import { Upload, Loader2, ChevronLeft, Image, X } from "lucide-react";
 import TemplateFieldMapper from "./TemplateFieldMapper";
+
+const IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg", ".webp"];
+const DOC_EXTENSIONS = [".xlsx", ".xls", ".docx", ".doc"];
+const ALL_EXTENSIONS = [...DOC_EXTENSIONS, ...IMAGE_EXTENSIONS];
+
+function getExtension(filename) {
+  const idx = filename.lastIndexOf(".");
+  return idx >= 0 ? filename.slice(idx).toLowerCase() : "";
+}
+
+function isImage(filename) {
+  return IMAGE_EXTENSIONS.includes(getExtension(filename));
+}
 
 export default function ImportReportPage({ api, slug }) {
   const navigate = useNavigate();
@@ -12,30 +25,56 @@ export default function ImportReportPage({ api, slug }) {
   const [availableColumns, setAvailableColumns] = useState([]);
   const [error, setError] = useState(null);
   const [generating, setGenerating] = useState(false);
+  const [pendingImages, setPendingImages] = useState([]); // for multi-image preview
 
-  const VALID_EXTENSIONS = [".xlsx", ".xls", ".docx", ".doc"];
+  const handleFileSelected = (fileOrFiles) => {
+    const files = Array.isArray(fileOrFiles) ? fileOrFiles : [fileOrFiles];
+    if (files.length === 0) return;
 
-  const getExtension = (filename) => {
-    const idx = filename.lastIndexOf(".");
-    return idx >= 0 ? filename.slice(idx).toLowerCase() : "";
-  };
+    // Validate all files
+    for (const f of files) {
+      if (!ALL_EXTENSIONS.includes(getExtension(f.name))) {
+        setError(`Format non supporté : ${f.name}. Utilisez .xlsx, .docx, .png ou .jpg.`);
+        return;
+      }
+    }
 
-  const handleFileSelected = (file) => {
-    if (!file) return;
-    const ext = getExtension(file.name);
-    if (!VALID_EXTENSIONS.includes(ext)) {
-      setError("Format non supporté. Veuillez déposer un fichier .xlsx ou .docx.");
+    // If images, allow accumulating multiple before sending
+    const hasImages = files.some(f => isImage(f.name));
+    const hasDocs = files.some(f => !isImage(f.name));
+
+    if (hasImages && hasDocs) {
+      setError("Veuillez envoyer soit des images, soit un document — pas les deux en meme temps.");
       return;
     }
+
+    if (hasDocs) {
+      // Document: send immediately (single file)
+      setError(null);
+      setStep(2);
+      handleUpload(files);
+      return;
+    }
+
+    // Images: add to pending list for preview
     setError(null);
-    setStep(2);
-    handleUpload(file);
+    setPendingImages(prev => [...prev, ...files]);
   };
 
-  const handleUpload = async (file) => {
+  const removeImage = (idx) => {
+    setPendingImages(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const submitImages = () => {
+    if (pendingImages.length === 0) return;
+    setStep(2);
+    handleUpload(pendingImages);
+  };
+
+  const handleUpload = async (files) => {
     try {
       setError(null);
-      const result = await api.importTemplate(file);
+      const result = await api.importTemplate(files);
       setFingerprint(result.fingerprint);
       setAvailableColumns(result.availableColumns);
       setStep(3);
@@ -71,13 +110,16 @@ export default function ImportReportPage({ api, slug }) {
 
   const handleDrop = (e) => {
     e.preventDefault();
-    const file = e.dataTransfer.files?.[0];
-    if (file) handleFileSelected(file);
+    const files = [...(e.dataTransfer.files || [])];
+    if (files.length === 1) handleFileSelected(files[0]);
+    else if (files.length > 1) handleFileSelected(files);
   };
 
   const handleInputChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) handleFileSelected(file);
+    const files = [...(e.target.files || [])];
+    if (files.length === 1) handleFileSelected(files[0]);
+    else if (files.length > 1) handleFileSelected(files);
+    e.target.value = ""; // reset for re-selection
   };
 
   const goBack = () => navigate(`/${slug}/reports`);
@@ -122,7 +164,8 @@ export default function ImportReportPage({ api, slug }) {
             color: "var(--mp-text-muted)",
             marginBottom: 32,
           }}>
-            Deposez un fichier Excel (.xlsx) ou Word (.docx) pour recreer un rapport equivalent.
+            Deposez un fichier Excel, Word, ou des captures d'ecran de rapports existants.
+            L'IA analysera la structure pour recreer un rapport equivalent.
           </p>
 
           {error && (
@@ -162,19 +205,111 @@ export default function ImportReportPage({ api, slug }) {
           >
             <Upload size={32} color="var(--mp-text-muted)" style={{ marginBottom: 16 }} />
             <p style={{ fontSize: 15, fontWeight: 500, marginBottom: 6, color: "var(--mp-text)" }}>
-              Deposer un fichier ici
+              Deposer des fichiers ici
             </p>
             <p style={{ fontSize: 13, color: "var(--mp-text-muted)" }}>
-              ou cliquer pour parcourir — .xlsx, .xls, .docx, .doc
+              .xlsx, .docx — ou captures d'ecran .png, .jpg
             </p>
             <input
               ref={fileInputRef}
               type="file"
-              accept=".xlsx,.xls,.docx,.doc"
+              accept=".xlsx,.xls,.docx,.doc,.png,.jpg,.jpeg,.webp"
+              multiple
               onChange={handleInputChange}
               style={{ display: "none" }}
             />
           </div>
+
+          {/* Image preview thumbnails */}
+          {pendingImages.length > 0 && (
+            <div style={{ marginTop: 24 }}>
+              <p style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 10,
+                fontWeight: 600,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "var(--mp-text-muted)",
+                marginBottom: 12,
+              }}>
+                <Image size={12} style={{ verticalAlign: "middle", marginRight: 6 }} />
+                {pendingImages.length} capture{pendingImages.length > 1 ? "s" : ""} selectionnee{pendingImages.length > 1 ? "s" : ""}
+              </p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 16 }}>
+                {pendingImages.map((img, i) => (
+                  <div key={i} style={{
+                    position: "relative",
+                    width: 120,
+                    height: 80,
+                    borderRadius: "var(--radius-sm)",
+                    overflow: "hidden",
+                    border: "1px solid var(--mp-border)",
+                  }}>
+                    <img
+                      src={URL.createObjectURL(img)}
+                      alt={img.name}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                    <button
+                      onClick={(e) => { e.stopPropagation(); removeImage(i); }}
+                      style={{
+                        position: "absolute", top: 4, right: 4,
+                        width: 20, height: 20, borderRadius: "50%",
+                        background: "rgba(0,0,0,0.6)", border: "none",
+                        color: "#fff", cursor: "pointer",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        padding: 0,
+                      }}
+                    >
+                      <X size={12} />
+                    </button>
+                    <div style={{
+                      position: "absolute", bottom: 0, left: 0, right: 0,
+                      background: "rgba(0,0,0,0.5)", color: "#fff",
+                      fontSize: 9, padding: "2px 6px",
+                      fontFamily: "var(--font-mono)",
+                      whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                    }}>
+                      {img.name}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ display: "flex", gap: 10 }}>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  style={{
+                    background: "transparent",
+                    border: "1px solid var(--mp-border)",
+                    borderRadius: "var(--radius-sm)",
+                    padding: "8px 16px",
+                    fontSize: 13,
+                    color: "var(--mp-text-muted)",
+                    cursor: "pointer",
+                    fontFamily: "var(--font-body)",
+                  }}
+                >
+                  + Ajouter des captures
+                </button>
+                <button
+                  onClick={submitImages}
+                  style={{
+                    background: "var(--mp-accent)",
+                    border: "none",
+                    borderRadius: "var(--radius-sm)",
+                    padding: "8px 20px",
+                    fontSize: 13,
+                    fontWeight: 500,
+                    color: "var(--mp-bg, #1C1D1A)",
+                    cursor: "pointer",
+                    fontFamily: "var(--font-body)",
+                  }}
+                >
+                  Analyser {pendingImages.length} capture{pendingImages.length > 1 ? "s" : ""}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -190,7 +325,7 @@ export default function ImportReportPage({ api, slug }) {
             Analyse du modele en cours...
           </p>
           <p style={{ fontSize: 13, color: "var(--mp-text-tertiary, var(--mp-text-muted))" }}>
-            L'IA identifie la structure, les KPIs et les champs de donnees.
+            L'IA identifie la structure, les tableaux, graphiques et KPIs.
           </p>
         </div>
       )}
